@@ -527,6 +527,28 @@ tr.vg-filters th{padding:5px 6px 9px; text-transform:none; letter-spacing:0; fon
 .fv .raya{ stroke-dasharray:60 50; stroke-width:7; animation:rayaF 3s linear infinite; }
 @keyframes rayaF{ to{ stroke-dashoffset:-110; } }
 .nm-grid.quieta .nm-card{ animation:none; }
+
+/* ============================================================
+   V8: consulta abierta (solo lectura)
+   ============================================================ */
+.consulta-wrap{ display:flex; justify-content:center; margin:20px auto 0; padding:0 4px; }
+.btn-consulta{ display:flex; align-items:center; gap:12px; width:100%; max-width:440px; text-align:left; padding:9px 18px 9px 10px; border-radius:999px; border:1px solid var(--line); background:var(--paper); background:color-mix(in srgb, var(--paper) 84%, transparent); color:var(--ink); box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.btn-consulta:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--blue); }
+.btn-consulta:focus-visible{ outline:2px solid var(--blue); outline-offset:3px; }
+.btn-consulta:disabled{ opacity:.7; cursor:default; }
+.btn-consulta .ojo{ width:40px; height:40px; flex:none; border-radius:50%; background:var(--blue-soft); display:grid; place-items:center; }
+.btn-consulta .tx{ min-width:0; }
+.btn-consulta b{ display:block; font-size:.86rem; color:var(--title); }
+.btn-consulta small{ display:block; font-size:.7rem; color:var(--ink-soft); line-height:1.35; margin-top:1px; }
+.btn-consulta .flecha{ margin-left:auto; color:var(--blue); font-weight:800; transition:transform .25s ease; }
+.btn-consulta:hover:not(:disabled) .flecha{ transform:translateX(4px); }
+.btn-consulta .parpado{ transform-box:fill-box; transform-origin:center; animation:parpadeo 6s infinite; }
+.btn-consulta .iris{ animation:mira 7s ease-in-out infinite; }
+@keyframes parpadeo{ 0%,93%,100%{ transform:scaleY(1); } 96%{ transform:scaleY(.12); } }
+@keyframes mira{ 0%,100%{ transform:translateX(0); } 30%{ transform:translateX(2.4px); } 65%{ transform:translateX(-2.4px); } }
+.vg-guest{ background:var(--blue-soft); color:var(--title); border-radius:10px; padding:9px 12px; margin:0 0 12px; font-size:.82rem; line-height:1.45; }
+.consulta-card .nm-badge{ font-size:.72rem; }
+.fun-hint{ background:var(--cream); background:color-mix(in srgb, var(--cream) 80%, transparent); border-radius:10px; padding:6px 12px; }
 </style>
 </head>
 <body>
@@ -554,6 +576,7 @@ let HOLIDAY_SET = new Set();
 let TODAY = (function(){ const d=new Date(); d.setHours(0,0,0,0); return d; })();
 let TOKEN = null, ME = null, PROFILES = [], CASOS = [];
 let viewTab = "mine", controlSelected = null;
+let INVITADO = false, CONSULTA_ACTIVA = true;   // INVITADO: consulta abierta de solo lectura (sin usuario ni clave)
 let mailMsg = {t:"", ok:true}, pwMsg = {t:"", ok:true};
 const mem = {};
 function store(k, v){
@@ -565,7 +588,7 @@ function store(k, v){
 /* Dos formas de hablar con el servidor:
    - dentro de la página de Apps Script: google.script.run
    - en la página alojada fuera de Google (GitHub Pages, tu sitio): fetch, que no depende de las cuentas de Google del navegador.
-   (Las barras de la dirección van escapadas: Google recorta el código que contenga "//" dentro de un texto.) */
+   (Las barras de la dirección van escapadas: Google recorta el código que tenga dos barras seguidas dentro de un texto.) */
 const API_URL = "https:\/\/script.google.com\/macros\/s\/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg\/exec";
 function api(fn, ...args){
   return (window.google && google.script && google.script.run) ? apiGoogle(fn, args) : apiWeb(fn, args);
@@ -600,7 +623,7 @@ function el(html){ const t=document.createElement("template"); t.innerHTML=html.
 function fmt(dt){ if(!dt) return "—"; return String(dt.getDate()).padStart(2,"0")+"/"+String(dt.getMonth()+1).padStart(2,"0")+"/"+dt.getFullYear(); }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 function iso(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
-function rolTexto(u){ return u.coord ? "Directora Jurídica" : "Profesional jurídica"; }
+function rolTexto(u){ if(INVITADO) return "Consulta de solo lectura"; return u.coord ? "Directora Jurídica" : "Profesional jurídica"; }
 
 /* ===================== NEGOCIO: días hábiles colombianos ===================== */
 function isBusinessDay(dt){
@@ -635,14 +658,22 @@ function counters(list){ const c={vigente:0,proximo:0,vencido:0,respondido:0}; l
 function urgentListFor(pid, list){ return list.filter(x=>x.estado!=="respondido").sort((a,b)=>a.limite-b.limite); }
 
 /* ===================== CARGA DE DATOS ===================== */
-async function cargar(){
-  const r = await api("datos", TOKEN);
-  ME = r.yo;
+function aplicarDatos(r){
   PROFILES = r.usuarios.map(u=>Object.assign({}, u, {coord: u.rol==="coord"}));
   CASOS = r.casos;
   HOLIDAY_SET = new Set(r.festivos);
   TIPOS = r.tipos; DEPENDENCIAS = r.dependencias;
   const p = r.hoy.split("-"); TODAY = new Date(+p[0], +p[1]-1, +p[2]);
+}
+async function cargar(){
+  const r = await api("datos", TOKEN);
+  ME = r.yo; CONSULTA_ACTIVA = r.consultaPublica !== false;
+  aplicarDatos(r);
+}
+async function cargarPublico(){
+  const r = await api("datosPublicos");
+  ME = {id:"invitado", nombre:"Consulta abierta", rol:"invitado", correo:"", bloqueado:false};
+  aplicarDatos(r);
 }
 function miPerfil(){ return PROFILES.find(p=>p.id===ME.id) || {id:ME.id, nombre:ME.nombre, coord:ME.rol==="coord"}; }
 
@@ -668,19 +699,21 @@ function guardarYa(id){
 function guardarPendientes(){ return Promise.all([...dirty].map(id=>guardarYa(id))); }
 
 async function refrescar(){
-  if(!TOKEN) return;
+  if(!TOKEN && !INVITADO) return;
   await guardarPendientes();
   try{
     const antes = JSON.stringify(CASOS);
     const tabAntes = viewTab;
-    const r = await api("datos", TOKEN);
+    const r = INVITADO ? await api("datosPublicos") : await api("datos", TOKEN);
     if(viewTab==="mine" || tabAntes==="mine" || viewTab==="norma") return;      // no pisar la edición propia
     const a = document.activeElement;
     if(a && a.matches && a.matches("#vg-host input, #vg-host select")) return;   // está escribiendo un filtro: se actualiza en el próximo ciclo
     if(JSON.stringify(r.casos) !== antes){ CASOS = r.casos; PROFILES = r.usuarios.map(u=>Object.assign({}, u, {coord:u.rol==="coord"})); render(); }
-  }catch(e){ /* silencioso */ }
+  }catch(e){
+    if(INVITADO && /desactivada/.test(e.message)){ INVITADO = false; ME = null; renderLogin(e.message); }   // la Dirección apagó la consulta abierta
+  }
 }
-setInterval(()=>{ if(TOKEN && viewTab!=="mine" && viewTab!=="norma") refrescar(); }, 60000);
+setInterval(()=>{ if((TOKEN || INVITADO) && viewTab!=="mine" && viewTab!=="norma") refrescar(); }, 60000);
 
 /* ===================== LOGIN ===================== */
 function renderLogin(msg){
@@ -705,6 +738,13 @@ function renderLogin(msg){
       <div class="err" id="login-err">${esc(msg||"")}</div>
     </div>
     <div class="profiles-hint">6 perfiles disponibles.</div>
+    <div class="consulta-wrap">
+      <button type="button" class="btn-consulta" id="btn-consulta">
+        <span class="ojo"><svg viewBox="0 0 28 28" width="26" height="26" aria-hidden="true"><path class="parpado" d="M2 14c3.5-6 8-9 12-9s8.5 3 12 9c-3.5 6-8 9-12 9S5.5 20 2 14z" fill="none" stroke="var(--title)" stroke-width="1.8" stroke-linejoin="round"/><g class="iris"><circle cx="14" cy="14" r="4.8" fill="#D6488E"/><circle cx="14" cy="14" r="2.1" fill="#01274B"/><circle cx="15.5" cy="12.5" r=".95" fill="#fff"/></g></svg></span>
+        <span class="tx"><b>Entrar solo a consultar</b><small>Para otras dependencias y personas externas · sin usuario ni clave · solo lectura</small></span>
+        <span class="flecha" aria-hidden="true">→</span>
+      </button>
+    </div>
     <div class="fun-hint">Juega con el fondo: toca los buses, el semáforo y el mazo. La balanza se equilibra cuando completas tu usuario y tu clave.</div>
     <div class="footnote">Elemento visual interactivo</div>`;
   const userI=document.getElementById("in-user"), passI=document.getElementById("in-pass"),
@@ -734,6 +774,16 @@ function renderLogin(msg){
   btn.addEventListener("click", tryLogin);
   passI.addEventListener("keydown", e=>{ if(e.key==="Enter") tryLogin(); });
   userI.addEventListener("keydown", e=>{ if(e.key==="Enter") passI.focus(); });
+  const bc = document.getElementById("btn-consulta");
+  bc.addEventListener("click", async ()=>{
+    const t = bc.querySelector("b"), antes = t.textContent;
+    bc.disabled = true; t.textContent = "Abriendo la consulta…"; err.textContent = "";
+    try{
+      await cargarPublico();
+      INVITADO = true; TOKEN = null; store("tj_token", null); viewTab = "general";
+      render();
+    }catch(e){ err.textContent = e.message; t.textContent = antes; bc.disabled = false; }
+  });
   wireFondo(); wireTema();
 }
 
@@ -747,7 +797,7 @@ function topbar(profile){
       <div class="spacer"></div>
       <div class="who"><b>${esc(profile.nombre)}</b>SETP · Dependencia Jurídica</div>
       ${temaBtn()}
-      <button class="logout-btn" id="btn-logout">Cerrar sesión</button>
+      <button class="logout-btn" id="btn-logout">${INVITADO ? "Salir" : "Cerrar sesión"}</button>
     </div>`;
 }
 
@@ -1385,11 +1435,14 @@ function alertBanner(cnt){
 
 /* ===================== DASHBOARD ===================== */
 function render(){
-  if(!TOKEN || !ME){ renderLogin(); return; }
+  if(!INVITADO && (!TOKEN || !ME)){ renderLogin(); return; }
   const profile = miPerfil();
-  const tabs = profile.coord
+  const tabs = INVITADO
+    ? [["general","Vista general"],["norma","Normativa"]]
+    : profile.coord
     ? [["mine","Mis procesos"],["general","Vista general"],["control","Control operativo"],["norma","Normativa"]]
     : [["mine","Mis procesos"],["general","Vista general"],["norma","Normativa"]];
+  if(INVITADO && viewTab!=="norma") viewTab="general";
   if(viewTab==="control" && !profile.coord) viewTab="mine";
   const app = document.getElementById("app");
   app.innerHTML = `
@@ -1401,6 +1454,7 @@ function render(){
     <div class="footnote">Terminal Jurídica · SETP Ibagué</div>`;
   wireTema();
   document.getElementById("btn-logout").addEventListener("click", async ()=>{
+    if(INVITADO){ INVITADO = false; ME = null; renderLogin(); return; }
     await guardarPendientes();
     try{ await api("salir", TOKEN); }catch(e){}
     TOKEN=null; ME=null; store("tj_token", null); renderLogin();
@@ -1500,6 +1554,7 @@ const VG_COLS = [
   {k:"ubicacion", l:"Ubicación / enlace del expediente", t:"txt"}
 ];
 
+function vgCols(){ return INVITADO ? VG_COLS.filter(c=>c.k!=="ubicacion") : VG_COLS; }
 function vgNorm(s){ return String(s==null?"":s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
 function vgRows(){
   return PROFILES.flatMap(p => computeAll(p.id).map(x => Object.assign({}, x, {
@@ -1556,7 +1611,7 @@ function vgFila(r){
     <td class="mono">${fmt(r.limite)}</td>
     <td>${estadoPill(r.estado)}</td>
     <td class="mono" style="text-align:right">${r.diasV===null?"—":r.diasV}</td>
-    <td>${esc(r.ubicacion||"—")}</td>
+    ${INVITADO ? "" : `<td>${esc(r.ubicacion||"—")}</td>`}
   </tr>`;
 }
 function vgMarkup(){
@@ -1584,8 +1639,8 @@ function vgMarkup(){
     </div>
     <div class="tbl-scroll"><table>
       <thead>
-        <tr>${VG_COLS.map(c=>`<th class="vg-th" data-vs="${c.k}" tabindex="0" role="button" title="Ordenar por ${esc(c.l)}">${esc(c.l)}<span class="ar">↕</span></th>`).join("")}</tr>
-        <tr class="vg-filters">${VG_COLS.map(c=>`<th>${filtro(c)}</th>`).join("")}</tr>
+        <tr>${vgCols().map(c=>`<th class="vg-th" data-vs="${c.k}" tabindex="0" role="button" title="Ordenar por ${esc(c.l)}">${esc(c.l)}<span class="ar">↕</span></th>`).join("")}</tr>
+        <tr class="vg-filters">${vgCols().map(c=>`<th>${filtro(c)}</th>`).join("")}</tr>
       </thead>
       <tbody></tbody>
     </table></div>`;
@@ -1595,7 +1650,7 @@ function vgActualizar(){
   const host = document.getElementById("vg-host");
   const tbody = host && host.querySelector("tbody"); if(!tbody) return;
   const all = vgRows(), list = vgFiltrar(all);
-  tbody.innerHTML = list.length ? list.map(vgFila).join("") : `<tr><td colspan="${VG_COLS.length}" class="empty-row">Ninguna actuación coincide con los filtros elegidos.</td></tr>`;
+  tbody.innerHTML = list.length ? list.map(vgFila).join("") : `<tr><td colspan="${vgCols().length}" class="empty-row">Ninguna actuación coincide con los filtros elegidos.</td></tr>`;
   host.querySelector("#vg-count").textContent = vgConteo(list.length, all.length);
   host.querySelector("#vg-clear").hidden = !vgActivos();
   host.querySelectorAll("th[data-vs]").forEach(th=>{
@@ -1631,6 +1686,7 @@ function renderVistaGeneral(){
   </div>
   <div class="card" style="margin-top:16px">
     <h2>🗂️ Vista general del área jurídica <span class="readonly-note">🔒 Solo lectura</span></h2>
+    ${INVITADO ? '<p class="vg-guest">👀 Estás en la <b>consulta abierta</b>: puedes ver el estado de los procesos del área jurídica, pero no editar nada. Por seguridad no se muestran los correos ni los enlaces de los expedientes.</p>' : ""}
     <p class="vg-tip">Procesos de los 6 perfiles. Haz clic en el título de una columna para ordenarla (de menor a mayor o al revés; en fechas, de la más antigua a la más reciente) y usa los filtros de abajo para ver solo lo que buscas. Cada quien edita únicamente su propia mesa de casos, en "Mis procesos".</p>
     <div id="vg-host"></div>
   </div>`;
@@ -1686,6 +1742,14 @@ function renderControlOperativo(bodyEl){
         <select id="ctrl-select">${staff.map(p=>`<option value="${p.id}" ${p.id===sel.id?'selected':''}>${esc(p.nombre.replace('Jurídica ',''))}</option>`).join("")}</select>
       </div>
     </div>
+    <div class="card consulta-card">
+      <div class="selector-row">
+        <label>🌐 Consulta abierta:</label>
+        <span class="nm-badge ${CONSULTA_ACTIVA ? "ley" : "juez"}">${CONSULTA_ACTIVA ? "Activa" : "Desactivada"}</span>
+        <button type="button" class="btn-sec" id="btn-consulta-sw" style="margin:0">${CONSULTA_ACTIVA ? "Desactivar" : "Activar"}</button>
+      </div>
+      <p class="vg-tip" style="margin:8px 0 0">Con el botón “Entrar solo a consultar” de la portada, otras dependencias y personas externas ven la tabla general sin usuario ni clave. No ven correos ni enlaces de expedientes y no pueden editar. Puedes apagarla cuando quieras.</p>
+    </div>
     ${alertBanner(cnt)}
     <div class="kpis">
       <div class="kpi navy"><div class="lbl">Total</div><div class="val">${total}</div></div>
@@ -1737,6 +1801,11 @@ function renderControlOperativo(bodyEl){
     </div>
   `;
   document.getElementById("ctrl-select").addEventListener("change", e=>{ controlSelected = e.target.value; render(); });
+  document.getElementById("btn-consulta-sw").addEventListener("click", async e=>{
+    e.currentTarget.disabled = true;
+    try{ const r = await api("consultaPublica", TOKEN, !CONSULTA_ACTIVA); CONSULTA_ACTIVA = !!r.consultaPublica; }catch(err){ /* se vuelve a pintar con el estado anterior */ }
+    render();
+  });
 }
 
 
