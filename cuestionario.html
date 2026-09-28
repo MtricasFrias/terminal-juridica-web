@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuestionario · Terminal Jurídica</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --navy:#01274B; --navy-2:#0A3A6B; --blue:#3D85C6; --blue-soft:#BBD6EE;
+  --ocobo:#D6488E; --ocobo-soft:#F6D6E7; --gold:#C9922B; --gold-soft:#F3E6C9;
+  --cream:#F6F3EC; --paper:#FFFFFF; --ink:#152238; --ink-soft:#5B6B82; --line:#E3E1D8;
+  --green:#1E8F5F; --green-bg:#E3F5EC; --amber:#C1710A; --amber-bg:#FBEED9; --red:#C6362B; --red-bg:#FBE5E2;
+  --shadow: 0 1px 2px rgba(1,39,75,.06), 0 8px 24px -12px rgba(1,39,75,.18);
+  --radius: 16px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --cream:#0A1526; --paper:#111F35; --ink:#EAEDF3; --ink-soft:#93A2B8; --line:#213249;
+    --blue-soft:#1D3555; --ocobo-soft:#3A1E33; --gold-soft:#3A2E12; --green-bg:#123626; --amber-bg:#3A2A0C; --red-bg:#3A1613; color-scheme:dark; }
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--cream); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; min-height:100vh; padding-bottom:40px;}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif; text-wrap:balance; margin:0;}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+.wrap{max-width:640px; margin:0 auto; padding:0 18px;}
+button{font-family:inherit; cursor:pointer;}
+.topbar{display:flex; align-items:center; gap:10px; padding:16px 18px; background:linear-gradient(135deg,var(--navy),var(--navy-2)); color:#fff;}
+.topbar b{font-family:'Fraunces',serif; font-size:1rem;}
+.topbar span{font-size:.72rem; opacity:.75; display:block;}
+.sem{width:20px; height:44px; flex:none;}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 24px; margin-top:24px;}
+.pantalla{animation:subir .4s cubic-bezier(.2,.8,.2,1) both;}
+@keyframes subir{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+
+/* pantalla: nombre */
+.intro h1{font-size:1.7rem; color:var(--navy); margin-bottom:6px;}
+.intro p{color:var(--ink-soft); font-size:.92rem; line-height:1.5; margin:0 0 18px;}
+.intro input{width:100%; border:1px solid var(--line); border-radius:10px; padding:13px 14px; font-size:1rem; background:var(--cream); color:var(--ink); margin-bottom:14px;}
+.intro input:focus{outline:none; border-color:var(--blue);}
+.btn-grande{width:100%; background:var(--navy); color:#fff; border:none; border-radius:10px; padding:15px; font-weight:800; font-size:1rem;}
+.btn-grande:disabled{opacity:.5; cursor:default;}
+.temas{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+.tema-chip{background:var(--blue-soft); color:var(--navy); font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:999px;}
+.err{color:var(--red); font-size:.82rem; min-height:1.2em; margin-top:4px;}
+
+/* pantalla: pregunta */
+.barra-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+.contador{font-size:.78rem; color:var(--ink-soft); font-weight:700;}
+.tiempo-track{height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:18px;}
+.tiempo-bar{height:100%; background:var(--blue); border-radius:99px; transform-origin:left; transition:transform 1s linear, background .3s;}
+.tiempo-bar.urge{background:var(--red);}
+.pregunta-tx{font-size:1.28rem; font-weight:700; color:var(--navy); line-height:1.35; margin-bottom:20px;}
+.opciones{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media (max-width:480px){ .opciones{grid-template-columns:1fr;} }
+.opcion{display:flex; align-items:center; gap:10px; text-align:left; border:none; border-radius:12px; padding:16px 14px; color:#fff; font-weight:700; font-size:.95rem; line-height:1.3; transition:transform .15s ease, opacity .15s ease; box-shadow:var(--shadow);}
+.opcion:active:not(:disabled){ transform:scale(.97); }
+.opcion:disabled{ opacity:.45; }
+.opcion .marca{width:20px; height:20px; flex:none; display:grid; place-items:center;}
+.op-0{background:var(--navy);} .op-1{background:var(--blue);} .op-2{background:var(--ocobo);} .op-3{background:var(--gold);}
+.opcion.correcta{outline:3px solid var(--green); box-shadow:0 0 0 4px var(--green-bg);}
+.opcion.incorrecta{outline:3px solid var(--red); box-shadow:0 0 0 4px var(--red-bg);}
+.feedback{margin-top:18px; padding:14px 16px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:10px; animation:subir .3s ease both;}
+.feedback.ok{background:var(--green-bg); color:var(--green);}
+.feedback.no{background:var(--red-bg); color:var(--red);}
+.feedback small{display:block; font-weight:600; color:var(--ink-soft); font-size:.76rem; margin-top:2px;}
+
+/* pantalla: resultado */
+.resultado-hero{text-align:center; padding:8px 0 4px;}
+.resultado-num{font-family:'Fraunces',serif; font-weight:800; font-size:3.4rem; color:var(--navy); line-height:1;}
+.resultado-lbl{color:var(--ink-soft); font-size:.82rem; text-transform:uppercase; letter-spacing:.05em; margin-top:4px;}
+.tabla-tit{display:flex; justify-content:space-between; align-items:baseline; margin:22px 0 10px;}
+.tabla-tit h3{font-size:1rem; color:var(--navy);}
+.tabla-tit span{font-size:.72rem; color:var(--ink-soft);}
+.fila{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);}
+.fila:last-child{border-bottom:none;}
+.pos{width:26px; height:26px; border-radius:50%; background:var(--cream); color:var(--ink-soft); font-size:.76rem; font-weight:800; display:grid; place-items:center; flex:none;}
+.fila.top1 .pos{background:var(--gold); color:#fff;} .fila.top2 .pos{background:var(--blue); color:#fff;} .fila.top3 .pos{background:var(--ocobo); color:#fff;}
+.fila .nom{flex:1; min-width:0; font-weight:700; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.fila.yo .nom{color:var(--ocobo);}
+.fila .pts{font-size:.9rem; font-weight:800; color:var(--navy);}
+.vacio{color:var(--ink-soft); font-size:.85rem; text-align:center; padding:14px 0;}
+.footnote{text-align:center; color:var(--ink-soft); font-size:.72rem; margin-top:22px;}
+[hidden]{display:none !important;}
+@media (prefers-reduced-motion: reduce){ .pantalla{animation:none;} .tiempo-bar{transition:none;} }
+</style>
+</head>
+<body>
+<div class="topbar wrap" style="max-width:none">
+  <svg class="sem" viewBox="0 0 40 92" aria-hidden="true"><rect x="4" y="2" width="32" height="88" rx="9" fill="#0B1420"/>
+    <circle cx="20" cy="22" r="9.5" fill="#4A2420"/><circle cx="20" cy="46" r="9.5" fill="#4A3A16" id="lucA"/><circle cx="20" cy="70" r="9.5" fill="#173B2C" id="lucV"/></svg>
+  <div><b>TERMINAL JURÍDICA</b><span>Cuestionario · Capacitación SETP</span></div>
+</div>
+<div class="wrap">
+
+<div id="p-intro" class="pantalla card intro">
+  <h1>¿Qué tanto quedó claro?</h1>
+  <p>12 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Tienes 20 segundos por pregunta: entre más rápido aciertes, más puntos ganas. Vas a tu propio ritmo, no hay que esperar a nadie.</p>
+  <input id="in-nombre" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="40">
+  <button id="btn-empezar" class="btn-grande">Empezar →</button>
+  <div class="err" id="err-intro"></div>
+  <div class="temas"><span class="tema-chip">Derecho de petición</span><span class="tema-chip">Tutela</span><span class="tema-chip">Coordinación entre áreas</span><span class="tema-chip">Terminal Jurídica</span></div>
+</div>
+
+<div id="p-pregunta" class="pantalla card" hidden>
+  <div class="barra-top"><span class="contador mono" id="contador"></span><span class="contador" id="tema-actual"></span></div>
+  <div class="tiempo-track"><div class="tiempo-bar" id="tiempo-bar"></div></div>
+  <h2 class="pregunta-tx" id="pregunta-tx"></h2>
+  <div class="opciones" id="opciones"></div>
+  <div id="feedback"></div>
+</div>
+
+<div id="p-resultado" class="pantalla card" hidden>
+  <div class="resultado-hero">
+    <div class="resultado-num mono" id="mi-puntaje">0</div>
+    <div class="resultado-lbl">puntos tuyos, sobre 12 000 posibles</div>
+  </div>
+  <div class="tabla-tit"><h3>🏆 Clasificación</h3><span id="cuenta-jugadores"></span></div>
+  <div id="tabla-pos"></div>
+  <div class="footnote">Se actualiza sola mientras el resto termina. Gracias por participar.</div>
+</div>
+
+</div>
+<script>
+(function(){
+"use strict";
+const API_URL = "https://script.google.com/macros/s/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg/exec";
+async function api(fn, ...args){
+  const resp = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({fn, args}), redirect:"follow"});
+  const r = await resp.json();
+  if(r && r.ok===false) throw new Error(r.error || "No se pudo conectar con el servidor.");
+  return r;
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function mem_get_set(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
+
+const MARCAS = ["▲","◆","●","■"];
+let PREGUNTAS = [], DURACION = 20, IDX = 0, NOMBRE = "", TOTAL = 0, T0 = 0, TIMER = null, RESPONDIENDO = false;
+
+const pIntro = document.getElementById("p-intro"), pPregunta = document.getElementById("p-pregunta"), pResultado = document.getElementById("p-resultado");
+const inNombre = document.getElementById("in-nombre"), btnEmpezar = document.getElementById("btn-empezar"), errIntro = document.getElementById("err-intro");
+
+async function empezar(){
+  const nom = inNombre.value.trim();
+  if(nom.length < 2){ errIntro.textContent = "Escribe tu nombre (mínimo 2 letras)."; return; }
+  btnEmpezar.disabled = true; btnEmpezar.textContent = "Cargando preguntas…"; errIntro.textContent = "";
+  try{
+    const r = await api("quizPreguntas");
+    PREGUNTAS = r.preguntas; DURACION = r.duracion; NOMBRE = nom; IDX = 0; TOTAL = 0;
+    mem_get_set("quiz_nombre", nom);
+    pIntro.hidden = true; pPregunta.hidden = false;
+    mostrarPregunta();
+  }catch(e){
+    errIntro.textContent = e.message; btnEmpezar.disabled = false; btnEmpezar.textContent = "Empezar →";
+  }
+}
+btnEmpezar.addEventListener("click", empezar);
+inNombre.addEventListener("keydown", e=>{ if(e.key==="Enter") empezar(); });
+
+const elContador = document.getElementById("contador"), elTema = document.getElementById("tema-actual"),
+      elBarra = document.getElementById("tiempo-bar"), elPreguntaTx = document.getElementById("pregunta-tx"),
+      elOpciones = document.getElementById("opciones"), elFeedback = document.getElementById("feedback");
+
+function mostrarPregunta(){
+  const q = PREGUNTAS[IDX];
+  RESPONDIENDO = false;
+  elContador.textContent = "Pregunta " + (IDX+1) + " de " + PREGUNTAS.length;
+  elTema.textContent = q.tema;
+  elPreguntaTx.textContent = q.pregunta;
+  elFeedback.innerHTML = "";
+  elOpciones.innerHTML = q.opciones.map((op,i)=>
+    `<button type="button" class="opcion op-${i}" data-i="${i}"><span class="marca">${MARCAS[i]}</span><span>${esc(op)}</span></button>`
+  ).join("");
+  elOpciones.querySelectorAll(".opcion").forEach(b=>b.addEventListener("click", ()=>responder(+b.dataset.i)));
+  elBarra.classList.remove("urge");
+  elBarra.style.transition = "none"; elBarra.style.transform = "scaleX(1)";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    elBarra.style.transition = "transform " + DURACION + "s linear, background .3s";
+    elBarra.style.transform = "scaleX(0)";
+  }));
+  T0 = Date.now();
+  clearTimeout(TIMER);
+  TIMER = setTimeout(()=>{ if(!RESPONDIENDO) responder(-1); }, DURACION*1000 + 80);
+  clearTimeout(mostrarPregunta._urgeT);
+  mostrarPregunta._urgeT = setTimeout(()=>elBarra.classList.add("urge"), (DURACION-5)*1000);
+}
+
+async function responder(opcionIdx){
+  if(RESPONDIENDO) return;
+  RESPONDIENDO = true;
+  clearTimeout(TIMER);
+  const ms = Date.now() - T0;
+  const botones = [...elOpciones.querySelectorAll(".opcion")];
+  botones.forEach(b=>b.disabled = true);
+  const q = PREGUNTAS[IDX];
+  let r;
+  try{ r = await api("quizResponder", NOMBRE, q.id, opcionIdx, ms); }
+  catch(e){ r = {correcta:false, puntos:0, error:e.message}; }
+  TOTAL += r.puntos || 0;
+  if(opcionIdx >= 0) botones[opcionIdx].classList.add(r.correcta ? "correcta" : "incorrecta");
+  elFeedback.innerHTML = r.correcta
+    ? `<div class="feedback ok">✓ ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${TOTAL}</small></div>`
+    : `<div class="feedback no">${opcionIdx<0 ? "⏱ Se acabó el tiempo" : "✕ No era esa"}<small>Total hasta ahora: ${TOTAL}</small></div>`;
+  setTimeout(()=>{ IDX++; if(IDX < PREGUNTAS.length) mostrarPregunta(); else mostrarResultado(); }, 1500);
+}
+
+const elMiPuntaje = document.getElementById("mi-puntaje"), elCuenta = document.getElementById("cuenta-jugadores"), elTabla = document.getElementById("tabla-pos");
+let POLL = null;
+function mostrarResultado(){
+  pPregunta.hidden = true; pResultado.hidden = false;
+  elMiPuntaje.textContent = TOTAL;
+  actualizarClasificacion();
+  clearInterval(POLL);
+  POLL = setInterval(actualizarClasificacion, 4000);
+}
+async function actualizarClasificacion(){
+  try{
+    const r = await api("quizClasificacion");
+    elCuenta.textContent = r.jugadores + (r.jugadores===1 ? " persona" : " personas");
+    if(!r.tabla.length){ elTabla.innerHTML = '<div class="vacio">Todavía no hay resultados.</div>'; return; }
+    elTabla.innerHTML = r.tabla.map((f,i)=>{
+      const top = i===0?"top1":i===1?"top2":i===2?"top3":"";
+      const yo = f.jugador===NOMBRE ? "yo" : "";
+      return `<div class="fila ${top} ${yo}"><span class="pos">${i+1}</span><span class="nom">${esc(f.jugador)}</span><span class="pts mono">${f.puntos}</span></div>`;
+    }).join("");
+  }catch(e){ /* silencioso: se reintenta en el próximo ciclo */ }
+}
+window.addEventListener("beforeunload", ()=>clearInterval(POLL));
+
+/* semáforo del encabezado: cicla rojo/ámbar/verde despacio, solo decorativo */
+(function(){
+  const luces = [document.getElementById("lucA"), document.getElementById("lucV")];
+  const ambar = ["#4A3A16", "#F5A623"], verde = ["#173B2C", "#26B67A"];
+  let i = 0;
+  setInterval(()=>{ i = (i+1) % 2;
+    luces[0].setAttribute("fill", i===0 ? ambar[1] : ambar[0]);
+    luces[1].setAttribute("fill", i===1 ? verde[1] : verde[0]);
+  }, 1400);
+})();
+
+const guardado = mem_get_set("quiz_nombre");
+if(guardado) inNombre.value = guardado;
+})();
+</script>
+</body>
+</html>

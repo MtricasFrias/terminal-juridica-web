@@ -531,8 +531,9 @@ tr.vg-filters th{padding:5px 6px 9px; text-transform:none; letter-spacing:0; fon
 /* ============================================================
    V8: consulta abierta (solo lectura)
    ============================================================ */
-.consulta-wrap{ display:flex; justify-content:center; margin:20px auto 0; padding:0 4px; }
-.btn-consulta{ display:flex; align-items:center; gap:12px; width:100%; max-width:440px; text-align:left; padding:9px 18px 9px 10px; border-radius:999px; border:1px solid var(--line); background:var(--paper); background:color-mix(in srgb, var(--paper) 84%, transparent); color:var(--ink); box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.consulta-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; margin:20px auto 0; padding:0 4px; }
+.btn-consulta{ display:flex; align-items:center; gap:12px; width:100%; max-width:440px; text-align:left; padding:9px 18px 9px 10px; border-radius:999px; border:1px solid var(--line); background:var(--paper); background:color-mix(in srgb, var(--paper) 84%, transparent); color:var(--ink); text-decoration:none; box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.btn-presentacion .ojo{ background:var(--ocobo-soft); }
 .btn-consulta:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--blue); }
 .btn-consulta:focus-visible{ outline:2px solid var(--blue); outline-offset:3px; }
 .btn-consulta:disabled{ opacity:.7; cursor:default; }
@@ -744,6 +745,11 @@ function renderLogin(msg){
         <span class="tx"><b>Entrar solo a consultar</b><small>Para otras dependencias y personas externas · sin usuario ni clave · solo lectura</small></span>
         <span class="flecha" aria-hidden="true">→</span>
       </button>
+      <a class="btn-consulta btn-presentacion" href="https://mtricasfrias.github.io/terminal-juridica-web/capacitacion.html" target="_blank" rel="noopener noreferrer">
+        <span class="ojo"><svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true"><path d="M3 10.5L14 5l11 5.5-11 5.5z" fill="var(--blue)"/><path d="M8 13.2v5.3c0 1.6 2.7 3 6 3s6-1.4 6-3v-5.3l-6 3z" fill="none" stroke="var(--title)" stroke-width="1.6" stroke-linejoin="round"/><path d="M23 11v5.5" stroke="var(--title)" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+        <span class="tx"><b>Ver la presentación de la capacitación</b><small>Derecho de petición y Terminal Jurídica · se abre en otra pestaña</small></span>
+        <span class="flecha" aria-hidden="true">↗</span>
+      </a>
     </div>
     <div class="fun-hint">Juega con el fondo: toca los buses, el semáforo y el mazo. La balanza se equilibra cuando completas tu usuario y tu clave.</div>
     <div class="footnote">Elemento visual interactivo</div>`;

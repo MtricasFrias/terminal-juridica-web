@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capacitación · Derecho de Petición y Terminal Jurídica</title>
+<meta name="description" content="Capacitación SETP: derecho de petición, términos, respuesta de fondo y la Terminal Jurídica.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --navy:#01274B; --navy-2:#0A3A6B; --blue:#3D85C6; --blue-soft:#BBD6EE;
+  --ocobo:#D6488E; --ocobo-soft:#F6D6E7; --gold:#C9922B; --gold-soft:#F3E6C9;
+  --cream:#F6F3EC; --paper:#FFFFFF; --ink:#152238; --ink-soft:#5B6B82; --line:#E3E1D8;
+  --green:#1E8F5F; --green-bg:#E3F5EC; --amber:#C1710A; --amber-bg:#FBEED9; --red:#C6362B; --red-bg:#FBE5E2;
+  --shadow: 0 1px 2px rgba(1,39,75,.08), 0 20px 44px -20px rgba(1,39,75,.35);
+  color-scheme:light;
+}
+*{box-sizing:border-box;}
+html,body{margin:0; height:100%; background:var(--navy); overflow:hidden;}
+body{font-family:'Manrope',system-ui,sans-serif; color:var(--ink);}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; text-wrap:balance;}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+button{font-family:inherit; cursor:pointer;}
+#deck{position:relative; width:100vw; height:100vh; overflow:hidden;}
+.slide{position:absolute; inset:0; display:flex; flex-direction:column; padding:7vh 7vw 11vh; opacity:0; pointer-events:none; transform:translateX(24px); transition:opacity .45s ease, transform .45s ease; background:var(--cream); color:var(--ink);}
+.slide.activa{opacity:1; pointer-events:auto; transform:none; position:relative;}
+.slide.navy{background:linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%); color:var(--cream);}
+.eyebrow{display:inline-block; background:var(--blue-soft); color:var(--navy); font-size:clamp(11px,1.1vw,15px); font-weight:700; letter-spacing:.09em; text-transform:uppercase; padding:7px 18px; border-radius:999px; margin:0 0 3vh; align-self:flex-start;}
+.navy .eyebrow{background:rgba(255,255,255,.14); color:var(--cream);}
+h2.tit{font-size:clamp(28px,3.6vw,52px); font-weight:700; color:var(--navy); line-height:1.15; margin-bottom:2.2vh;}
+.navy h2.tit, .navy h1{color:var(--cream);}
+.cont{flex:1; min-height:0; display:flex; flex-direction:column; gap:2vh;}
+.footer{position:absolute; left:7vw; right:7vw; bottom:4vh; display:flex; justify-content:space-between; align-items:center; font-size:clamp(10px,.95vw,13px); color:var(--ink-soft);}
+.navy .footer{color:rgba(246,243,236,.65);}
+.grid{display:grid; gap:1.6vw;}
+.g2{grid-template-columns:1fr 1fr;} .g3{grid-template-columns:repeat(3,1fr);} .g4{grid-template-columns:repeat(4,1fr);}
+.card{background:var(--paper); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:1.8vw 2vw;}
+.pill{display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:clamp(11px,1vw,14px); padding:5px 14px; border-radius:999px; white-space:nowrap;}
+.pill.ley{background:var(--blue-soft); color:var(--navy);} .pill.juez{background:var(--ocobo-soft); color:#7a2a52;} .pill.interno{background:var(--green-bg); color:var(--green);}
+.chip-dias{text-align:center;}
+.chip-dias .num{font-family:'Fraunces',serif; font-weight:800; font-size:clamp(40px,5vw,72px); color:var(--navy); line-height:1;}
+.chip-dias .lbl{font-size:clamp(11px,.95vw,14px); color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-top:.4vh;}
+.chip-dias .tit2{font-weight:800; font-size:clamp(14px,1.3vw,19px); color:var(--ink); margin-top:1vh;}
+.chip-dias p.d{font-size:clamp(11px,1vw,14px); color:var(--ink-soft); margin:.6vh 0 0; line-height:1.4;}
+.flujo{display:flex; align-items:center; flex-wrap:wrap; gap:.6vw; font-size:clamp(13px,1.3vw,19px); font-weight:700; color:var(--navy);}
+.flujo .paso{background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:.8vh 1.1vw; box-shadow:var(--shadow);}
+.flujo .fl{color:var(--ocobo); font-weight:800;}
+.tabla{width:100%; border-collapse:collapse; font-size:clamp(13px,1.15vw,17px);}
+.tabla th{text-align:left; background:var(--navy); color:#fff; padding:1.2vh 1.2vw; font-size:clamp(11px,.9vw,13px); text-transform:uppercase; letter-spacing:.04em;}
+.tabla th:first-child{border-radius:10px 0 0 0;} .tabla th:last-child{border-radius:0 10px 0 0;}
+.tabla td{padding:1.2vh 1.2vw; border-bottom:1px solid var(--line); background:var(--paper); vertical-align:top;}
+.tabla tr:last-child td{border-bottom:none;}
+.contraste{display:grid; grid-template-columns:1fr 1fr; gap:1.6vw;}
+.contraste .box{border-radius:16px; padding:1.8vw; box-shadow:var(--shadow);}
+.contraste .no{background:var(--red-bg); border:2px solid var(--red);}
+.contraste .si{background:var(--green-bg); border:2px solid var(--green);}
+.contraste .tag{font-weight:800; font-size:clamp(12px,1.1vw,15px); text-transform:uppercase; letter-spacing:.05em; margin-bottom:1vh; display:block;}
+.contraste .no .tag{color:var(--red);} .contraste .si .tag{color:var(--green);}
+.contraste blockquote{margin:0; font-size:clamp(13px,1.2vw,18px); line-height:1.5; font-style:italic; color:var(--ink);}
+.lista-clave{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1.1vh;}
+.lista-clave li{display:flex; gap:1vw; align-items:flex-start; font-size:clamp(13px,1.25vw,19px); line-height:1.45;}
+.lista-clave b.n{flex:none; width:2.2vw; height:2.2vw; min-width:32px; min-height:32px; border-radius:50%; background:var(--navy); color:#fff; font-family:'Fraunces',serif; display:flex; align-items:center; justify-content:center; font-size:clamp(13px,1.1vw,17px);}
+.chips-fuente{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.4vh;}
+.chip-fte{background:var(--gold-soft); color:#6b4d15; font-size:clamp(10px,.85vw,12px); font-weight:700; padding:4px 12px; border-radius:999px;}
+.qr-box{display:flex; align-items:center; justify-content:center; gap:3vw; flex:1;}
+.qr-box img{width:min(30vw,320px); height:min(30vw,320px); border-radius:18px; box-shadow:var(--shadow); background:#fff; padding:14px;}
+.qr-tx{max-width:34vw;}
+.qr-tx h2{color:var(--cream); font-size:clamp(26px,3vw,46px); margin-bottom:2vh;}
+.qr-tx p{font-size:clamp(14px,1.3vw,19px); color:var(--blue-soft); line-height:1.5;}
+.qr-tx .link{font-family:'IBM Plex Mono',monospace; font-size:clamp(11px,1vw,14px); color:var(--cream); background:rgba(255,255,255,.1); padding:8px 14px; border-radius:8px; display:inline-block; margin-top:2vh; word-break:break-all;}
+.badge-tema{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.6vh;}
+.badge-tema span{background:rgba(255,255,255,.14); color:var(--cream); font-size:clamp(10px,.9vw,13px); font-weight:700; padding:5px 14px; border-radius:999px;}
+.sky{position:absolute; left:0; right:0; bottom:0; height:26vh; pointer-events:none;}
+.nav{position:fixed; left:0; right:0; bottom:0; height:60px; display:flex; align-items:center; justify-content:center; gap:14px; background:rgba(1,39,75,.92); backdrop-filter:blur(6px); z-index:50; opacity:0; transition:opacity .3s;}
+#deck:hover .nav, .nav.despierto{opacity:1;}
+.nav button{background:rgba(255,255,255,.14); color:#fff; border:none; width:38px; height:38px; border-radius:50%; font-size:16px; display:flex; align-items:center; justify-content:center;}
+.nav button:hover{background:rgba(255,255,255,.26);}
+.nav button:disabled{opacity:.3; cursor:default;}
+.nav .cont-n{color:#fff; font-family:'IBM Plex Mono',monospace; font-size:13px; min-width:64px; text-align:center;}
+.progreso{position:fixed; left:0; top:0; height:4px; background:var(--ocobo); z-index:60; transition:width .35s ease;}
+@media (max-width:820px){
+  .g2,.g3,.g4,.contraste{grid-template-columns:1fr;}
+  .qr-box{flex-direction:column; gap:4vh;}
+  .qr-tx{max-width:none; text-align:center;}
+  .qr-box img{width:min(58vw,280px); height:min(58vw,280px);}
+}
+</style>
+</head>
+<body>
+<div class="progreso" id="progreso" style="width:5%"></div>
+<div id="deck"></div>
+<div class="nav despierto" id="nav">
+  <button id="btn-prev" aria-label="Anterior">←</button>
+  <span class="cont-n mono" id="nav-cont">1 / 20</span>
+  <button id="btn-next" aria-label="Siguiente">→</button>
+  <button id="btn-full" aria-label="Pantalla completa" title="Pantalla completa" style="margin-left:10px">⛶</button>
+</div>
+<script>
+const busSVG = (c)=>`<rect x="1" y="2" width="60" height="22" rx="5" fill="${c}"/><rect x="1" y="14.5" width="60" height="3" fill="#D6488E"/>${[5,14,23,32,41].map(x=>`<rect x="${x}" y="6" width="7.5" height="7" rx="1.5" fill="#CDE5F7"/>`).join("")}<rect x="50" y="5.5" width="8.5" height="9" rx="1.5" fill="#AACDEC"/><circle cx="60.5" cy="19.5" r="1.6" fill="#FFE282"/>${[12,49].map(x=>`<circle cx="${x}" cy="25" r="4.6" fill="#141E2C"/><circle cx="${x}" cy="25" r="1.9" fill="#96A0AF"/>`).join("")}`;
+const skySVG = `<svg viewBox="0 0 1920 340" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <polygon points="0,260 170,180 360,235 560,145 760,225 970,160 1170,230 1380,150 1580,220 1780,170 1920,235 1920,340 0,340" fill="#0A3A6B" fill-opacity="0.5"/>
+  <rect x="246" y="228" width="8" height="42" fill="#0A3A6B" fill-opacity="0.6"/>
+  <circle cx="250" cy="203" r="30" fill="#D6488E" fill-opacity="0.34"/><circle cx="226" cy="222" r="20" fill="#D6488E" fill-opacity="0.34"/><circle cx="274" cy="222" r="20" fill="#D6488E" fill-opacity="0.34"/>
+  <rect x="815" y="235" width="290" height="14" fill="#F6F3EC" fill-opacity="0.55"/>
+  <rect x="805" y="249" width="310" height="8" fill="#F6F3EC" fill-opacity="0.42"/>
+  <rect x="835" y="175" width="16" height="60" fill="#F6F3EC" fill-opacity="0.55"/><rect x="883" y="175" width="16" height="60" fill="#F6F3EC" fill-opacity="0.55"/>
+  <rect x="931" y="175" width="16" height="60" fill="#F6F3EC" fill-opacity="0.55"/><rect x="979" y="175" width="16" height="60" fill="#F6F3EC" fill-opacity="0.55"/><rect x="1027" y="175" width="16" height="60" fill="#F6F3EC" fill-opacity="0.55"/>
+  <polygon points="808,175 1072,175 940,122" fill="#F6F3EC" fill-opacity="0.55"/>
+  <line x1="940" y1="96" x2="940" y2="122" stroke="#F6F3EC" stroke-width="3" stroke-opacity="0.65"/><line x1="905" y1="101" x2="975" y2="101" stroke="#F6F3EC" stroke-width="3" stroke-opacity="0.65"/>
+  <circle cx="940" cy="96" r="4.5" fill="#C9922B"/>
+  <path d="M886,101 a19,11 0 0 0 38,0 Z" fill="#3D85C6" fill-opacity="0.6"/><path d="M956,101 a19,11 0 0 0 38,0 Z" fill="#D6488E" fill-opacity="0.6"/>
+  <rect x="1655" y="222" width="9" height="48" fill="#0A3A6B" fill-opacity="0.6"/>
+  <circle cx="1660" cy="193" r="34" fill="#D6488E" fill-opacity="0.34"/><circle cx="1631" cy="215" r="22" fill="#D6488E" fill-opacity="0.34"/><circle cx="1689" cy="215" r="22" fill="#D6488E" fill-opacity="0.34"/>
+  <line x1="0" y1="284" x2="1920" y2="284" stroke="#F6F3EC" stroke-width="2" stroke-opacity="0.3" stroke-dasharray="20 16"/>
+  <g id="skybus"><rect x="-100" y="240" width="96" height="30" rx="6" fill="#3D85C6" fill-opacity="0.55"/><rect x="-100" y="251" width="96" height="4" fill="#D6488E" fill-opacity="0.65"/><circle cx="-80" cy="272" r="8" fill="#0A3A6B" fill-opacity="0.7"/><circle cx="-36" cy="272" r="8" fill="#0A3A6B" fill-opacity="0.7"/></g>
+</svg>`;
+const semSVG = (activo)=>{
+  const o={r:activo==='r'?1:.18, a:activo==='a'?1:.18, v:activo==='v'?1:.18};
+  return `<svg viewBox="0 0 40 92" width="34" height="78"><rect x="4" y="2" width="32" height="88" rx="9" fill="#0B1420"/>
+  <circle cx="20" cy="22" r="9.5" fill="#E5483B" fill-opacity="${o.r}"/><circle cx="20" cy="46" r="9.5" fill="#F5A623" fill-opacity="${o.a}"/><circle cx="20" cy="70" r="9.5" fill="#26B67A" fill-opacity="${o.v}"/></svg>`;
+};
+
+const SLIDES = [];
+function slide(id, cls, html, notas){ SLIDES.push({id, cls: cls||"", html}); }
+
+/* 1 · portada */
+slide("cover","navy",`
+  <p class="eyebrow">Capacitación SETP · Dependencia Jurídica</p>
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <h1 style="font-size:clamp(38px,6.2vw,92px); font-weight:800; line-height:1.05; margin-bottom:2.4vh;">Derecho de Petición<br>y Terminal Jurídica</h1>
+    <p style="font-size:clamp(16px,1.7vw,26px); color:var(--blue-soft); max-width:56vw; line-height:1.5;">Términos, respuesta de fondo y trabajo coordinado entre áreas — y la herramienta que ya construimos para que sea más fácil cumplirlo.</p>
+  </div>
+  <div class="sky">${skySVG}</div>
+  <div class="footer"><span>Ibagué · SETP</span><span>Elemento visual interactivo</span></div>
+`);
+
+/* 2 · bienvenida / objetivo */
+slide("bienvenida","",`
+  <p class="eyebrow">¿Por qué estamos aquí?</p>
+  <h2 class="tit">No se trata solo de cumplir un plazo</h2>
+  <div class="cont" style="justify-content:center;">
+    <p style="font-size:clamp(15px,1.5vw,22px); color:var(--ink-soft); max-width:60vw; line-height:1.55; margin-bottom:2vh;">La finalidad es que la entidad pueda responder <b style="color:var(--navy)">correctamente</b> al ciudadano dentro del término legal, y evitar los riesgos jurídicos que salen de respuestas tardías, incompletas, o que no atienden realmente lo solicitado.</p>
+    <div class="grid g3">
+      <div class="card"><b style="color:var(--navy); font-size:clamp(15px,1.3vw,19px)">📖 Entender</b><p style="font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft); margin:.8vh 0 0">Qué es un derecho de petición y cuáles son sus términos legales.</p></div>
+      <div class="card"><b style="color:var(--navy); font-size:clamp(15px,1.3vw,19px)">🤝 Coordinar</b><p style="font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft); margin:.8vh 0 0">Por qué el cumplimiento no es solo tarea de Jurídica, sino de todas las áreas.</p></div>
+      <div class="card"><b style="color:var(--navy); font-size:clamp(15px,1.3vw,19px)">🧭 Usar la herramienta</b><p style="font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft); margin:.8vh 0 0">Conocer la Terminal Jurídica, que hace más fácil no dejar vencer un término.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">02 / 20</span></div>
+`);
+
+/* 3 · agenda */
+slide("agenda","",`
+  <p class="eyebrow">Cómo vamos a usar los próximos 20 minutos</p>
+  <h2 class="tit">Agenda</h2>
+  <div class="cont" style="justify-content:center; gap:1.6vw;">
+    <div class="flujo" style="font-size:clamp(15px,1.5vw,22px)">
+      <div class="paso" style="background:var(--navy); color:#fff; border-color:var(--navy)">1 · Derecho de petición</div><span class="fl">→</span>
+      <div class="paso" style="background:var(--blue); color:#fff; border-color:var(--blue)">2 · Terminal Jurídica</div><span class="fl">→</span>
+      <div class="paso" style="background:var(--ocobo); color:#fff; border-color:var(--ocobo)">3 · Cuestionario en vivo</div>
+    </div>
+    <div class="grid g3" style="margin-top:2vh">
+      <div class="card"><p style="margin:0; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft)">Qué es, sus términos legales, respuesta de fondo, y su relación con la tutela.</p></div>
+      <div class="card"><p style="margin:0; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft)">Un recorrido rápido por lo que ya construimos para gestionar todo esto.</p></div>
+      <div class="card"><p style="margin:0; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft)">12 preguntas, puntos por rapidez y una clasificación en vivo.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">03 / 20</span></div>
+`);
+
+/* 4 · divisor bloque 1 */
+slide("div1","navy",`
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <p class="eyebrow">Bloque 1</p>
+    <h1 style="font-size:clamp(40px,6vw,88px); font-weight:800;">Derecho de Petición</h1>
+    <div class="badge-tema"><span>Constitución art. 23</span><span>Ley 1755 de 2015</span><span>Decreto 2591 de 1991</span></div>
+  </div>
+  <div class="sky">${skySVG}</div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">04 / 20</span></div>
+`);
+
+/* 5 · qué es + 6 elementos */
+slide("que-es","",`
+  <p class="eyebrow">Constitución, art. 23 · Ley 1755 de 2015, art. 13</p>
+  <h2 class="tit">¿Qué es un derecho de petición?</h2>
+  <div class="cont">
+    <p style="font-size:clamp(14px,1.3vw,19px); color:var(--ink-soft); max-width:58vw; line-height:1.5">Toda persona puede presentar peticiones respetuosas a las autoridades y obtener pronta resolución. <b style="color:var(--navy)">No importa el título del documento</b>: aunque alguien no escriba "derecho de petición", si está solicitando algo a la entidad, lo está ejerciendo.</p>
+    <div class="grid" style="grid-template-columns:repeat(6,1fr); gap:1vw; margin-top:1vh">
+      ${["Oportuna","De fondo","Clara","Precisa","Congruente","Comunicada"].map((t,i)=>`<div class="card" style="text-align:center; padding:1.4vw 1vw"><b class="n" style="width:2.6vw;height:2.6vw;min-width:34px;min-height:34px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;margin:0 auto .8vh">${i+1}</b><div style="font-weight:800; font-size:clamp(11px,.95vw,14px); color:var(--navy)">${t}</div></div>`).join("")}
+    </div>
+    <div class="card" style="margin-top:1vh">
+      <b style="color:var(--ocobo); font-size:clamp(11px,.95vw,13px); text-transform:uppercase; letter-spacing:.05em">Ejemplo</b>
+      <p style="margin:.6vh 0 0; font-size:clamp(13px,1.15vw,17px); font-style:italic">"Solicito que me informen qué actuaciones ha realizado el SETP frente a la situación presentada en determinada vía." — aunque no diga "derecho de petición", está amparada por el artículo 23 y la Ley 1755.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">05 / 20</span></div>
+`);
+
+/* 6 · por qué intervienen las áreas */
+slide("areas","",`
+  <p class="eyebrow">El punto más importante de la capacitación</p>
+  <h2 class="tit">Jurídica no siempre tiene toda la información</h2>
+  <div class="cont" style="flex-direction:row; gap:2vw; align-items:stretch">
+    <div style="flex:1.1; display:flex; flex-direction:column; gap:1.4vh; justify-content:center">
+      <p style="font-size:clamp(14px,1.3vw,19px); color:var(--ink-soft); line-height:1.5">Una petición puede tratar de contratación, obras, infraestructura, operación, gestión financiera, proyectos o asuntos técnicos. Cuando Jurídica remite una solicitud a otra dependencia, <b style="color:var(--navy)">no está trasladando su responsabilidad</b>: está pidiendo los insumos que solo esa área tiene.</p>
+    </div>
+    <div class="card" style="flex:1">
+      <b style="color:var(--ocobo); font-size:clamp(11px,.95vw,13px); text-transform:uppercase; letter-spacing:.05em">Ejemplo</b>
+      <p style="margin:.8vh 0 1.2vh; font-size:clamp(13px,1.15vw,17px); font-style:italic">"¿Cuál es el estado actual del contrato X y qué actividades se han ejecutado?"</p>
+      <p style="margin:0 0 .6vh; font-weight:800; color:var(--navy); font-size:clamp(12px,1.05vw,15px)">El área responsable debe informar:</p>
+      <ul style="margin:0; padding-left:1.2em; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft); line-height:1.7">
+        <li>Estado actual y actividades ejecutadas</li><li>Fechas y soportes</li><li>Obligaciones cumplidas y pendientes</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">06 / 20</span></div>
+`);
+
+/* 7 · terminos */
+slide("terminos","",`
+  <p class="eyebrow">Ley 1755 de 2015, artículo 14</p>
+  <h2 class="tit">Los términos según el tipo de petición</h2>
+  <div class="cont" style="justify-content:center">
+    <div class="grid g3">
+      <div class="card chip-dias"><div class="num">15</div><div class="lbl">días hábiles</div><div class="tit2">Regla general</div><p class="d">Toda petición, salvo norma especial.</p></div>
+      <div class="card chip-dias" style="border-color:var(--blue)"><div class="num" style="color:var(--blue)">10</div><div class="lbl">días hábiles</div><div class="tit2">Documentos e información</div><p class="d">Si no se responde a tiempo, se entiende <b>aceptada</b> la solicitud (silencio administrativo positivo).</p></div>
+      <div class="card chip-dias" style="border-color:var(--ocobo)"><div class="num" style="color:var(--ocobo)">30</div><div class="lbl">días hábiles</div><div class="tit2">Consultas</div><p class="d">Cuando se pregunta la interpretación jurídica sobre un asunto a cargo de la entidad.</p></div>
+    </div>
+    <div class="card" style="margin-top:.4vh"><p style="margin:0; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft)">⚠️ <b style="color:var(--navy)">Excepcionalmente</b> el término puede ampliarse hasta el <b>doble</b> (10→20, 15→30, 30→60), pero la autoridad debe avisarlo <b>antes</b> de que venza el plazo original, explicando el motivo. No es un mecanismo habitual.</p></div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">07 / 20</span></div>
+`);
+
+/* 8 · respuesta de fondo */
+slide("fondo","",`
+  <p class="eyebrow">La idea que más se malinterpreta</p>
+  <h2 class="tit">¿Qué significa una "respuesta de fondo"?</h2>
+  <div class="cont" style="justify-content:center">
+    <p style="font-size:clamp(14px,1.3vw,19px); color:var(--ink-soft); max-width:60vw">No significa decir que sí. La entidad puede responder que sí, que no, parcialmente, que no es procedente, o señalar qué trámite corresponde — lo importante es que <b style="color:var(--navy)">realmente resuelva</b> lo solicitado.</p>
+    <div class="contraste">
+      <div class="box no"><span class="tag">✕ No es de fondo</span><p style="margin:0 0 1vh; font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">"¿Cuál es el estado del contrato X?"</p><blockquote>"La entidad se encuentra comprometida con el cumplimiento de sus funciones y trabaja permanentemente por prestar un servicio de calidad."</blockquote></div>
+      <div class="box si"><span class="tag">✓ Sí es de fondo</span><p style="margin:0 0 1vh; font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">Misma pregunta</p><blockquote>"Su solicitud sobre el contrato X se encuentra en etapa de ejecución. A la fecha se han desarrollado las siguientes actividades: […]. El estado de las obligaciones corresponde a […]."</blockquote></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">08 / 20</span></div>
+`);
+
+/* 9 · por qué urgente */
+slide("urgente","",`
+  <p class="eyebrow">La pregunta más frecuente de las áreas</p>
+  <h2 class="tit">¿Por qué Jurídica pide "urgente" si hay 15 días?</h2>
+  <div class="cont" style="justify-content:center; gap:1.4vw">
+    <p style="font-size:clamp(14px,1.3vw,19px); color:var(--ink-soft); max-width:60vw">Porque el término legal del ciudadano <b style="color:var(--navy)">no es el mismo</b> que el tiempo interno de trabajo. Antes de responder hay que recibir, radicar, identificar el área, recolectar información, analizar, redactar, revisar, firmar y notificar.</p>
+    <div class="card">
+      <p style="margin:0 0 .8vh; font-size:clamp(12px,1.05vw,15px)"><b style="color:var(--navy)">Ejemplo:</b> petición recibida el 1 de septiembre · término legal 15 días</p>
+      <p style="margin:0; font-size:clamp(13px,1.15vw,17px); font-style:italic">Jurídica solicita al área técnica: "Favor remitir información y soportes dentro de los próximos <b>3 días</b>" — para tener tiempo de revisar, analizar, redactar, validar y gestionar firmas.</p>
+    </div>
+    <div class="card" style="background:var(--navy); border:none">
+      <p style="margin:0; color:#fff; font-weight:700; font-size:clamp(13px,1.2vw,18px)">💡 El plazo interno no reemplaza ni modifica el término legal. Es una herramienta de gestión para poder cumplirlo.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">09 / 20</span></div>
+`);
+
+/* 10 · riesgo institucional */
+slide("riesgo","",`
+  <p class="eyebrow">Qué pasa si un área no entrega a tiempo</p>
+  <h2 class="tit">Una demora interna se vuelve un problema institucional</h2>
+  <div class="cont" style="justify-content:center">
+    <div style="display:flex; flex-wrap:wrap; gap:.5vw; align-items:center; font-size:clamp(11px,1vw,14px); font-weight:700; color:var(--navy)">
+      ${["Ciudadano → petición","Jurídica pide info","Área no responde","Vencimiento cercano","Respuesta tardía","Posible tutela","Más riesgo institucional"].map((t,i,arr)=>`<div class="paso" style="background:${i===arr.length-1?"var(--red)":"var(--paper)"}; color:${i===arr.length-1?"#fff":"var(--navy)"}; border:1px solid ${i===arr.length-1?"var(--red)":"var(--line)"}; border-radius:10px; padding:.9vh 1vw; box-shadow:var(--shadow)">${t}</div>${i<arr.length-1?'<span class="fl">→</span>':""}`).join("")}
+    </div>
+    <div class="card" style="margin-top:1vh"><p style="margin:0; font-size:clamp(13px,1.15vw,17px); color:var(--ink-soft)">Es parte de una adecuada <b style="color:var(--navy)">gestión del riesgo jurídico institucional</b>: el cumplimiento de los términos no es responsabilidad exclusiva de Jurídica — cada área aporta una parte del proceso.</p></div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">10 / 20</span></div>
+`);
+
+/* 11 · tutelas */
+slide("tutelas","",`
+  <p class="eyebrow">Constitución art. 86 · Decreto 2591 de 1991</p>
+  <h2 class="tit">¿Y qué pasa con las tutelas?</h2>
+  <div class="cont" style="justify-content:center">
+    <p style="font-size:clamp(14px,1.3vw,19px); color:var(--ink-soft); max-width:60vw">Cuando el asunto ya no es una petición administrativa, sino que un ciudadano considera vulnerado un derecho fundamental y acude ante un juez. La Constitución establece máximo <b style="color:var(--navy)">10 días</b> para resolver una tutela.</p>
+    <div class="card" style="border-color:var(--amber); background:var(--amber-bg)">
+      <b style="color:var(--amber); font-size:clamp(12px,1.05vw,15px)">¿Toda tutela tiene 48 horas para responder? — NO</b>
+      <p style="margin:.8vh 0 0; font-size:clamp(13px,1.15vw,17px)">Es el <b>juez</b> quien fija el término del informe, según las circunstancias. El artículo 29 del Decreto 2591 exige fallo en máximo 10 días. Las <b>48 horas</b> aplican solo cuando el juez <b>concede</b> la tutela: es el plazo máximo para <b>cumplir</b> esa orden, no para responder.</p>
+    </div>
+    <p style="margin:0; font-size:clamp(13px,1.15vw,17px); color:var(--navy); font-weight:700">Por eso el mensaje correcto a un área es: "Necesitamos su colaboración inmediata porque existe un término judicial que debemos cumplir."</p>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">11 / 20</span></div>
+`);
+
+/* 12 · peticion vs tutela */
+slide("comparativa","",`
+  <p class="eyebrow">Para no confundirlos</p>
+  <h2 class="tit">Derecho de petición vs. acción de tutela</h2>
+  <div class="cont" style="justify-content:center">
+    <table class="tabla">
+      <tr><th>Derecho de petición</th><th>Acción de tutela</th></tr>
+      <tr><td>Es un derecho fundamental</td><td>Es un mecanismo judicial de protección de derechos fundamentales</td></tr>
+      <tr><td>Se presenta ante autoridades</td><td>Se presenta ante un juez</td></tr>
+      <tr><td>Regla general: 15 días · documentos: 10 · consulta: 30</td><td>La Constitución exige máximo 10 días para el fallo</td></tr>
+      <tr><td>La respuesta debe ser de fondo</td><td>El fallo puede ordenar cumplir en máximo 48 horas</td></tr>
+      <tr><td>Debe comunicarse al peticionario</td><td>Las órdenes judiciales deben cumplirse</td></tr>
+    </table>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">12 / 20</span></div>
+`);
+
+/* 13 · que nos llevamos */
+slide("resumen1","",`
+  <p class="eyebrow">Antes de seguir</p>
+  <h2 class="tit">¿Qué quiero que nos llevemos hoy?</h2>
+  <div class="cont" style="justify-content:center">
+    <ul class="lista-clave">
+      <li><b class="n">1</b><span>No todos los documentos tienen el mismo término: primero hay que identificar qué tipo de solicitud es.</span></li>
+      <li><b class="n">2</b><span>15 días no significa esperar hasta el día 15 para empezar: es el término <b>máximo</b> legal.</span></li>
+      <li><b class="n">3</b><span>Una respuesta de fondo no significa una respuesta favorable, sino responder realmente lo solicitado.</span></li>
+      <li><b class="n">4</b><span>El área que tiene la información es fundamental: sin sus insumos, Jurídica no puede responder bien.</span></li>
+      <li><b class="n">5</b><span>Los tiempos internos existen para cumplir los tiempos externos frente al ciudadano.</span></li>
+      <li><b class="n">6</b><span>Las tutelas requieren especial atención: el término lo fija el juez, según el caso.</span></li>
+      <li><b class="n">7</b><span>La comunicación también importa: una respuesta que no llega al ciudadano no satisface el derecho de petición.</span></li>
+    </ul>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">13 / 20</span></div>
+`);
+
+/* 14 · divisor bloque 2 */
+slide("div2","navy",`
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+    <p class="eyebrow">Bloque 2</p>
+    <h1 style="font-size:clamp(40px,6vw,88px); font-weight:800;">La Terminal Jurídica</h1>
+    <p style="font-size:clamp(15px,1.6vw,24px); color:var(--blue-soft); max-width:52vw; margin-top:1.4vh">Todo lo que acabamos de ver, convertido en una herramienta de todos los días.</p>
+  </div>
+  <div class="sky">${skySVG}</div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">14 / 20</span></div>
+`);
+
+/* 15 · problema que resuelve */
+slide("problema","",`
+  <p class="eyebrow">Por qué la construimos</p>
+  <h2 class="tit">Le pusimos nombre al riesgo, y una herramienta encima</h2>
+  <div class="cont" style="justify-content:center">
+    <div class="contraste">
+      <div class="box no"><span class="tag">Antes</span><p style="margin:0; font-size:clamp(13px,1.15vw,17px); line-height:1.6">Los plazos vivían en la cabeza de cada persona. Nadie más sabía qué estaba por vencer, ni en qué área estaba represado un requerimiento.</p></div>
+      <div class="box si"><span class="tag">Ahora</span><p style="margin:0; font-size:clamp(13px,1.15vw,17px); line-height:1.6">Cada actuación tiene semáforo, fecha límite y responsable visibles para todo el equipo — y un correo automático avisa antes de que se venza.</p></div>
+    </div>
+    <div class="grid g3" style="margin-top:.5vh">
+      <div class="card" style="text-align:center"><div style="font-size:clamp(22px,2vw,30px)">🟢🟡🔴</div><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Semáforo por actuación</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:clamp(22px,2vw,30px)">🚌</div><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Ruta de plazos visual</p></div>
+      <div class="card" style="text-align:center"><div style="font-size:clamp(22px,2vw,30px)">✉️</div><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Recordatorios automáticos</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">15 / 20</span></div>
+`);
+
+/* 16 · funciones */
+slide("funciones","",`
+  <p class="eyebrow">Un recorrido rápido</p>
+  <h2 class="tit">Lo que trae la herramienta</h2>
+  <div class="cont" style="justify-content:center">
+    <div class="grid g3">
+      <div class="card"><b style="color:var(--navy)">📋 Mesa de casos</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Cada quien registra y edita únicamente sus propias actuaciones.</p></div>
+      <div class="card"><b style="color:var(--navy)">🗂️ Vista general</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Todos pueden consultar el estado de todo el equipo, con filtros y orden.</p></div>
+      <div class="card"><b style="color:var(--navy)">📊 Control operativo</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">La Dirección Jurídica compara tiempos de respuesta por tipo de actuación.</p></div>
+      <div class="card"><b style="color:var(--navy)">📚 Normativa integrada</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Las normas que sustentan cada término, a un clic de distancia.</p></div>
+      <div class="card"><b style="color:var(--navy)">👀 Consulta abierta</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Otras dependencias consultan sin usuario ni clave, solo lectura.</p></div>
+      <div class="card"><b style="color:var(--navy)">🔒 Seguridad</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Claves cifradas; cada quien edita solo lo suyo.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">16 / 20</span></div>
+`);
+
+/* 17 · demo qr */
+slide("demoqr","navy",`
+  <p class="eyebrow">Pruébala tú mismo, ahora</p>
+  <div class="qr-box">
+    <img src="qr_herramienta.png" alt="Código QR de acceso a la Terminal Jurídica">
+    <div class="qr-tx">
+      <h2>Escanea y entra a consultar</h2>
+      <p>Sin usuario ni clave. Vas a ver la Vista general y la pestaña Normativa, tal como las vería otra dependencia.</p>
+      <span class="link">mtricasfrias.github.io/terminal-juridica-web</span>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">17 / 20</span></div>
+`);
+
+/* 18 · cierre */
+slide("cierre","",`
+  <p class="eyebrow">Para terminar</p>
+  <h2 class="tit">Una respuesta oportuna no empieza cuando Jurídica escribe</h2>
+  <div class="cont" style="justify-content:center">
+    <p style="font-size:clamp(15px,1.5vw,22px); font-style:italic; color:var(--navy); max-width:62vw; line-height:1.5">"Empieza desde el momento en que cada área recibe y atiende oportunamente la solicitud de información. Cumplir el término no es solamente evitar que se venza un plazo; es garantizarle al ciudadano una respuesta real, clara y de fondo."</p>
+    <div class="grid g3" style="margin-top:1vh">
+      <div class="card"><b style="color:var(--navy); font-size:clamp(12px,1.05vw,15px)">✅ Cada quien</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Cambia su clave y activa su correo en la Terminal Jurídica.</p></div>
+      <div class="card"><b style="color:var(--navy); font-size:clamp(12px,1.05vw,15px)">📌 Cuando llegue una petición</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Identifica el tipo y responde a Jurídica dentro del plazo interno que te pidan.</p></div>
+      <div class="card"><b style="color:var(--navy); font-size:clamp(12px,1.05vw,15px)">🤝 Trabajamos</b><p style="margin:.6vh 0 0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">Como una sola entidad frente al ciudadano.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">18 / 20</span></div>
+`);
+
+/* 19 · fuentes */
+slide("fuentes","",`
+  <p class="eyebrow">Para consultar después</p>
+  <h2 class="tit">Fuentes normativas de esta capacitación</h2>
+  <div class="cont" style="justify-content:center">
+    <div class="chips-fuente" style="margin-top:0">
+      <span class="chip-fte">Constitución Política, art. 23</span><span class="chip-fte">Constitución Política, art. 86</span>
+      <span class="chip-fte">Ley 1755 de 2015, arts. 13, 14 y 15</span><span class="chip-fte">Ley 1437 de 2011 · CPACA</span>
+      <span class="chip-fte">Decreto 2591 de 1991</span><span class="chip-fte">Jurisprudencia de la Corte Constitucional</span>
+    </div>
+    <p style="margin-top:2vh; font-size:clamp(12px,1.05vw,15px); color:var(--ink-soft); max-width:56vw">Este material es un resumen de apoyo con fines de capacitación interna; para un caso concreto, consulta siempre el texto oficial de la norma.</p>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">19 / 20</span></div>
+`);
+
+/* 20 · cuestionario */
+slide("cuestionario","navy",`
+  <p class="eyebrow">Ahora te toca a ti</p>
+  <div class="qr-box">
+    <img src="qr_cuestionario.png" alt="Código QR del cuestionario">
+    <div class="qr-tx">
+      <h2>¿Qué tanto quedó claro?</h2>
+      <p>12 preguntas sobre lo que acabamos de ver. Entre más rápido aciertes, más puntos ganas. Hay clasificación en vivo.</p>
+      <span class="link">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
+    </div>
+  </div>
+  <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">20 / 20 · Gracias</span></div>
+`);
+
+/* ===================== motor de navegación ===================== */
+const deck = document.getElementById("deck");
+SLIDES.forEach(s=>{ const el=document.createElement("section"); el.className="slide "+s.cls; el.id=s.id; el.innerHTML=s.html; deck.appendChild(el); });
+let IDX = Math.max(0, Math.min(SLIDES.length-1, (parseInt((location.hash||"").replace("#",""),10)||1)-1));
+const els = [...document.querySelectorAll(".slide")];
+const navCont = document.getElementById("nav-cont"), btnPrev=document.getElementById("btn-prev"), btnNext=document.getElementById("btn-next"), btnFull=document.getElementById("btn-full"), progreso=document.getElementById("progreso");
+function ir(i){
+  IDX = Math.max(0, Math.min(SLIDES.length-1, i));
+  els.forEach((el,k)=>el.classList.toggle("activa", k===IDX));
+  navCont.textContent = (IDX+1)+" / "+SLIDES.length;
+  progreso.style.width = (((IDX+1)/SLIDES.length)*100)+"%";
+  btnPrev.disabled = IDX===0; btnNext.disabled = IDX===SLIDES.length-1;
+  history.replaceState(null,"","#"+(IDX+1));
+}
+btnPrev.addEventListener("click", ()=>ir(IDX-1));
+btnNext.addEventListener("click", ()=>ir(IDX+1));
+btnFull.addEventListener("click", ()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); });
+window.addEventListener("keydown", e=>{
+  if(["ArrowRight","PageDown"," "].includes(e.key)){ e.preventDefault(); ir(IDX+1); }
+  else if(["ArrowLeft","PageUp"].includes(e.key)){ e.preventDefault(); ir(IDX-1); }
+  else if(e.key==="Home") ir(0);
+  else if(e.key==="End") ir(SLIDES.length-1);
+});
+window.addEventListener("hashchange", ()=>{
+  const n = parseInt((location.hash||"").replace("#",""),10);
+  if(n && (n-1)!==IDX) ir(n-1);
+});
+let touchX=null;
+deck.addEventListener("touchstart", e=>{ touchX=e.touches[0].clientX; }, {passive:true});
+deck.addEventListener("touchend", e=>{
+  if(touchX===null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(Math.abs(dx) > 60) ir(IDX + (dx<0?1:-1));
+  touchX=null;
+}, {passive:true});
+ir(IDX);
+</script>
+</body>
+</html>
