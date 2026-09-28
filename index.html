@@ -761,10 +761,12 @@ function renderLogin(msg){
     if(!userI.value.trim() || !passI.value){ err.textContent="Escribe tu usuario y tu clave."; return; }
     btn.disabled=true; btn.textContent="Ingresando…"; err.textContent="";
     try{
-      const r = await api("login", userI.value, passI.value);
+      // login + datos en un solo viaje al servidor (cada llamada a Apps Script cuesta 1-3 s: hacerlo en dos pasos se sentía muy lento)
+      const r = await api("loginYDatos", userI.value, passI.value);
       TOKEN = r.token; store("tj_token", TOKEN);
+      ME = r.yo; CONSULTA_ACTIVA = r.consultaPublica !== false; aplicarDatos(r);
       if(fondo && !REDUCE){ fondo.classList.add("st-ok"); await new Promise(res=>setTimeout(res, 900)); }   // el mazo golpea y la balanza se equilibra
-      await cargar(); viewTab="mine"; controlSelected=null; mailMsg={t:"",ok:true}; pwMsg={t:"",ok:true};
+      viewTab="mine"; controlSelected=null; mailMsg={t:"",ok:true}; pwMsg={t:"",ok:true};
       render();
     }catch(e){
       err.textContent=e.message; passI.value=""; btn.disabled=false; btn.textContent="Ingresar →";
@@ -1163,11 +1165,6 @@ const NORMAS = [
    puntos:["Art. 62: en los plazos de días de las leyes y actos oficiales se entienden suprimidos los feriados y de vacante, salvo que se diga lo contrario.","Los plazos de meses y años se cuentan por calendario; si el último día es feriado, se extienden hasta el primer día hábil."],
    tipos:"*", uso:"Por esto la página cuenta solo días hábiles al calcular la fecha límite.",
    url:"www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=8426"},
-  {id:"l51", nivel:"ley", nombre:"Ley 51 de 1983 (Ley Emiliani)", titulo:"Festivos y descanso remunerado",
-   resumen:"Traslada varios festivos al lunes siguiente.",
-   puntos:["Se trasladan al lunes: 6 de enero, 19 de marzo, 29 de junio, 15 de agosto, 12 de octubre, 1 y 11 de noviembre, Ascensión, Corpus Christi y Sagrado Corazón.","La página trae los festivos de 2026 a 2028; conviene actualizarlos cada año."],
-   tipos:"*", uso:"Estos festivos se excluyen al calcular fechas límite y al enviar recordatorios.",
-   url:"www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4954"},
   {id:"l1581", nivel:"ley", nombre:"Ley 1581 de 2012", titulo:"Protección de datos personales (habeas data)",
    resumen:"Protege los datos personales guardados en bases de datos.",
    puntos:["Art. 1: desarrolla el derecho a conocer, actualizar y rectificar la información recogida en bases de datos (art. 15 de la Constitución).","La página guarda solo lo necesario: nombre, correo de trabajo y datos de cada actuación."],
@@ -1186,7 +1183,7 @@ const NORMAS = [
   {id:"i_calc", nivel:"interno", nombre:"Cómputo de días hábiles", titulo:"Cómo se calcula la fecha límite",
    resumen:"La fecha límite es la recepción más el término, contando solo días hábiles.",
    puntos:["El término empieza a contar desde el día siguiente a la recepción.","Cuentan de lunes a viernes que no sean festivos de Colombia.","Los festivos de 2026 a 2028 están cargados en el sistema.","Con esa fecha se calculan el semáforo, la ruta de plazos y los recordatorios."],
-   tipos:"*", siempre:true, uso:"Columna “Fecha límite” y todo lo que depende de ella. Base: Ley 4 de 1913 y Ley 51 de 1983.", url:null},
+   tipos:"*", siempre:true, uso:"Columna “Fecha límite” y todo lo que depende de ella. Base: Ley 4 de 1913.", url:null},
   {id:"i_sem", nivel:"interno", nombre:"Semáforo de estados", titulo:"Verde, ámbar, rojo y azul",
    resumen:"Cada actuación tiene un color según cuánto plazo le queda.",
    puntos:["Verde (vigente): le quedan más de 3 días hábiles.","Ámbar (próximo a vencer): le quedan 3 días hábiles o menos.","Rojo (vencido): pasó la fecha límite y no hay respuesta.","Azul (respondido): ya tiene fecha de respuesta."],
@@ -1209,7 +1206,7 @@ const NORMAS = [
    tipos:"*", uso:"Sin servidores propios que mantener.", url:null}
 ];
 const TIPO_INFO = {
-  "DERECHO DE PETICIÓN (GENERAL)": {q:"ley", base:["cp","l1755","l4","l51"], txt:"Toda petición debe resolverse en 15 días (Ley 1755 de 2015, art. 14). Los días se cuentan como hábiles."},
+  "DERECHO DE PETICIÓN (GENERAL)": {q:"ley", base:["cp","l1755","l4"], txt:"Toda petición debe resolverse en 15 días (Ley 1755 de 2015, art. 14). Los días se cuentan como hábiles."},
   "DERECHO DE PETICIÓN (DOCUMENTOS / INFORMACIÓN)": {q:"ley", base:["l1755","l1712","l4"], txt:"Las solicitudes de documentos e información se resuelven en 10 días. Si no se responde en ese plazo, se entiende aceptada la solicitud (art. 14)."},
   "DERECHO DE PETICIÓN (CONSULTA)": {q:"ley", base:["l1755","l4"], txt:"Las consultas a las autoridades sobre asuntos a su cargo se resuelven en 30 días (art. 14)."},
   "PQR": {q:"ley", base:["cp","l1755","l4"], txt:"Las quejas y los reclamos son peticiones: se manejan con el término general de 15 días."},
