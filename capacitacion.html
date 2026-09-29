@@ -628,20 +628,17 @@ ir(IDX);
     return r;
   }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-  const AV_COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828"};
+  const ICONO_ACC_MINI = {gafas:"🕶️",corbata:"👔",mascarilla:"😷",bufanda:"🧣",audifonos:"🎧",panuelo:"🔺","moño":"🎀"};
+  const ICONO_EL_MINI = {mochila:"🎒",tablet:"📱",mapa:"🗺️",llave:"🔧",radio:"📻",cono:"🚧",semaforo:"🚦",bandera:"🚩",megafono:"📢",planta:"🌱",balon:"⚽",patineta:"🛹",capa:"🦸",libro:"📖",binoculares:"🔭",camara:"📷"};
+  /* mismas fotos reales de SETPI que en cuestionario.html: personaje:accesorio:elemento */
   function avatarSVG(spec, sz){
     sz = sz || 32;
-    const partes = String(spec||"royal:ninguno:ninguno").split(":"); const c = AV_COLORES[partes[0]] || AV_COLORES.royal, som = partes[1]||"ninguno", acc = partes[2]||"ninguno";
-    const cuerpo = `<path d="M9,30 Q24,36 39,30 L39,43 Q24,47 9,43 Z" fill="${c}"/><rect x="16.5" y="34.5" width="15" height="3.6" rx="1.6" fill="#fff" opacity=".9"/>`;
-    const casco = '<path d="M7,23 Q7,3 24,3 Q41,3 41,23 L41,27 Q24,31.5 7,27 Z" fill="#EAEEF5" stroke="#C7D0E0" stroke-width="1.1"/><circle cx="24" cy="9.5" r="4.6" fill="#fff" stroke="#C7D0E0" stroke-width=".9"/><circle cx="24" cy="9.5" r="2.6" fill="#1D4ED8"/>';
-    let ojos = '<ellipse cx="17" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><ellipse cx="31" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><circle cx="18.2" cy="21.6" r="2.5" fill="#0D1730"/><circle cx="29.8" cy="21.6" r="2.5" fill="#0D1730"/>';
-    if(acc==="gafas") ojos = '<rect x="11.5" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="26" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="22" y="20.5" width="4" height="2" fill="#0D1730"/>';
-    let accMk = acc==="corbata" ? '<polygon points="21,32 27,32 29,42 24,46 19,42" fill="#D62828"/>' : "";
-    let somMk = "";
-    if(som==="gorra") somMk = '<path d="M6,12 a18,12 0 0 1 36,0 Z" fill="#0B1F5C"/><rect x="4" y="11" width="40" height="4.4" rx="2.2" fill="#0B1F5C"/>';
-    else if(som==="casco") somMk = '<path d="M5,12 a19,14 0 0 1 38,0 Z" fill="#F0A800"/><rect x="3" y="11" width="42" height="4.4" rx="2.2" fill="#c98c00"/>';
-    else if(som==="corona") somMk = '<polygon points="8,12 13,2 19,9 24,1 29,9 35,2 40,12" fill="#F0A800" stroke="#c98c00" stroke-width="1"/>';
-    return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true">${cuerpo}${casco}${ojos}${accMk}${somMk}</svg>`;
+    const partes = String(spec||"traje_azul:ninguno:ninguno").split(":");
+    const personaje = partes[0] || "traje_azul", acc = partes[1]||"ninguno", el = partes[2]||"ninguno";
+    const fs = Math.max(10, Math.round(sz*.4));
+    const a = ICONO_ACC_MINI[acc] ? `<span style="position:absolute; right:-2px; bottom:-2px; font-size:${fs}px; line-height:1">${ICONO_ACC_MINI[acc]}</span>` : "";
+    const e = ICONO_EL_MINI[el] ? `<span style="position:absolute; left:-2px; bottom:-2px; font-size:${fs}px; line-height:1">${ICONO_EL_MINI[el]}</span>` : "";
+    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none;"><img src="img/setpi/${personaje}.png" width="${sz}" height="${sz}" style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:50%; display:block; background:#fff;" alt="">${a}${e}</span>`;
   }
 
   const mhLogin = document.getElementById("mh-login"), mhLobby = document.getElementById("mh-lobby"), mhCurso = document.getElementById("mh-curso");

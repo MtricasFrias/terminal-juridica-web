@@ -63,6 +63,13 @@ button{font:inherit; cursor:pointer;}
 .sw.on{border-color:var(--navy); transform:scale(1.12);}
 .acc-btn{display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--paper); border:2px solid var(--line); border-radius:12px; padding:8px 10px; font-size:.68rem; font-weight:700; color:var(--muted); min-width:64px;}
 .acc-btn.on{border-color:var(--cyan); background:var(--cyan-soft); color:var(--navy);}
+.tabs-personaje{display:flex; gap:6px; margin-bottom:8px;}
+.tab-p{flex:1; background:var(--paper); border:2px solid var(--line); border-radius:10px; padding:7px 4px; font-size:.72rem; font-weight:700; color:var(--muted);}
+.tab-p.on{border-color:var(--royal); background:var(--blue-soft); color:var(--navy);}
+.picker-gallery{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-height:190px; overflow-y:auto; padding:4px; background:var(--paper); border-radius:12px; border:1px solid var(--line);}
+.pg-item{border:2.5px solid transparent; border-radius:10px; overflow:hidden; background:var(--cream); line-height:0; aspect-ratio:1/1;}
+.pg-item img{width:100%; height:100%; object-fit:cover; object-position:top;}
+.pg-item.on{border-color:var(--cyan); box-shadow:0 0 0 2px var(--cyan-soft);}
 .btn-grande{width:100%; margin-top:20px; padding:15px 18px; border:0; border-radius:14px; color:#fff; background:linear-gradient(135deg,var(--cyan),var(--royal)); font-family:"Barlow",sans-serif; font-weight:800; font-size:16.5px; letter-spacing:.02em; box-shadow:0 12px 26px rgba(21,155,214,.35); transition:transform .14s, box-shadow .14s;}
 .btn-grande:active:not(:disabled){transform:translateY(1px) scale(.99);}
 .btn-grande:disabled{opacity:.6; cursor:progress;}
@@ -159,12 +166,13 @@ button{font:inherit; cursor:pointer;}
   <p>10 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Elige tu personaje, entra a la sala y espera: el cuestionario arranca <b>para todos a la vez</b>.</p>
   <div class="avatar-preview"><div class="marco" id="avatar-marco"></div></div>
   <input id="in-nombre" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="40">
-  <div class="picker-tit">Color</div>
-  <div class="picker-row" id="picker-color"></div>
-  <div class="picker-tit">Sombrero</div>
-  <div class="picker-row" id="picker-som"></div>
+  <div class="picker-tit">Personaje</div>
+  <div class="tabs-personaje" id="tabs-personaje"></div>
+  <div class="picker-gallery" id="picker-gallery"></div>
   <div class="picker-tit">Accesorio</div>
   <div class="picker-row" id="picker-acc"></div>
+  <div class="picker-tit">Lleva en la mano</div>
+  <div class="picker-row" id="picker-el"></div>
   <p style="font-size:.72rem; color:var(--muted); margin:6px 0 0">Te asignamos un look al azar — cámbialo si quieres, o entra tal cual.</p>
   <button id="btn-empezar" class="btn-grande">Entrar a la sala →</button>
   <div class="err" id="err-intro"></div>
@@ -240,83 +248,77 @@ async function api(fn, ...args){
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 function mem(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
 
-/* ---------- personajes: color + accesorio, al estilo "vístete tu jugador" ---------- */
-const COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828", purple:"#7C3AED", orange:"#EA580C", gris:"#5B6A88", blanco:"#F4F6FB"};
-const NOMBRES_COLOR = {navy:"Azul noche", royal:"Azul rey", cyan:"Celeste", green:"Verde", gold:"Dorado", red:"Rojo", purple:"Morado", orange:"Naranja", gris:"Gris", blanco:"Blanco"};
-/* SETPI: la mascota del SETP. Cara fija, traje de color a elegir, y dos capas independientes
-   (sombrero + accesorio) — igual que el mascotario oficial, en versión SVG liviana. Con 10 colores,
-   8 sombreros y 8 accesorios hay 640 combinaciones posibles, más el color al azar de cada persona. */
-const SOMBREROS = ["ninguno","gorra","casco","corona","boina","deportiva","explorador","tolimense"];
-const NOMBRES_SOM = {ninguno:"Ninguno", gorra:"Gorra SETP", casco:"Casco de obra", corona:"Corona", boina:"Boina", deportiva:"Gorra deportiva", explorador:"Sombrero explorador", tolimense:"Sombrero tolimense"};
+/* ---------- personajes: fotos reales de SETPI recortadas de tu mascotario ---------- */
+const PERSONAJES = {
+  traje_azul:"Azul (Principal)", traje_rojo:"Rojo", traje_verde:"Verde", traje_amarillo:"Amarillo", traje_blanco:"Blanco", traje_gris:"Gris", traje_negro:"Negro", traje_naranja:"Naranja", traje_morado:"Morado",
+  tematico_conductor_bus:"Conductor de bus", tematico_pasajero:"Pasajero", tematico_semaforo:"Semáforo", tematico_ciclista:"Ciclista", tematico_obrero:"Obrero de infraestructura",
+  tematico_personal_setp:"Personal SETP", tematico_mecanico:"Mecánico", tematico_inspector:"Inspector", tematico_planificador:"Planificador", tematico_ambiental:"Ambiental",
+  tematico_cultura_tolimense:"Cultura Tolimense", tematico_superheroe:"Superhéroe SETP", tematico_explorador:"Explorador",
+  som_ninguno:"Sin sombrero", som_gorra_setp:"Gorra SETP", som_tolimense:"Sombrero tolimense", som_vueltiao:"Sombrero vueltiao", som_casco_obra:"Casco de obra", som_deportiva:"Gorra deportiva", som_conductor:"Gorra conductor",
+  som_ciclista:"Casco ciclista", som_corona:"Corona", som_explorador:"Sombrero explorador", som_ambiental:"Sombrero ambiental", som_cultural:"Sombrero cultural"
+};
+const GRUPOS = [
+  ["color", "Colores", Object.keys(PERSONAJES).filter(k=>k.startsWith("traje_"))],
+  ["tematico", "Trajes SETP", Object.keys(PERSONAJES).filter(k=>k.startsWith("tematico_"))],
+  ["sombrero", "Sombreros", Object.keys(PERSONAJES).filter(k=>k.startsWith("som_"))]
+];
 const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla","bufanda","audifonos","panuelo","moño"];
 const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla", bufanda:"Bufanda", audifonos:"Audífonos", panuelo:"Pañuelo", "moño":"Moño"};
-/* SETPI siempre tiene: capucha/casco gris claro con la insignia del SETP en la frente, y ojos
-   grandes de caricatura — eso es lo que lo hace reconocible. El color elegido va en el traje,
-   no en la cabeza (igual que en el mascotario: "cara fija" + "traje" + capas encima). */
+const ICONO_ACC = {gafas:"🕶️", corbata:"👔", mascarilla:"😷", bufanda:"🧣", audifonos:"🎧", panuelo:"🔺", "moño":"🎀"};
+const ELEMENTOS = ["ninguno","mochila","tablet","mapa","llave","radio","cono","semaforo","bandera","megafono","planta","balon","patineta","capa","libro","binoculares","camara"];
+const NOMBRES_EL = {ninguno:"Ninguno", mochila:"Mochila", tablet:"Tablet", mapa:"Mapa", llave:"Llave inglesa", radio:"Radio", cono:"Cono", semaforo:"Semáforo portátil", bandera:"Bandera", megafono:"Megáfono", planta:"Planta", balon:"Balón", patineta:"Patineta", capa:"Capa", libro:"Libro", binoculares:"Binoculares", camara:"Cámara"};
+const ICONO_EL = {mochila:"🎒", tablet:"📱", mapa:"🗺️", llave:"🔧", radio:"📻", cono:"🚧", semaforo:"🚦", bandera:"🚩", megafono:"📢", planta:"🌱", balon:"⚽", patineta:"🛹", capa:"🦸", libro:"📖", binoculares:"🔭", camara:"📷"};
+/* spec = "personaje:accesorio:elemento". El personaje es una foto real (img/setpi/<clave>.png);
+   accesorio y elemento se muestran como insignias pequeñas encima, en vez de intentar dibujarlos
+   sobre la foto (evita que se vean mal pegados). */
 function avatarSVG(spec, sz){
   sz = sz || 40;
-  const partes = String(spec||"royal:ninguno:ninguno").split(":");
-  const color = COLORES[partes[0]] ? partes[0] : "royal", som = SOMBREROS.includes(partes[1]) ? partes[1] : "ninguno", acc = ACCESORIOS.includes(partes[2]) ? partes[2] : "ninguno";
-  const c = COLORES[color];
-
-  const cuerpo = `<path d="M9,30 Q24,36 39,30 L39,43 Q24,47 9,43 Z" fill="${c}" stroke="#C7D0E0" stroke-width=".7"/><rect x="16.5" y="34.5" width="15" height="3.6" rx="1.6" fill="#0D1730" opacity=".18"/>`;
-  const casco = `<path d="M7,23 Q7,3 24,3 Q41,3 41,23 L41,27 Q24,31.5 7,27 Z" fill="#EAEEF5" stroke="#C7D0E0" stroke-width="1.1"/>
-    <circle cx="24" cy="9.5" r="4.6" fill="#fff" stroke="#C7D0E0" stroke-width=".9"/><circle cx="24" cy="9.5" r="2.6" fill="${COLORES.royal}"/><path d="M21.6,9.5 q2.4,-2.6 4.8,0" stroke="#fff" stroke-width=".9" fill="none"/>`;
-
-  let ojos = '<ellipse cx="17" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><ellipse cx="31" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><circle cx="18.2" cy="21.6" r="2.5" fill="#0D1730"/><circle cx="29.8" cy="21.6" r="2.5" fill="#0D1730"/><circle cx="19.2" cy="20.4" r=".9" fill="#fff"/><circle cx="30.8" cy="20.4" r=".9" fill="#fff"/>';
-  let boca = '<path d="M19,28 q5,3.6 10,0" stroke="#8A93A8" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-  if(acc==="gafas"){ ojos = '<rect x="11.5" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="26" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="22" y="20.5" width="4" height="2" fill="#0D1730"/><ellipse cx="16.8" cy="20.8" rx="1.6" ry="1.2" fill="#fff" opacity=".5"/><ellipse cx="31.3" cy="20.8" rx="1.6" ry="1.2" fill="#fff" opacity=".5"/>'; }
-  else if(acc==="mascarilla"){ boca = '<path d="M13,26.5 Q24,34.5 35,26.5 L35,31 Q24,39 13,31 Z" fill="#E6F4FB" stroke="#159BD6" stroke-width="1.2"/>'; }
-  let accMk = "";
-  if(acc==="corbata") accMk = '<polygon points="21,32 27,32 29,42 24,46 19,42" fill="#D62828"/><polygon points="21,32 27,32 24,36.5" fill="#0B1F5C"/>';
-  else if(acc==="moño") accMk = '<polygon points="15,33 22,30.5 22,36.5" fill="#D62828"/><polygon points="33,33 26,30.5 26,36.5" fill="#D62828"/><circle cx="24" cy="33" r="2.2" fill="#a01e1e"/>';
-  else if(acc==="bufanda") accMk = '<path d="M9,29 Q24,35 39,29 L39,33.5 Q24,39.5 9,33.5 Z" fill="#D62828"/><rect x="20" y="33" width="7" height="13" rx="2" fill="#D62828"/><rect x="20" y="42" width="7" height="3.4" fill="#a01e1e"/>';
-  else if(acc==="audifonos") accMk = '<path d="M9,17 Q9,1 24,1 Q39,1 39,17" fill="none" stroke="#0D1730" stroke-width="2.6"/><rect x="5.5" y="14" width="7" height="11" rx="3.5" fill="#0D1730"/><rect x="35.5" y="14" width="7" height="11" rx="3.5" fill="#0D1730"/>';
-  else if(acc==="panuelo") accMk = '<path d="M8,28.5 Q24,34.5 40,28.5 L40,33 Q24,39 8,33 Z" fill="#EA580C"/><circle cx="12" cy="30" r="1.3" fill="#fff" opacity=".7"/><circle cx="36" cy="30" r="1.3" fill="#fff" opacity=".7"/><circle cx="24" cy="32.5" r="1.3" fill="#fff" opacity=".7"/>';
-
-  let somMk = "";
-  if(som==="gorra") somMk = '<path d="M6,12 a18,12 0 0 1 36,0 Z" fill="#0B1F5C"/><rect x="4" y="11" width="40" height="4.4" rx="2.2" fill="#0B1F5C"/><rect x="20" y="2" width="8" height="4" rx="1" fill="#00A830"/><circle cx="24" cy="4" r="1.8" fill="#F0A800"/>';
-  else if(som==="casco") somMk = '<path d="M5,12 a19,14 0 0 1 38,0 Z" fill="#F0A800"/><rect x="3" y="11" width="42" height="4.4" rx="2.2" fill="#c98c00"/><rect x="20" y="1" width="8" height="6" rx="1.4" fill="#c98c00"/>';
-  else if(som==="corona") somMk = '<polygon points="8,12 13,2 19,9 24,1 29,9 35,2 40,12" fill="#F0A800" stroke="#c98c00" stroke-width="1"/><circle cx="13" cy="2" r="2" fill="#D62828"/><circle cx="24" cy="1" r="2" fill="#159BD6"/><circle cx="35" cy="2" r="2" fill="#00A830"/>';
-  else if(som==="boina") somMk = '<ellipse cx="24" cy="8" rx="18" ry="8" fill="#7C3AED"/><ellipse cx="24" cy="10" rx="14" ry="4.5" fill="#EAEEF5"/><circle cx="24" cy="1" r="1.8" fill="#7C3AED"/>';
-  else if(som==="deportiva") somMk = '<path d="M7,13 a17,11 0 0 1 34,0 Z" fill="#D62828"/><path d="M38,12 q10,-1 11,4 q-9,2 -12,-1 Z" fill="#D62828"/><circle cx="24" cy="4" r="1.6" fill="#fff"/>';
-  else if(som==="explorador") somMk = '<ellipse cx="24" cy="13" rx="23" ry="4.6" fill="#c98c00"/><path d="M9,13 a15,10 0 0 1 30,0 Z" fill="#EA580C"/><rect x="6" y="11.5" width="36" height="3" fill="#a04d05"/>';
-  else if(som==="tolimense") somMk = '<ellipse cx="24" cy="12" rx="22" ry="4.2" fill="#F4F6FB" stroke="#C7D0E0" stroke-width=".8"/><path d="M9,12 a15,10 0 0 1 30,0 Z" fill="#F4F6FB" stroke="#C7D0E0" stroke-width=".8"/><path d="M6,10 h36 M6,12.5 h36" stroke="#0D1730" stroke-width=".7" opacity=".5"/>';
-
-  return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true">${cuerpo}${casco}${ojos}${boca}${accMk}${somMk}</svg>`;
+  const partes = String(spec||"traje_azul:ninguno:ninguno").split(":");
+  const personaje = PERSONAJES[partes[0]] !== undefined ? partes[0] : "traje_azul";
+  const acc = ACCESORIOS.includes(partes[1]) ? partes[1] : "ninguno";
+  const el = ELEMENTOS.includes(partes[2]) ? partes[2] : "ninguno";
+  const fs = Math.max(11, Math.round(sz*.4));
+  const accIco = ICONO_ACC[acc] ? `<span style="position:absolute; right:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))">${ICONO_ACC[acc]}</span>` : "";
+  const elIco = ICONO_EL[el] ? `<span style="position:absolute; left:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))">${ICONO_EL[el]}</span>` : "";
+  return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none;"><img src="img/setpi/${personaje}.png" width="${sz}" height="${sz}" style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:50%; display:block; background:#fff;" alt="${esc(PERSONAJES[personaje])}">${accIco}${elIco}</span>`;
 }
 function busWatermark(color, cls){
   return `<svg class="${cls}" viewBox="0 0 200 90" aria-hidden="true"><rect x="6" y="12" width="176" height="54" rx="14" fill="${color}"/><rect x="6" y="42" width="176" height="8" fill="#D62828"/>${[26,62,98,134].map(x=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#fff"/>`).join("")}<circle cx="188" cy="58" r="5" fill="#F0A800"/>${[46,146].map(x=>`<circle cx="${x}" cy="70" r="13" fill="#0D1730"/><circle cx="${x}" cy="70" r="5.5" fill="#8A93A8"/>`).join("")}</svg>`;
 }
 
 /* look inicial al azar (distinto cada vez que alguien entra, para que no todos se vean iguales
-   si nadie toca el selector — solo el color se sortea siempre "en el aire", sombrero y accesorio
-   parten en "ninguno" para no saturar, pero el color ya los distingue entre sí). */
-const CLAVES_COLOR = Object.keys(COLORES);
-let MI_COLOR = CLAVES_COLOR[Math.floor(Math.random()*CLAVES_COLOR.length)], MI_SOM = "ninguno", MI_ACC = "ninguno";
-const avatarMarco = document.getElementById("avatar-marco"), pickerColor = document.getElementById("picker-color"), pickerSom = document.getElementById("picker-som"), pickerAcc = document.getElementById("picker-acc");
-function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(MI_COLOR+":"+MI_SOM+":"+MI_ACC, 60); }
-Object.keys(COLORES).forEach(k=>{
-  const b = document.createElement("button"); b.type="button"; b.className="sw"+(k===MI_COLOR?" on":""); b.style.background = COLORES[k]; b.title = NOMBRES_COLOR[k]; b.setAttribute("aria-label", NOMBRES_COLOR[k]);
-  b.addEventListener("click", ()=>{ MI_COLOR = k; [...pickerColor.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
-  pickerColor.appendChild(b);
-});
-SOMBREROS.forEach(k=>{
-  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_SOM?" on":"");
-  b.innerHTML = avatarSVG("navy:"+k+":ninguno", 30) + "<span>"+NOMBRES_SOM[k]+"</span>";
-  b.addEventListener("click", ()=>{ MI_SOM = k; [...pickerSom.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
-  pickerSom.appendChild(b);
-});
+   si nadie toca el selector — se sortea entre los 34 personajes reales). */
+const CLAVES_PERSONAJE = Object.keys(PERSONAJES);
+let MI_PERSONAJE = CLAVES_PERSONAJE[Math.floor(Math.random()*CLAVES_PERSONAJE.length)], MI_ACC = "ninguno", MI_EL = "ninguno";
+let TAB_ACTIVA = GRUPOS.find(g=>g[2].includes(MI_PERSONAJE))[0];
+const avatarMarco = document.getElementById("avatar-marco"), tabsPersonaje = document.getElementById("tabs-personaje"), pickerGallery = document.getElementById("picker-gallery"), pickerAcc = document.getElementById("picker-acc"), pickerEl = document.getElementById("picker-el");
+function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(MI_PERSONAJE+":"+MI_ACC+":"+MI_EL, 60); }
+function pintarTabs(){
+  tabsPersonaje.innerHTML = GRUPOS.map(g=>`<button type="button" class="tab-p${g[0]===TAB_ACTIVA?" on":""}" data-t="${g[0]}">${g[1]}</button>`).join("");
+  tabsPersonaje.querySelectorAll(".tab-p").forEach(b=>b.addEventListener("click", ()=>{ TAB_ACTIVA = b.dataset.t; pintarTabs(); pintarGaleria(); }));
+}
+function pintarGaleria(){
+  const grupo = GRUPOS.find(g=>g[0]===TAB_ACTIVA);
+  pickerGallery.innerHTML = grupo[2].map(k=>`<button type="button" class="pg-item${k===MI_PERSONAJE?" on":""}" data-k="${k}" title="${esc(PERSONAJES[k])}"><img src="img/setpi/${k}.png" alt="${esc(PERSONAJES[k])}" loading="lazy"></button>`).join("");
+  pickerGallery.querySelectorAll(".pg-item").forEach(b=>b.addEventListener("click", ()=>{ MI_PERSONAJE = b.dataset.k; pintarGaleria(); pintarAvatarPreview(); }));
+}
+pintarTabs(); pintarGaleria();
 ACCESORIOS.forEach(k=>{
   const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_ACC?" on":"");
-  b.innerHTML = avatarSVG("navy:ninguno:"+k, 30) + "<span>"+NOMBRES_ACC[k]+"</span>";
+  b.innerHTML = `<span style="font-size:1.25rem">${ICONO_ACC[k]||"🚫"}</span><span>${NOMBRES_ACC[k]}</span>`;
   b.addEventListener("click", ()=>{ MI_ACC = k; [...pickerAcc.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
   pickerAcc.appendChild(b);
+});
+ELEMENTOS.forEach(k=>{
+  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_EL?" on":"");
+  b.innerHTML = `<span style="font-size:1.25rem">${ICONO_EL[k]||"🚫"}</span><span>${NOMBRES_EL[k]}</span>`;
+  b.addEventListener("click", ()=>{ MI_EL = k; [...pickerEl.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
+  pickerEl.appendChild(b);
 });
 pintarAvatarPreview();
 
 function confeti(cont){
-  const colores = [COLORES.royal, COLORES.green, COLORES.gold, COLORES.red, COLORES.cyan];
+  const colores = ["#1D4ED8", "#00A830", "#F0A800", "#D62828", "#159BD6"];
   for(let i=0;i<cont;i++){
     const d = document.createElement("div"); d.className = "confeti";
     d.style.left = (Math.random()*100)+"vw"; d.style.background = colores[i%colores.length];
@@ -324,7 +326,7 @@ function confeti(cont){
     document.body.appendChild(d); setTimeout(()=>d.remove(), 4200);
   }
 }
-document.getElementById("marca-agua").innerHTML = busWatermark(COLORES.green,"ma-bus1") + busWatermark(COLORES.royal,"ma-bus2");
+document.getElementById("marca-agua").innerHTML = busWatermark("#00A830","ma-bus1") + busWatermark("#1D4ED8","ma-bus2");
 
 /* ---------- estado y pantallas ---------- */
 let PREGUNTAS = [], DURACION = 20, TRANSICION = 3, TOTAL = 10, NOMBRE = "", MI_AVATAR = "royal:ninguno:ninguno";
@@ -345,7 +347,7 @@ async function empezar(){
   const nom = inNombre.value.trim();
   if(nom.length < 2){ errIntro.textContent = "Escribe tu nombre (mínimo 2 letras)."; return; }
   btnEmpezar.disabled = true; btnEmpezar.textContent = "Entrando…"; errIntro.textContent = "";
-  MI_AVATAR = MI_COLOR+":"+MI_SOM+":"+MI_ACC;
+  MI_AVATAR = MI_PERSONAJE+":"+MI_ACC+":"+MI_EL;
   try{
     const r = await api("quizUnirse", nom, MI_AVATAR);
     NOMBRE = nom; mem("quiz_nombre", nom); mem("quiz_avatar", MI_AVATAR);
@@ -408,7 +410,7 @@ const elSetpi = document.getElementById("setpi-mira");
 function mostrarPregunta(idx){
   const q = PREGUNTAS[idx];
   elFeedback.innerHTML = ""; elEsperando.hidden = true;
-  if(elSetpi) elSetpi.innerHTML = avatarSVG("gold:casco:ninguno", 44);
+  if(elSetpi) elSetpi.innerHTML = avatarSVG("tematico_inspector:ninguno:ninguno", 44);
   ORDEN = barajaEstable(q.opciones.length, NOMBRE + ":" + q.id);
   elContador.textContent = "Pregunta " + (idx+1) + " de " + TOTAL;
   elTema.textContent = q.tema;
@@ -509,10 +511,11 @@ document.getElementById("host-btn-reiniciar").addEventListener("click", async ()
 
 const guardado = mem("quiz_nombre"); if(guardado) inNombre.value = guardado;
 const avGuardado = mem("quiz_avatar");
-if(avGuardado){ const [c,s,a] = avGuardado.split(":"); if(COLORES[c]) MI_COLOR=c; if(SOMBREROS.includes(s)) MI_SOM=s; if(ACCESORIOS.includes(a)) MI_ACC=a;
-  [...pickerColor.children].forEach((el,i)=>el.classList.toggle("on", CLAVES_COLOR[i]===MI_COLOR));
-  [...pickerSom.children].forEach((el,i)=>el.classList.toggle("on", SOMBREROS[i]===MI_SOM));
+if(avGuardado){ const [p,a,e] = avGuardado.split(":"); if(PERSONAJES[p]!==undefined) MI_PERSONAJE=p; if(ACCESORIOS.includes(a)) MI_ACC=a; if(ELEMENTOS.includes(e)) MI_EL=e;
+  TAB_ACTIVA = GRUPOS.find(g=>g[2].includes(MI_PERSONAJE))[0];
+  pintarTabs(); pintarGaleria();
   [...pickerAcc.children].forEach((el,i)=>el.classList.toggle("on", ACCESORIOS[i]===MI_ACC));
+  [...pickerEl.children].forEach((el,i)=>el.classList.toggle("on", ELEMENTOS[i]===MI_EL));
   pintarAvatarPreview();
 }
 })();
