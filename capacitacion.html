@@ -5,22 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Capacitación · Derecho de Petición y Terminal Jurídica</title>
 <meta name="description" content="Capacitación SETP: derecho de petición, términos, respuesta de fondo y la Terminal Jurídica.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap">
 <style>
 :root{
-  --navy:#01274B; --navy-2:#0A3A6B; --blue:#3D85C6; --blue-soft:#BBD6EE;
-  --ocobo:#D6488E; --ocobo-soft:#F6D6E7; --gold:#C9922B; --gold-soft:#F3E6C9;
-  --cream:#F6F3EC; --paper:#FFFFFF; --ink:#152238; --ink-soft:#5B6B82; --line:#E3E1D8;
-  --green:#1E8F5F; --green-bg:#E3F5EC; --amber:#C1710A; --amber-bg:#FBEED9; --red:#C6362B; --red-bg:#FBE5E2;
-  --shadow: 0 1px 2px rgba(1,39,75,.08), 0 20px 44px -20px rgba(1,39,75,.35);
+  /* paleta real del SETP (la misma de los tableros institucionales: TransMusical SETP + Alcaldía) */
+  --navy:#0B1F5C; --navy-2:#123a7a; --navy-deep:#071444; --blue:#159BD6; --blue-soft:#E6F4FB;
+  --ocobo:#D62828; --ocobo-soft:#FBE6E6; --gold:#F0A800; --gold-soft:#FEF3DE;
+  --cream:#EEF2F9; --paper:#FFFFFF; --ink:#0D1730; --ink-soft:#5B6A88; --line:#E0E6F1;
+  --green:#00A830; --green-bg:#E4F6EA; --amber:#B9821C; --amber-bg:#FEF3DE; --red:#D62828; --red-bg:#FBE6E6;
+  --shadow: 0 6px 20px rgba(11,31,92,.08), 0 20px 44px -20px rgba(11,31,92,.28);
   color-scheme:light;
 }
 *{box-sizing:border-box;}
 [hidden]{display:none !important;}
 html,body{margin:0; height:100%; background:var(--navy); overflow:hidden;}
-body{font-family:'Manrope',system-ui,sans-serif; color:var(--ink);}
-h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; text-wrap:balance;}
-.mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+body{font-family:'Public Sans',system-ui,sans-serif; color:var(--ink);}
+h1,h2,h3{font-family:'Barlow',sans-serif; font-weight:800; letter-spacing:-.01em; margin:0; text-wrap:balance;}
+.mono{font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+.logo-lockup{display:inline-flex; align-items:center; align-self:flex-start; background:#fff; border-radius:12px; padding:5px 10px; box-shadow:0 6px 16px rgba(0,0,0,.28); flex:none; position:relative; z-index:1;}
+.logo-lockup img{height:32px; display:block;}
+.foto-marca{position:absolute; inset:0; z-index:-1; overflow:hidden;}
+.foto-marca img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scale(1.05);}
+.foto-marca::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(7,20,68,.82) 0%, rgba(11,31,92,.86) 55%, rgba(11,31,92,.96) 100%);}
 button{font-family:inherit; cursor:pointer;}
 #deck{position:relative; width:100vw; height:100vh; overflow:hidden;}
 .slide{position:absolute; inset:0; display:flex; flex-direction:column; padding:6.5vh 6.5vw 10.5vh; opacity:0; pointer-events:none; transition:opacity .5s ease; background:var(--cream); color:var(--ink);}
@@ -96,7 +104,7 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 .timeline-v::before{content:""; position:absolute; left:17px; top:8px; bottom:8px; width:2px; background:var(--line);}
 .navy .timeline-v::before{background:rgba(255,255,255,.2);}
 .timeline-v li{display:flex; gap:1vw; align-items:flex-start; font-size:clamp(12px,1.15vw,18px); line-height:1.42; position:relative;}
-.timeline-v b.n{flex:none; width:2.1vw; height:2.1vw; min-width:30px; min-height:30px; border-radius:50%; background:var(--navy); color:#fff; font-family:'Fraunces',serif; display:flex; align-items:center; justify-content:center; font-size:clamp(12px,1.05vw,16px); z-index:1; box-shadow:0 0 0 5px var(--cream);}
+.timeline-v b.n{flex:none; width:2.1vw; height:2.1vw; min-width:30px; min-height:30px; border-radius:50%; background:var(--navy); color:#fff; font-family:'Barlow',sans-serif; display:flex; align-items:center; justify-content:center; font-size:clamp(12px,1.05vw,16px); z-index:1; box-shadow:0 0 0 5px var(--cream);}
 .navy .timeline-v b.n{box-shadow:0 0 0 5px var(--navy-2); background:var(--ocobo);}
 .chips-fuente{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.2vh;}
 .chip-fte{background:var(--gold-soft); color:#6b4d15; font-size:clamp(10px,.85vw,12px); font-weight:700; padding:4px 12px; border-radius:999px;}
@@ -189,7 +197,7 @@ function svgHub(){ const areas=[["Financiera","var(--blue)",0],["Operativa","var
   const lineas = pts.map(p=>`<line x1="170" y1="110" x2="${p.x}" y2="${p.y}" stroke="var(--line)" stroke-width="3" class="linea-dibujo"/>`).join("");
   const nodos = pts.map((p,i)=>`<g class="flota" style="animation-delay:${i*.3}s"><circle cx="${p.x}" cy="${p.y}" r="30" fill="${p[1]}" opacity=".16"/><circle cx="${p.x}" cy="${p.y}" r="30" fill="none" stroke="${p[1]}" stroke-width="3"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-family="Manrope" font-weight="700" font-size="10" fill="var(--navy)">${p[0]}</text></g>`).join("");
   return `<svg width="340" height="220" viewBox="0 0 340 220" aria-hidden="true">${lineas}
-    <circle cx="170" cy="110" r="42" fill="var(--navy)"/><text x="170" y="106" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="13" fill="#fff">Jurí-</text><text x="170" y="122" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="13" fill="#fff">dica</text>
+    <circle cx="170" cy="110" r="42" fill="var(--navy)"/><text x="170" y="106" text-anchor="middle" font-family="Barlow" font-weight="800" font-size="13" fill="#fff">Jurí-</text><text x="170" y="122" text-anchor="middle" font-family="Barlow" font-weight="800" font-size="13" fill="#fff">dica</text>
     ${nodos}</svg>`;
 }
 
@@ -215,15 +223,15 @@ function munecoPodio(color, corona){ return `<svg width="52" height="52" viewBox
   <path d="M11,44 q12,-14 24,0 Z" fill="${color}"/></svg>`; }
 
 function svgPodiumMini(){ return `<div style="display:flex; align-items:flex-end; justify-content:center; gap:10px; height:100%">
-  <div class="flota" style="display:flex; flex-direction:column; align-items:center; animation-delay:.2s">${munecoPodio("var(--blue)",false)}<div style="width:64px; height:70px; background:linear-gradient(180deg,var(--blue),var(--navy-2)); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Fraunces; font-weight:800">2°</div></div>
-  <div class="flota" style="display:flex; flex-direction:column; align-items:center"><div style="margin-bottom:-2px">${munecoPodio("var(--gold)",true)}</div><div style="width:64px; height:98px; background:linear-gradient(180deg,var(--gold),#a9781f); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Fraunces; font-weight:800; font-size:1.3rem">1°</div></div>
-  <div class="flota" style="display:flex; flex-direction:column; align-items:center; animation-delay:.5s">${munecoPodio("var(--ocobo)",false)}<div style="width:64px; height:52px; background:linear-gradient(180deg,var(--ocobo),#a13868); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Fraunces; font-weight:800">3°</div></div>
+  <div class="flota" style="display:flex; flex-direction:column; align-items:center; animation-delay:.2s">${munecoPodio("var(--blue)",false)}<div style="width:64px; height:70px; background:linear-gradient(180deg,var(--blue),var(--navy-2)); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800">2°</div></div>
+  <div class="flota" style="display:flex; flex-direction:column; align-items:center"><div style="margin-bottom:-2px">${munecoPodio("var(--gold)",true)}</div><div style="width:64px; height:98px; background:linear-gradient(180deg,var(--gold),#a9781f); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800; font-size:1.3rem">1°</div></div>
+  <div class="flota" style="display:flex; flex-direction:column; align-items:center; animation-delay:.5s">${munecoPodio("var(--ocobo)",false)}<div style="width:64px; height:52px; background:linear-gradient(180deg,var(--ocobo),#a13868); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800">3°</div></div>
 </div>`; }
 
 function svgTramites(){ const carriles=[["15 días","var(--navy)","Regla general","Toda petición, salvo norma especial"],["10 días","var(--blue)","Documentos e información","Si no responden a tiempo: silencio administrativo positivo"],["30 días","var(--ocobo)","Consultas","Interpretación jurídica sobre un asunto a cargo de la entidad"]];
   return carriles.map((c,i)=>`<div class="card entra" style="display:flex; gap:1vw; align-items:center; animation-delay:${.08+i*.12}s">
     <div style="flex:none">${svgReloj(c[1],64,6+i*4)}</div>
-    <div><div style="font-family:Fraunces; font-weight:800; font-size:clamp(20px,2vw,30px); color:${c[1]}">${c[0]}</div><div style="font-weight:800; font-size:clamp(12px,1vw,15px); color:var(--navy)">${c[2]}</div><div style="font-size:clamp(11px,.9vw,13px); color:var(--ink-soft)">${c[3]}</div></div>
+    <div><div style="font-family:Barlow; font-weight:800; font-size:clamp(20px,2vw,30px); color:${c[1]}">${c[0]}</div><div style="font-weight:800; font-size:clamp(12px,1vw,15px); color:var(--navy)">${c[2]}</div><div style="font-size:clamp(11px,.9vw,13px); color:var(--ink-soft)">${c[3]}</div></div>
   </div>`).join("");
 }
 
@@ -251,7 +259,7 @@ function escenaViva(){ return `<div class="escena-viva" aria-hidden="true"><svg 
 </svg></div>`; }
 
 function svgAbogado(sz){ return `<svg class="abogado" width="${sz}" height="${sz}" viewBox="0 0 140 160" aria-hidden="true">
-  <g class="globo" transform="translate(78,4)"><rect width="58" height="40" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><polygon points="10,40 6,52 22,40" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><text x="29" y="27" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="24" fill="var(--ocobo)">¿?</text></g>
+  <g class="globo" transform="translate(78,4)"><rect width="58" height="40" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><polygon points="10,40 6,52 22,40" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><text x="29" y="27" text-anchor="middle" font-family="Barlow" font-weight="800" font-size="24" fill="var(--ocobo)">¿?</text></g>
   <circle cx="60" cy="46" r="26" fill="#E7B486"/>
   <path d="M36,40 q24,-30 48,0 q2,-18 -24,-20 q-26,2 -24,20 Z" fill="var(--navy)"/>
   <circle cx="51" cy="46" r="2.6" fill="#2B1B0F"/><circle cx="69" cy="46" r="2.6" fill="#2B1B0F"/>
@@ -275,10 +283,11 @@ const SLIDES = [];
 function slide(id, cls, html){ SLIDES.push({id, cls: cls||"", html}); }
 
 slide("cover","navy",`
-  <div style="position:absolute; left:0; right:0; bottom:0; height:26vh; opacity:.85">${escenaViva()}</div>
+  <div class="foto-marca entra"><img src="img/monumento-bandera-ibague.jpg" alt=""></div>
   ${petalos(6)}
+  <div class="logo-lockup entra" style="margin-bottom:1.6vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
   <p class="eyebrow entra">Capacitación SETP · Dependencia Jurídica</p>
-  <div class="cont entra" style="animation-delay:.08s; justify-content:flex-start; margin-top:2vh; max-width:56vw">
+  <div class="cont entra" style="animation-delay:.08s; justify-content:flex-start; margin-top:2vh; max-width:58vw">
     <h1 style="font-size:clamp(34px,5.4vw,80px); font-weight:800; line-height:1.05; margin-bottom:2vh;">Derecho de Petición<br>y Terminal Jurídica</h1>
     <p style="font-size:clamp(15px,1.5vw,23px); color:var(--blue-soft); line-height:1.5;">Lo legal, lo que hacemos distinto, y la herramienta que construimos para cumplirlo mejor.</p>
   </div>
@@ -310,7 +319,7 @@ slide("agenda","",`
       ${[["1","Derecho de petición","Qué es, términos, respuesta de fondo y tutela.","var(--navy)"],["2","Terminal Jurídica","Un recorrido rápido por la herramienta que ya construimos.","var(--blue)"],["3","Cuestionario en vivo","Sala de espera, arranque sincronizado y podio con premio.","var(--ocobo)"]].map((s,i)=>`
       <div class="entra" style="animation-delay:${.1+i*.15}s; flex:1; text-align:center; position:relative; padding:0 1vw;">
         ${i>0?'<div style="position:absolute; left:0; top:26px; width:100%; height:3px; background:var(--line)"></div>':''}
-        <div class="flota" style="animation-delay:${i*.3}s; width:54px; height:54px; border-radius:50%; background:${s[3]}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Fraunces; font-weight:800; font-size:1.3rem; margin:0 auto 1.4vh; position:relative; box-shadow:0 8px 20px -8px ${s[3]}">${s[0]}</div>
+        <div class="flota" style="animation-delay:${i*.3}s; width:54px; height:54px; border-radius:50%; background:${s[3]}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Barlow; font-weight:800; font-size:1.3rem; margin:0 auto 1.4vh; position:relative; box-shadow:0 8px 20px -8px ${s[3]}">${s[0]}</div>
         <div style="font-weight:800; color:var(--navy); font-size:clamp(13px,1.2vw,18px); margin-bottom:.6vh">${s[1]}</div>
         <div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">${s[2]}</div>
       </div>`).join("")}
@@ -320,8 +329,9 @@ slide("agenda","",`
 `);
 
 slide("div1","navy",`
-  <div style="position:absolute; left:0; right:0; bottom:0; height:26vh; opacity:.8">${escenaViva()}</div>
+  <div class="foto-marca entra"><img src="img/semaforo-real-ibague.jpg" alt=""></div>
   <div class="cont entra" style="justify-content:flex-start; margin-top:4vh">
+    <div class="logo-lockup" style="margin-bottom:1.4vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
     <p class="eyebrow">Bloque 1</p>
     <h1 style="font-size:clamp(36px,5.4vw,78px); font-weight:800;">Derecho de Petición</h1>
     <div class="badge-tema"><span>Constitución art. 23</span><span>Ley 1755 de 2015</span><span>Decreto 2591 de 1991</span></div>
@@ -336,7 +346,7 @@ slide("que-es","",`
       <h2 class="tit entra" style="animation-delay:.05s">¿Qué es y qué debe tener la respuesta?</h2>
       <p class="entra" style="animation-delay:.1s; font-size:clamp(13px,1.2vw,18px); color:var(--ink-soft); line-height:1.5">Toda persona puede pedir algo a las autoridades y obtener pronta resolución. <b style="color:var(--navy)">No importa el título del documento</b>: si están solicitando algo, están ejerciendo este derecho.</p>
       <div class="grid" style="grid-template-columns:repeat(3,1fr); gap:.7vw; margin-top:.4vh">
-        ${["Oportuna","De fondo","Clara","Precisa","Congruente","Comunicada"].map((t,i)=>`<div class="card entra" style="animation-delay:${.16+i*.05}s; text-align:center; padding:1vw .6vw"><b style="width:2vw;height:2vw;min-width:26px;min-height:26px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:Fraunces;margin:0 auto .5vh; font-size:.8rem">${i+1}</b><div style="font-weight:800; font-size:clamp(10px,.85vw,13px); color:var(--navy)">${t}</div></div>`).join("")}
+        ${["Oportuna","De fondo","Clara","Precisa","Congruente","Comunicada"].map((t,i)=>`<div class="card entra" style="animation-delay:${.16+i*.05}s; text-align:center; padding:1vw .6vw"><b style="width:2vw;height:2vw;min-width:26px;min-height:26px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:Barlow;margin:0 auto .5vh; font-size:.8rem">${i+1}</b><div style="font-weight:800; font-size:clamp(10px,.85vw,13px); color:var(--navy)">${t}</div></div>`).join("")}
       </div>
     </div>
     <div class="ilustra entra" style="animation-delay:.2s">${svgAbogado(210)}</div>
@@ -461,9 +471,10 @@ slide("resumen1","",`
 `);
 
 slide("div2","navy",`
-  ${petalos(6)}
+  <div class="foto-marca entra"><img src="img/paradero-carrera5-vertical.jpg" alt=""></div>
   <div class="split" style="align-items:center">
     <div class="cont entra">
+      <div class="logo-lockup" style="margin-bottom:1.4vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
       <p class="eyebrow">Bloque 2</p>
       <h1 style="font-size:clamp(36px,5.4vw,78px); font-weight:800;">La Terminal Jurídica</h1>
       <p style="font-size:clamp(14px,1.5vw,22px); color:var(--blue-soft); max-width:32vw; margin-top:1.2vh">Todo lo anterior, convertido en una herramienta de todos los días.</p>
@@ -529,14 +540,15 @@ slide("fuentes","",`
 `);
 
 slide("cuestionario","navy",`
-  ${petalos(6)}
+  <div class="foto-marca entra"><img src="img/ocobos-ibague.jpg" alt=""></div>
   <p class="eyebrow entra">Ahora te toca a ti</p>
   <div class="split" style="align-items:stretch; gap:2.4vw">
     <div class="cont entra" style="animation-delay:.05s; justify-content:center">
+      <div class="logo-lockup" style="margin-bottom:1vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
       <h2 class="tit" style="font-size:clamp(24px,2.8vw,40px)">¿Qué tanto quedó claro?</h2>
-      <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, escribe tu nombre y espera en la sala. 12 preguntas, puntos por rapidez.</p>
+      <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, elige tu personaje y espera en la sala. 10 preguntas, puntos por rapidez.</p>
       <div style="display:flex; align-items:center; gap:1vw">
-        <img src="qr_cuestionario.png" alt="Código QR del cuestionario" width="118" height="118" style="border-radius:14px; box-shadow:var(--shadow); background:#fff; padding:8px; flex:none">
+        <img src="qr_cuestionario.png" alt="Código QR del cuestionario" width="168" height="168" style="border-radius:14px; box-shadow:var(--shadow); background:#fff; padding:8px; flex:none">
         <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.3rem">🏆</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
       </div>
       <span class="link" style="font-size:clamp(9px,.85vw,12px)">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
@@ -544,10 +556,9 @@ slide("cuestionario","navy",`
     <div class="card entra" id="mini-host" style="animation-delay:.15s; flex:1.3; display:flex; flex-direction:column; min-height:0; background:rgba(255,255,255,.95); color:var(--ink); padding:1.4vw 1.6vw;">
       <div id="mh-login">
         <b style="color:var(--navy); font-size:clamp(12px,1.05vw,15px)">Panel del anfitrión</b>
-        <p style="margin:.6vh 0 1vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">Entra con tu usuario de la Dirección Jurídica para controlar la sala desde aquí.</p>
-        <input id="mh-usuario" type="text" placeholder="Usuario" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:.85rem;">
-        <input id="mh-clave" type="password" placeholder="Clave" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:.85rem;">
-        <button id="mh-btn-entrar" style="width:100%; background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:.82rem;">Entrar como anfitrión</button>
+        <p style="margin:.6vh 0 1vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">Pon el PIN del juego para revelar el QR y poder iniciarlo.</p>
+        <input id="mh-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px; font-size:1.4rem; letter-spacing:.5em; text-align:center;">
+        <button id="mh-btn-entrar" style="width:100%; background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:.82rem;">Desbloquear →</button>
         <div id="mh-err" style="color:var(--red); font-size:.75rem; min-height:1.1em; margin-top:4px;"></div>
       </div>
       <div id="mh-lobby" hidden style="display:flex; flex-direction:column; min-height:0; flex:1;">
@@ -617,33 +628,36 @@ ir(IDX);
     return r;
   }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-  const AVATAR_COLORES = ["#01274B","#3D85C6","#D6488E","#C9922B","#1E8F5F"];
-  function colorDe(n){ let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))|0; return AVATAR_COLORES[Math.abs(h)%AVATAR_COLORES.length]; }
+  const AV_COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828"};
+  function avatarSVG(spec, sz){
+    sz = sz || 32;
+    const partes = String(spec||"royal:ninguno:ninguno").split(":"); const c = AV_COLORES[partes[0]] || AV_COLORES.royal, som = partes[1]||"ninguno", acc = partes[2]||"ninguno";
+    let cara = '<circle cx="18.5" cy="24" r="2.3" fill="#fff"/><circle cx="29.5" cy="24" r="2.3" fill="#fff"/><path d="M17,30 q7,7 14,0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    if(acc==="gafas") cara = '<rect x="14.5" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/><rect x="25" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/>';
+    let accMk = acc==="corbata" ? '<polygon points="21,33 27,33 29,44 24,50 19,44" fill="#D62828"/>' : "";
+    let somMk = "";
+    if(som==="gorra") somMk = '<path d="M9,19 a15,11 0 0 1 30,0 Z" fill="#0B1F5C"/><rect x="7" y="18" width="34" height="4" rx="2" fill="#0B1F5C"/>';
+    else if(som==="casco") somMk = '<path d="M8,18 a16,13 0 0 1 32,0 Z" fill="#F0A800"/><rect x="6" y="17" width="36" height="4" rx="2" fill="#c98c00"/>';
+    else if(som==="corona") somMk = '<polygon points="10,18 15,7 20,15 24,5 28,15 33,7 38,18" fill="#F0A800"/>';
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="17" fill="${c}"/>${cara}${accMk}${somMk}</svg>`;
+  }
 
   const mhLogin = document.getElementById("mh-login"), mhLobby = document.getElementById("mh-lobby"), mhCurso = document.getElementById("mh-curso");
-  const mhUsuario = document.getElementById("mh-usuario"), mhClave = document.getElementById("mh-clave"), mhBtnEntrar = document.getElementById("mh-btn-entrar"), mhErr = document.getElementById("mh-err");
+  const mhPin = document.getElementById("mh-pin"), mhBtnEntrar = document.getElementById("mh-btn-entrar"), mhErr = document.getElementById("mh-err");
   const mhRoster = document.getElementById("mh-roster"), mhCuenta = document.getElementById("mh-cuenta"), mhBtnIniciar = document.getElementById("mh-btn-iniciar");
   const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio");
   if(!mhLogin) return; // esta diapositiva no está en esta página
 
-  let TOKEN = "", conocidos = new Set(), pollLobby = null, pollClasif = null, tickAnillo = null;
-  const DURACION_REF = 20, PAUSA_REF = 1.5, TOTAL_PREGUNTAS = 12;
+  let TOKEN = "", pollLobby = null, pollClasif = null, tickAnillo = null;
+  let DURACION = 20, TRANSICION = 3, TOTAL_PREGUNTAS = 10;
   const CIRC = 2*Math.PI*44;
 
   function fase(nombre){ mhLogin.hidden = nombre!=="login"; mhLobby.hidden = nombre!=="lobby"; mhCurso.hidden = nombre!=="curso"; }
 
   function pintarRoster(jugadores){
-    jugadores.forEach(j=>{
-      if(conocidos.has(j)) return; conocidos.add(j);
-      const chip = document.createElement("span");
-      chip.style.cssText = "display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;font-size:.72rem;font-weight:700;color:var(--navy);animation:entraKF .35s both;";
-      chip.innerHTML = `<span style="width:18px;height:18px;border-radius:50%;background:${colorDe(j)};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800">${(j.trim()[0]||"?").toUpperCase()}</span>${esc(j)}`;
-      mhRoster.appendChild(chip);
-    });
+    mhRoster.innerHTML = jugadores.map(j=>`<span style="display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;font-size:.72rem;font-weight:700;color:var(--navy);animation:entraKF .35s both;">${avatarSVG(j.avatar,20)}${esc(j.jugador)}</span>`).join("");
     mhCuenta.textContent = jugadores.length + (jugadores.length===1 ? " persona en la sala" : " personas en la sala");
   }
-
-  function munecoMini(color, corona){ return `<svg width="34" height="34" viewBox="0 0 46 46">${corona?'<polygon points="15,14 18,7 23,12 28,7 31,14" fill="var(--gold)"/>':''}<circle cx="23" cy="18" r="10" fill="${color}"/><circle cx="19.5" cy="17" r="1.6" fill="#fff"/><circle cx="26.5" cy="17" r="1.6" fill="#fff"/><path d="M18,21 q5,5 10,0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`; }
 
   let podioPintado = false;
   async function actualizarPodio(){
@@ -657,38 +671,36 @@ ir(IDX);
         if(!f) return `<div style="width:26%; opacity:.2; height:${alturas[i]}px; background:var(--line); border-radius:6px 6px 0 0"></div>`;
         return `<div style="display:flex; flex-direction:column; align-items:center; width:26%;">
           <div style="font-size:clamp(8px,.65vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:1px 6px; margin-bottom:2px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
-          ${munecoMini(colores[i], nums[i]==="1°")}
-          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Fraunces; font-weight:800; font-size:.8rem;">${nums[i]}</div>
+          <div style="margin-bottom:-4px">${avatarSVG(f.avatar,34)}</div>
+          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800; font-size:.8rem;">${nums[i]}</div>
         </div>`;
       }).join("");
       podioPintado = true;
     }catch(e){ /* reintenta solo */ }
   }
 
-  function pasoAReferencia(inicioMs){
-    const transcurrido = (Date.now() - inicioMs) / 1000;
-    const paso = DURACION_REF + PAUSA_REF;
-    const idx = Math.min(TOTAL_PREGUNTAS - 1, Math.floor(transcurrido / paso));
-    const restante = Math.max(0, DURACION_REF - (transcurrido - idx*paso));
-    return { idx, restante, terminado: transcurrido >= TOTAL_PREGUNTAS*paso };
-  }
+  /* mismo reloj compartido que usan los celulares: todos calculan la MISMA pregunta actual
+     a partir del mismo "inicio", así que este panel nunca se desincroniza de lo que la gente ve. */
   function iniciarCurso(inicioMs){
     fase("curso");
     clearInterval(pollLobby);
     clearInterval(tickAnillo);
     tickAnillo = setInterval(()=>{
-      const p = pasoAReferencia(inicioMs);
-      if(p.terminado){
+      const ciclo = (DURACION+TRANSICION)*1000;
+      const transcurrido = Date.now() - inicioMs;
+      const idx = Math.floor(transcurrido / ciclo);
+      const restante = Math.max(0, DURACION - (transcurrido - idx*ciclo)/1000);
+      if(idx >= TOTAL_PREGUNTAS){
         mhPreguntaNum.textContent = "Cuestionario terminado";
         mhAnillo.style.stroke = "var(--green)"; mhAnillo.style.strokeDashoffset = "0"; mhAnilloNum.textContent = "🏆";
         clearInterval(tickAnillo);
         return;
       }
-      mhPreguntaNum.textContent = "Pregunta " + (p.idx+1) + " de " + TOTAL_PREGUNTAS + " (referencia)";
-      mhAnilloNum.textContent = Math.ceil(p.restante);
-      mhAnillo.style.strokeDashoffset = String(CIRC * (1 - p.restante/DURACION_REF));
-      mhAnillo.style.stroke = p.restante <= 5 ? "var(--red)" : "var(--blue)";
-    }, 250);
+      mhPreguntaNum.textContent = "Pregunta " + (idx+1) + " de " + TOTAL_PREGUNTAS;
+      mhAnilloNum.textContent = Math.ceil(restante);
+      mhAnillo.style.strokeDashoffset = String(CIRC * (1 - Math.max(0,restante)/DURACION));
+      mhAnillo.style.stroke = restante <= 5 ? "var(--red)" : "var(--blue)";
+    }, 200);
     actualizarPodio();
     clearInterval(pollClasif);
     pollClasif = setInterval(actualizarPodio, 2500);
@@ -697,6 +709,7 @@ ir(IDX);
   async function sondearLobby(){
     try{
       const r = await api("quizEstadoSesion");
+      DURACION = r.duracion || DURACION; TRANSICION = r.transicion !== undefined ? r.transicion : TRANSICION; TOTAL_PREGUNTAS = r.totalPreguntas || TOTAL_PREGUNTAS;
       pintarRoster(r.jugadores);
       if(r.estado === "en_curso" && r.inicio) iniciarCurso(parseInt(r.inicio,10));
     }catch(e){ /* reintenta solo */ }
@@ -704,25 +717,21 @@ ir(IDX);
 
   function mostrarLobby(){
     fase("lobby");
-    conocidos = new Set(); mhRoster.innerHTML = "";
+    mhRoster.innerHTML = "";
     sondearLobby();
     clearInterval(pollLobby);
     pollLobby = setInterval(sondearLobby, 1400);
   }
 
-  mhBtnEntrar.addEventListener("click", async ()=>{
+  mhBtnEntrar.addEventListener("click", ()=>{
     mhErr.textContent = "";
-    const u = mhUsuario.value.trim(), c = mhClave.value;
-    if(!u || !c){ mhErr.textContent = "Escribe tu usuario y tu clave."; return; }
-    try{
-      const r = await api("login", u, c);
-      TOKEN = r.token;
-      try{ sessionStorage.setItem("tj_host_token", TOKEN); }catch(e){}
-      mostrarLobby();
-    }catch(e){ mhErr.textContent = e.message; }
+    const pin = mhPin.value.trim();
+    if(pin.length !== 4){ mhErr.textContent = "El PIN tiene 4 dígitos."; return; }
+    TOKEN = pin;
+    try{ sessionStorage.setItem("tj_host_token", TOKEN); }catch(e){}
+    mostrarLobby();
   });
-  mhUsuario.addEventListener("keydown", e=>{ if(e.key==="Enter") mhClave.focus(); });
-  mhClave.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
+  mhPin.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
 
   mhBtnIniciar.addEventListener("click", async ()=>{
     mhBtnIniciar.disabled = true; mhBtnIniciar.textContent = "Iniciando…";

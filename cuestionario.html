@@ -3,132 +3,169 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cuestionario en vivo · Terminal Jurídica</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<title>Cuestionario en vivo · Terminal Jurídica SETP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --navy:#01274B; --navy-2:#0A3A6B; --blue:#3D85C6; --blue-soft:#BBD6EE;
-  --ocobo:#D6488E; --ocobo-soft:#F6D6E7; --gold:#C9922B; --gold-soft:#F3E6C9;
-  --cream:#F6F3EC; --paper:#FFFFFF; --ink:#152238; --ink-soft:#5B6B82; --line:#E3E1D8;
-  --green:#1E8F5F; --green-bg:#E3F5EC; --amber:#C1710A; --amber-bg:#FBEED9; --red:#C6362B; --red-bg:#FBE5E2;
-  --shadow: 0 1px 2px rgba(1,39,75,.06), 0 8px 24px -12px rgba(1,39,75,.18);
-  --radius: 16px; color-scheme:light;
+  --navy:#0B1F5C; --navy-deep:#071444; --royal:#1D4ED8; --cyan:#159BD6; --cyan-soft:#E6F4FB;
+  --green:#00A830; --gold:#F0A800; --red:#D62828;
+  --paper:#EEF2F9; --card:#FFFFFF; --ink:#0D1730; --muted:#5B6A88; --line:#E0E6F1;
+  --green-bg:#E4F6EA; --red-bg:#FBE6E6; --gold-bg:#FEF3DE;
+  --shadow:0 6px 20px rgba(11,31,92,.08); --shadow-lg:0 18px 44px rgba(11,31,92,.18);
+  color-scheme:light;
 }
 *{box-sizing:border-box;}
-body{margin:0; background:var(--cream); color:var(--ink); font-family:'Manrope',system-ui,sans-serif; min-height:100vh; padding-bottom:40px; overflow-x:hidden;}
-h1,h2,h3{font-family:'Fraunces',Georgia,serif; text-wrap:balance; margin:0;}
-.mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+[hidden]{display:none!important;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:"Public Sans",system-ui,sans-serif; min-height:100vh; padding-bottom:40px; overflow-x:hidden;}
+h1,h2,h3{font-family:"Barlow",sans-serif; font-weight:800; letter-spacing:-.01em; text-wrap:balance; margin:0;}
+.mono{font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums;}
 .wrap{max-width:640px; margin:0 auto; padding:0 18px;}
-button{font-family:inherit; cursor:pointer;}
-.topbar{display:flex; align-items:center; gap:10px; padding:16px 18px; background:linear-gradient(135deg,var(--navy),var(--navy-2)); color:#fff; position:relative; overflow:hidden;}
-.topbar b{font-family:'Fraunces',serif; font-size:1rem;}
-.topbar span{font-size:.72rem; opacity:.75; display:block;}
-.sem{width:20px; height:44px; flex:none;}
-.topbar .petalos{position:absolute; inset:0; pointer-events:none;}
-.card{background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 24px; margin-top:24px; position:relative; overflow:hidden;}
-.pantalla{animation:subir .45s cubic-bezier(.2,.8,.2,1) both;}
-@keyframes subir{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;} }
-@keyframes pop{ 0%{opacity:0; transform:scale(.5) translateY(10px);} 70%{opacity:1; transform:scale(1.08);} 100%{transform:scale(1);} }
-@keyframes flotar{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-7px);} }
-[hidden]{display:none !important;}
+button{font:inherit; cursor:pointer;}
+@keyframes fadeUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;}}
+@keyframes pop{0%{opacity:0; transform:scale(.6) translateY(8px);} 70%{opacity:1; transform:scale(1.06);} 100%{transform:scale(1);}}
+@keyframes floaty{0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);}}
+@keyframes pulso{0%,100%{opacity:.35; transform:scale(.85);} 50%{opacity:1; transform:scale(1.15);}}
+@keyframes caer{to{transform:translateY(105vh) rotate(540deg); opacity:.1;}}
 
-/* intro / lobby comunes */
-.intro h1, .lobby h1{font-size:1.65rem; color:var(--navy); margin-bottom:6px;}
-.intro p, .lobby p{color:var(--ink-soft); font-size:.92rem; line-height:1.5; margin:0 0 16px;}
-.intro input{width:100%; border:1px solid var(--line); border-radius:10px; padding:13px 14px; font-size:1rem; background:var(--cream); color:var(--ink); margin-bottom:14px;}
-.intro input:focus{outline:none; border-color:var(--blue);}
-.btn-grande{width:100%; background:var(--navy); color:#fff; border:none; border-radius:10px; padding:15px; font-weight:800; font-size:1rem; box-shadow:0 10px 24px -10px rgba(1,39,75,.5); transition:transform .15s ease;}
-.btn-grande:active:not(:disabled){ transform:scale(.98); }
-.btn-grande:disabled{opacity:.5; cursor:default;}
+/* ---- topbar con el logo real (mismo lockup que usamos en los tableros del SETP) ---- */
+.topbar{position:relative; overflow:hidden; color:#fff; background:linear-gradient(115deg,var(--navy-deep) 0%,var(--navy) 55%,#123a7a 100%); border-bottom:4px solid var(--cyan);}
+.tbar{position:relative; z-index:1; display:flex; align-items:center; gap:12px; padding:12px 18px; max-width:640px; margin:0 auto;}
+.lockup{display:flex; align-items:center; background:#fff; border-radius:12px; padding:5px 10px; box-shadow:0 6px 16px rgba(0,0,0,.28); flex:none;}
+.lockup img{height:34px; display:block;}
+.brand{min-width:0;}
+.brand b{font-size:16px; letter-spacing:.03em; display:block; line-height:1.1;}
+.brand span{font-size:11px; color:#B9D2F2; display:block; margin-top:2px;}
+
+/* ---- marca de agua propia del SETP: bus + destellos, muy tenue, detrás del contenido ---- */
+.marca-agua{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;}
+.marca-agua svg{position:absolute; opacity:.05;}
+.ma-bus1{width:340px; bottom:6%; left:-8%; animation:maDeriva 46s linear infinite;}
+.ma-bus2{width:220px; top:14%; right:-10%; animation:maDerivaIzq 60s linear infinite;}
+@keyframes maDeriva{from{transform:translateX(0);} to{transform:translateX(130vw);}}
+@keyframes maDerivaIzq{from{transform:translateX(0) scaleX(-1);} to{transform:translateX(-130vw) scaleX(-1);}}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-lg); padding:26px 22px; margin-top:22px; position:relative; overflow:hidden;}
+.pantalla{animation:fadeUp .45s cubic-bezier(.2,.7,.3,1) both;}
+
+/* pantalla: nombre + personaje */
+.intro h1{font-size:1.7rem; color:var(--navy); margin-bottom:6px;}
+.intro p{color:var(--muted); font-size:.92rem; line-height:1.5; margin:0 0 16px;}
+.intro input{width:100%; border:1.5px solid var(--line); border-radius:11px; padding:13px 14px; font-size:1rem; background:var(--paper); color:var(--ink); margin-bottom:16px; font-family:inherit;}
+.intro input:focus{outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(21,155,214,.18);}
+.avatar-preview{display:flex; justify-content:center; margin-bottom:14px;}
+.avatar-preview .marco{width:92px; height:92px; border-radius:50%; background:var(--cyan-soft); display:flex; align-items:center; justify-content:center; animation:floaty 3s ease-in-out infinite;}
+.picker-tit{font-size:.78rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; margin:14px 0 8px;}
+.picker-row{display:flex; gap:9px; flex-wrap:wrap;}
+.sw{width:38px; height:38px; border-radius:50%; border:3px solid transparent; padding:0; transition:transform .15s;}
+.sw.on{border-color:var(--navy); transform:scale(1.12);}
+.acc-btn{display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--paper); border:2px solid var(--line); border-radius:12px; padding:8px 10px; font-size:.68rem; font-weight:700; color:var(--muted); min-width:64px;}
+.acc-btn.on{border-color:var(--cyan); background:var(--cyan-soft); color:var(--navy);}
+.btn-grande{width:100%; margin-top:20px; padding:15px 18px; border:0; border-radius:14px; color:#fff; background:linear-gradient(135deg,var(--cyan),var(--royal)); font-family:"Barlow",sans-serif; font-weight:800; font-size:16.5px; letter-spacing:.02em; box-shadow:0 12px 26px rgba(21,155,214,.35); transition:transform .14s, box-shadow .14s;}
+.btn-grande:active:not(:disabled){transform:translateY(1px) scale(.99);}
+.btn-grande:disabled{opacity:.6; cursor:progress;}
 .temas{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
-.tema-chip{background:var(--blue-soft); color:var(--navy); font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:999px;}
+.tema-chip{background:var(--cyan-soft); color:var(--navy); font-size:.72rem; font-weight:700; padding:5px 12px; border-radius:999px;}
 .err{color:var(--red); font-size:.82rem; min-height:1.2em; margin-top:4px;}
-.premio-banner{display:flex; align-items:center; gap:10px; background:linear-gradient(90deg,var(--gold-soft),var(--ocobo-soft)); border:1px dashed var(--gold); border-radius:12px; padding:11px 14px; font-weight:800; font-size:.85rem; color:#6b4d15; margin-bottom:18px;}
-.premio-banner .ico{font-size:1.4rem; animation:flotar 2.2s ease-in-out infinite;}
 
-/* sala de espera */
+/* lobby */
 .lobby-cabeza{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
-.pulso{display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:700; color:var(--blue);}
-.punto{width:9px; height:9px; border-radius:50%; background:var(--blue); animation:pulso 1.3s ease-in-out infinite;}
-@keyframes pulso{ 0%,100%{opacity:.35; transform:scale(.8);} 50%{opacity:1; transform:scale(1.15);} }
-.roster{display:flex; flex-wrap:wrap; gap:9px; margin:14px 0 6px; min-height:44px;}
-.chip-persona{display:flex; align-items:center; gap:7px; background:var(--cream); border:1px solid var(--line); border-radius:999px; padding:7px 13px 7px 8px; font-size:.85rem; font-weight:700; color:var(--navy); animation:pop .4s cubic-bezier(.2,.8,.2,1) both;}
-.chip-persona .avatar{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; color:#fff; font-size:.68rem; font-weight:800; flex:none;}
-.contador-sala{font-size:.78rem; color:var(--ink-soft); margin-top:4px;}
-.tu-chip{outline:2px solid var(--ocobo); outline-offset:1px;}
+.pulso{display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:700; color:var(--royal);}
+.punto{width:9px; height:9px; border-radius:50%; background:var(--royal); animation:pulso 1.3s ease-in-out infinite;}
+.premio-banner{display:flex; align-items:center; gap:10px; background:linear-gradient(90deg,var(--gold-bg),var(--cyan-soft)); border:1px dashed var(--gold); border-radius:14px; padding:11px 14px; font-weight:800; font-size:.85rem; color:#7a5a0a; margin-bottom:16px;}
+.premio-banner .ico{font-size:1.4rem; animation:floaty 2.2s ease-in-out infinite;}
+.roster{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px; min-height:44px;}
+.chip-persona{display:flex; align-items:center; gap:7px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:5px 13px 5px 5px; font-size:.85rem; font-weight:700; color:var(--navy); animation:pop .4s cubic-bezier(.2,.8,.2,1) both;}
+.chip-persona svg{width:26px; height:26px; border-radius:50%;}
+.contador-sala{font-size:.78rem; color:var(--muted); margin-top:4px;}
+.tu-chip{outline:2px solid var(--cyan); outline-offset:1px;}
 
-/* pantalla: pregunta */
+/* pregunta */
 .barra-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px;}
-.contador{font-size:.78rem; color:var(--ink-soft); font-weight:700;}
-.anillo-wrap{position:relative; width:46px; height:46px; flex:none;}
+.contador{font-size:.78rem; color:var(--muted); font-weight:700;}
+.anillo-wrap{position:relative; width:48px; height:48px; flex:none;}
 .anillo-wrap svg{transform:rotate(-90deg);}
-.anillo-num{position:absolute; inset:0; display:grid; place-items:center; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.85rem; color:var(--navy);}
-.pregunta-tx{font-size:1.28rem; font-weight:700; color:var(--navy); line-height:1.35; margin-bottom:20px;}
+.anillo-num{position:absolute; inset:0; display:grid; place-items:center; font-weight:800; font-size:.85rem; color:var(--navy);}
+.pregunta-tx{font-size:1.28rem; font-weight:700; color:var(--navy); line-height:1.35; margin-bottom:20px; font-family:"Barlow",sans-serif;}
 .opciones{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-@media (max-width:480px){ .opciones{grid-template-columns:1fr;} }
-.opcion{display:flex; align-items:center; gap:10px; text-align:left; border:none; border-radius:12px; padding:16px 14px; color:#fff; font-weight:700; font-size:.95rem; line-height:1.3; transition:transform .15s ease, opacity .15s ease; box-shadow:var(--shadow); animation:pop .38s cubic-bezier(.2,.8,.2,1) both;}
+@media (max-width:480px){.opciones{grid-template-columns:1fr;}}
+.opcion{display:flex; align-items:center; gap:10px; text-align:left; border:none; border-radius:14px; padding:16px 14px; color:#fff; font-weight:700; font-size:.95rem; line-height:1.3; transition:transform .15s ease, opacity .15s ease; box-shadow:var(--shadow); animation:pop .38s cubic-bezier(.2,.8,.2,1) both;}
 .opcion:nth-child(1){animation-delay:.02s;} .opcion:nth-child(2){animation-delay:.08s;} .opcion:nth-child(3){animation-delay:.14s;} .opcion:nth-child(4){animation-delay:.2s;}
-.opcion:active:not(:disabled){ transform:scale(.97); }
-.opcion:disabled{ opacity:.45; }
-.opcion .marca{width:20px; height:20px; flex:none; display:grid; place-items:center;}
-.op-0{background:var(--navy);} .op-1{background:var(--blue);} .op-2{background:var(--ocobo);} .op-3{background:var(--gold);}
+.opcion:active:not(:disabled){transform:scale(.97);}
+.opcion:disabled{opacity:.45;}
+.op-0{background:var(--navy);} .op-1{background:var(--royal);} .op-2{background:var(--green);} .op-3{background:var(--gold); color:var(--navy);}
 .opcion.correcta{outline:3px solid var(--green); box-shadow:0 0 0 4px var(--green-bg);}
 .opcion.incorrecta{outline:3px solid var(--red); box-shadow:0 0 0 4px var(--red-bg);}
-.feedback{margin-top:18px; padding:14px 16px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:10px; animation:subir .3s ease both;}
+.feedback{margin-top:18px; padding:14px 16px; border-radius:12px; font-weight:700; display:flex; align-items:center; gap:10px; animation:fadeUp .3s ease both;}
 .feedback.ok{background:var(--green-bg); color:var(--green);}
 .feedback.no{background:var(--red-bg); color:var(--red);}
-.feedback small{display:block; font-weight:600; color:var(--ink-soft); font-size:.76rem; margin-top:2px;}
+.feedback small{display:block; font-weight:600; color:var(--muted); font-size:.76rem; margin-top:2px;}
+.esperando-tx{text-align:center; color:var(--muted); font-size:.85rem; padding:20px 0;}
+.setpi-mira{position:absolute; right:14px; bottom:10px; width:44px; height:44px; opacity:.9; pointer-events:none; animation:setpiVigila 2.6s ease-in-out infinite;}
+@keyframes setpiVigila{0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-4px) rotate(3deg);}}
 
 /* podio */
 .podio-hero{text-align:center; margin-bottom:6px;}
-.podio-hero .trofeo{font-size:2.4rem; animation:flotar 2.4s ease-in-out infinite;}
+.podio-hero .trofeo{font-size:2.4rem; animation:floaty 2.4s ease-in-out infinite;}
 .podio-escenario{position:relative; height:230px; margin:14px 0 8px; display:flex; align-items:flex-end; justify-content:center; gap:8px;}
-.pedestal{position:relative; width:30%; border-radius:10px 10px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; opacity:0; transform:translateY(40px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
-@keyframes subirPodio{ to{opacity:1; transform:translateY(0);} }
-.pedestal .num{font-family:'Fraunces',serif; font-weight:800; font-size:1.6rem; color:#fff;}
-.pedestal .nom{position:absolute; top:-30px; left:50%; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); padding:3px 10px; border-radius:999px; white-space:nowrap; max-width:110%; overflow:hidden; text-overflow:ellipsis; box-shadow:var(--shadow);}
-.pedestal .muneco{position:absolute; top:-78px; left:50%; transform:translateX(-50%); animation:flotar 2.6s ease-in-out infinite;}
+.pedestal{position:relative; width:30%; border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; opacity:0; transform:translateY(40px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes subirPodio{to{opacity:1; transform:translateY(0);}}
+.pedestal .num{font-family:"Barlow",sans-serif; font-weight:800; font-size:1.6rem; color:#fff;}
+.pedestal .nom{position:absolute; top:-30px; left:50%; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 10px; border-radius:999px; white-space:nowrap; max-width:130%; overflow:hidden; text-overflow:ellipsis; box-shadow:var(--shadow);}
+.pedestal .muneco{position:absolute; top:-80px; left:50%; transform:translateX(-50%); animation:floaty 2.6s ease-in-out infinite;}
+.pedestal .muneco svg{width:52px; height:52px;}
 .ped-1{height:150px; background:linear-gradient(180deg,var(--gold),#a9781f); order:2;}
-.ped-2{height:112px; background:linear-gradient(180deg,var(--blue),var(--navy-2)); order:1;}
-.ped-3{height:86px; background:linear-gradient(180deg,var(--ocobo),#a13868); order:3;}
+.ped-2{height:112px; background:linear-gradient(180deg,var(--royal),var(--navy)); order:1;}
+.ped-3{height:86px; background:linear-gradient(180deg,var(--cyan),var(--navy)); order:3;}
 .confeti{position:fixed; top:-10px; width:9px; height:14px; border-radius:2px; z-index:5; animation:caer linear forwards;}
-@keyframes caer{ to{ transform:translateY(105vh) rotate(540deg); opacity:.15; } }
 .tabla-tit{display:flex; justify-content:space-between; align-items:baseline; margin:18px 0 10px;}
 .tabla-tit h3{font-size:1rem; color:var(--navy);}
-.tabla-tit span{font-size:.72rem; color:var(--ink-soft);}
-.fila{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);}
+.tabla-tit span{font-size:.72rem; color:var(--muted);}
+.fila{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid var(--line);}
 .fila:last-child{border-bottom:none;}
-.pos{width:26px; height:26px; border-radius:50%; background:var(--cream); color:var(--ink-soft); font-size:.76rem; font-weight:800; display:grid; place-items:center; flex:none;}
-.fila.top1 .pos{background:var(--gold); color:#fff;} .fila.top2 .pos{background:var(--blue); color:#fff;} .fila.top3 .pos{background:var(--ocobo); color:#fff;}
+.fila svg{width:28px; height:28px; border-radius:50%; flex:none;}
+.pos{width:24px; font-size:.76rem; font-weight:800; color:var(--muted); flex:none; text-align:center;}
+.fila.top1 .pos{color:var(--gold);} .fila.top2 .pos{color:var(--royal);} .fila.top3 .pos{color:var(--cyan);}
 .fila .nom{flex:1; min-width:0; font-weight:700; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.fila.yo .nom{color:var(--ocobo);}
+.fila.yo .nom{color:var(--red);}
 .fila .pts{font-size:.9rem; font-weight:800; color:var(--navy);}
-.vacio{color:var(--ink-soft); font-size:.85rem; text-align:center; padding:14px 0;}
-.footnote{text-align:center; color:var(--ink-soft); font-size:.72rem; margin-top:22px;}
-.mi-fila{display:flex; align-items:center; justify-content:center; gap:10px; background:var(--cream); border-radius:12px; padding:12px; margin:14px 0; font-weight:800; color:var(--navy);}
+.vacio{color:var(--muted); font-size:.85rem; text-align:center; padding:14px 0;}
+.footnote{text-align:center; color:var(--muted); font-size:.72rem; margin-top:22px;}
 
-/* modo anfitrion */
+/* anfitrión */
 .host-badge{position:fixed; right:14px; bottom:14px; background:var(--navy); color:#fff; border:none; border-radius:999px; width:38px; height:38px; font-size:1rem; box-shadow:var(--shadow); opacity:.55; z-index:20;}
 .host-lista{display:flex; flex-direction:column; gap:6px; max-height:260px; overflow:auto; margin:14px 0;}
-.host-fila{display:flex; justify-content:space-between; background:var(--cream); border-radius:8px; padding:8px 12px; font-size:.85rem; font-weight:700;}
+.host-fila{display:flex; align-items:center; gap:8px; background:var(--paper); border-radius:8px; padding:6px 12px; font-size:.85rem; font-weight:700;}
+.host-fila svg{width:22px; height:22px; border-radius:50%;}
 .estado-pill{display:inline-block; padding:4px 12px; border-radius:999px; font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;}
-.estado-pill.lobby{background:var(--amber-bg); color:var(--amber);}
-.estado-pill.curso{background:var(--green-bg); color:var(--green);}
-@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+.estado-pill.lobby{background:var(--gold-bg); color:#7a5a0a;} .estado-pill.curso{background:var(--green-bg); color:var(--green);}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
 </style>
 </head>
 <body>
-<div class="topbar wrap" style="max-width:none">
-  <svg class="sem" viewBox="0 0 40 92" aria-hidden="true"><rect x="4" y="2" width="32" height="88" rx="9" fill="#0B1420"/>
-    <circle cx="20" cy="22" r="9.5" fill="#4A2420"/><circle cx="20" cy="46" r="9.5" fill="#4A3A16" id="lucA"/><circle cx="20" cy="70" r="9.5" fill="#173B2C" id="lucV"/></svg>
-  <div><b>TERMINAL JURÍDICA</b><span>Cuestionario en vivo · Capacitación SETP</span></div>
+<div class="marca-agua" aria-hidden="true" id="marca-agua"></div>
+<div class="topbar">
+  <div class="tbar">
+    <div class="lockup"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
+    <div class="brand"><b>TERMINAL JURÍDICA</b><span>Cuestionario en vivo · Capacitación SETP</span></div>
+  </div>
 </div>
 <div class="wrap">
 
 <div id="p-intro" class="pantalla card intro">
   <h1>¿Qué tanto quedó claro?</h1>
-  <p>12 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Entras a la sala de espera y el cuestionario arranca para <b>todos al mismo tiempo</b> cuando el anfitrión lo indique — así nadie le alcanza a copiar la respuesta a nadie.</p>
+  <p>10 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Elige tu personaje, entra a la sala y espera: el cuestionario arranca <b>para todos a la vez</b>.</p>
+  <div class="avatar-preview"><div class="marco" id="avatar-marco"></div></div>
   <input id="in-nombre" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="40">
+  <div class="picker-tit">Color</div>
+  <div class="picker-row" id="picker-color"></div>
+  <div class="picker-tit">Sombrero</div>
+  <div class="picker-row" id="picker-som"></div>
+  <div class="picker-tit">Accesorio</div>
+  <div class="picker-row" id="picker-acc"></div>
+  <p style="font-size:.72rem; color:var(--muted); margin:6px 0 0">Te asignamos un look al azar — cámbialo si quieres, o entra tal cual.</p>
   <button id="btn-empezar" class="btn-grande">Entrar a la sala →</button>
   <div class="err" id="err-intro"></div>
   <div class="temas"><span class="tema-chip">Derecho de petición</span><span class="tema-chip">Tutela</span><span class="tema-chip">Coordinación entre áreas</span><span class="tema-chip">Terminal Jurídica</span></div>
@@ -136,7 +173,7 @@ button{font-family:inherit; cursor:pointer;}
 
 <div id="p-lobby" class="pantalla card lobby" hidden>
   <div class="lobby-cabeza"><h1 style="font-size:1.3rem">Sala de espera</h1><span class="pulso"><span class="punto"></span> en vivo</span></div>
-  <p>Ya estás dentro. En cuanto el anfitrión dé la señal, la primera pregunta aparece para todos al mismo tiempo.</p>
+  <p style="color:var(--muted); font-size:.9rem; margin:6px 0 14px">Ya estás dentro. En cuanto el anfitrión dé la señal, la primera pregunta aparece para todos al mismo tiempo.</p>
   <div class="premio-banner"><span class="ico">🏆</span><span>Los 3 primeros puestos de la clasificación final se llevan premio — ¡a jugársela!</span></div>
   <div id="lobby-roster" class="roster"></div>
   <div class="contador-sala" id="lobby-cuenta"></div>
@@ -147,18 +184,20 @@ button{font-family:inherit; cursor:pointer;}
     <span class="contador mono" id="contador"></span>
     <span class="contador" id="tema-actual" style="flex:1; text-align:right"></span>
     <div class="anillo-wrap">
-      <svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--line)" stroke-width="5"/><circle id="anillo" cx="23" cy="23" r="19" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="0"/></svg>
+      <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="var(--line)" stroke-width="5"/><circle id="anillo" cx="24" cy="24" r="20" fill="none" stroke="var(--royal)" stroke-width="5" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="0"/></svg>
       <span class="anillo-num mono" id="anillo-num">20</span>
     </div>
   </div>
   <h2 class="pregunta-tx" id="pregunta-tx"></h2>
   <div class="opciones" id="opciones"></div>
   <div id="feedback"></div>
+  <div id="esperando" class="esperando-tx" hidden>Ya respondiste. Esperando a que termine el tiempo de esta pregunta…</div>
+  <div class="setpi-mira" id="setpi-mira" aria-hidden="true"></div>
 </div>
 
 <div id="p-podio" class="pantalla card" hidden>
   <div class="podio-hero"><div class="trofeo">🏆</div><h1 style="font-size:1.4rem">¡Cuestionario terminado!</h1></div>
-  <div class="mi-fila mono" id="mi-puntaje-fila"></div>
+  <div style="display:flex; align-items:center; justify-content:center; gap:10px; background:var(--paper); border-radius:12px; padding:12px; margin:14px 0; font-weight:800; color:var(--navy)" class="mono" id="mi-puntaje-fila"></div>
   <div class="podio-escenario" id="podio-escenario"></div>
   <div class="premio-banner" style="margin-top:4px"><span class="ico">🎁</span><span>Premio para el 1°, 2° y 3° puesto.</span></div>
   <div class="tabla-tit"><h3>Clasificación completa</h3><span id="cuenta-jugadores"></span></div>
@@ -168,19 +207,20 @@ button{font-family:inherit; cursor:pointer;}
 
 <div id="p-host" class="pantalla card" hidden>
   <h1 style="font-size:1.3rem">Modo anfitrión</h1>
-  <p>Inicia sesión con tu usuario de la Terminal Jurídica (solo la Dirección Jurídica puede controlar la sala).</p>
+  <p style="color:var(--muted); font-size:.9rem">Este panel es solo para quien presenta. Mientras no pongas el PIN, el QR y la sala quedan ocultos.</p>
   <div id="host-login">
-    <input id="host-usuario" type="text" placeholder="Usuario" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--cream);color:var(--ink);">
-    <input id="host-clave" type="password" placeholder="Clave" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--cream);color:var(--ink);">
-    <button id="host-btn-entrar" class="btn-grande">Entrar como anfitrión</button>
+    <div class="picker-tit" style="text-align:center; margin-top:10px">PIN de acceso al juego</div>
+    <input id="host-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" style="width:100%; border:1.5px solid var(--line); border-radius:11px; padding:16px 14px; margin-bottom:10px; background:var(--paper); color:var(--ink); font-family:inherit; font-size:2rem; letter-spacing:.5em; text-align:center;">
+    <button id="host-btn-entrar" class="btn-grande" style="margin-top:0">Desbloquear →</button>
     <div class="err" id="host-err"></div>
   </div>
   <div id="host-panel" hidden>
     <p style="display:flex;align-items:center;gap:8px">Estado: <span class="estado-pill" id="host-estado-pill">—</span></p>
+    <div style="text-align:center; margin:10px 0"><img src="qr_cuestionario.png" alt="Código QR del cuestionario" style="width:min(60vw,260px); height:min(60vw,260px); border-radius:16px; box-shadow:var(--shadow-lg); background:#fff; padding:12px;"></div>
     <div class="host-lista" id="host-lista"></div>
     <div class="contador-sala" id="host-cuenta"></div>
-    <button id="host-btn-iniciar" class="btn-grande" style="background:var(--green); margin-top:12px;">▶ Iniciar para todos</button>
-    <button id="host-btn-reiniciar" class="btn-grande" style="background:var(--red); margin-top:10px;">↺ Reiniciar sesión (borra resultados)</button>
+    <button id="host-btn-iniciar" class="btn-grande" style="background:linear-gradient(135deg,var(--green),#0c7a4a); margin-top:12px;">▶ Iniciar para todos</button>
+    <button id="host-btn-reiniciar" class="btn-grande" style="background:linear-gradient(135deg,var(--red),#a01e1e); margin-top:10px;">↺ Reiniciar sesión (borra resultados)</button>
     <div class="err" id="host-err2"></div>
   </div>
 </div>
@@ -198,35 +238,77 @@ async function api(fn, ...args){
   return r;
 }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-function mem_get_set(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
-const AVATAR_COLORES = ["var(--navy)","var(--blue)","var(--ocobo)","var(--gold)","#1E8F5F"];
-function colorDe(nombre){ let h=0; for(let i=0;i<nombre.length;i++) h=(h*31+nombre.charCodeAt(i))|0; return AVATAR_COLORES[Math.abs(h)%AVATAR_COLORES.length]; }
-function inicial(nombre){ return (nombre.trim()[0]||"?").toUpperCase(); }
-/* baraja las opciones en un orden distinto (pero siempre igual) para cada jugador+pregunta,
-   asi aunque alguien mire la pantalla de al lado, las posiciones de los botones no coinciden */
-function barajaEstable(n, semilla){
-  let s=0; for(let i=0;i<semilla.length;i++) s=(Math.imul(31,s)+semilla.charCodeAt(i))|0; s=s>>>0;
-  function rand(){ s=(s+0x6D2B79F5)|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
-  const idx=[...Array(n).keys()];
-  for(let i=idx.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; }
-  return idx;
+function mem(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
+
+/* ---------- personajes: color + accesorio, al estilo "vístete tu jugador" ---------- */
+const COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828"};
+const NOMBRES_COLOR = {navy:"Azul noche", royal:"Azul rey", cyan:"Celeste", green:"Verde", gold:"Dorado", red:"Rojo"};
+/* SETPI: la mascota del SETP. Cara fija, chaleco de color a elegir, y dos capas independientes
+   (sombrero + accesorio) — igual que el mascotario oficial, en versión SVG liviana. */
+const SOMBREROS = ["ninguno","gorra","casco","corona"];
+const NOMBRES_SOM = {ninguno:"Ninguno", gorra:"Gorra SETP", casco:"Casco de obra", corona:"Corona"};
+const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla"];
+const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla"};
+function avatarSVG(spec, sz){
+  sz = sz || 40;
+  const partes = String(spec||"royal:ninguno:ninguno").split(":");
+  const color = COLORES[partes[0]] ? partes[0] : "royal", som = SOMBREROS.includes(partes[1]) ? partes[1] : "ninguno", acc = ACCESORIOS.includes(partes[2]) ? partes[2] : "ninguno";
+  const c = COLORES[color];
+  let cara = '<circle cx="18.5" cy="24" r="2.3" fill="#fff"/><circle cx="29.5" cy="24" r="2.3" fill="#fff"/><path d="M17,30 q7,7 14,0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  if(acc==="gafas") cara = '<rect x="14.5" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/><rect x="25" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/><rect x="23" y="23" width="2" height="1.6" fill="#0D1730"/><path d="M18,30 q6,5 12,0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  else if(acc==="mascarilla") cara = '<circle cx="18.5" cy="23" r="2.1" fill="#fff"/><circle cx="29.5" cy="23" r="2.1" fill="#fff"/><path d="M14,29 Q24,36 34,29 L34,33 Q24,40 14,33 Z" fill="#E6F4FB" stroke="#159BD6" stroke-width="1.2"/>';
+  let accMk = "";
+  if(acc==="corbata") accMk = '<polygon points="21,33 27,33 29,44 24,50 19,44" fill="#D62828"/><polygon points="21,33 27,33 24,38" fill="#0B1F5C"/>';
+  let somMk = "";
+  if(som==="gorra") somMk = '<path d="M9,19 a15,11 0 0 1 30,0 Z" fill="#0B1F5C"/><rect x="7" y="18" width="34" height="4" rx="2" fill="#0B1F5C"/><rect x="20" y="10" width="8" height="4" rx="1" fill="#00A830"/><circle cx="24" cy="12" r="2" fill="#F0A800"/>';
+  else if(som==="casco") somMk = '<path d="M8,18 a16,13 0 0 1 32,0 Z" fill="#F0A800"/><rect x="6" y="17" width="36" height="4" rx="2" fill="#c98c00"/><rect x="21" y="6" width="6" height="6" rx="1" fill="#c98c00"/>';
+  else if(som==="corona") somMk = '<polygon points="10,18 15,7 20,15 24,5 28,15 33,7 38,18" fill="#F0A800" stroke="#c98c00" stroke-width="1"/><circle cx="15" cy="7" r="2" fill="#D62828"/><circle cx="24" cy="5" r="2" fill="#159BD6"/><circle cx="33" cy="7" r="2" fill="#00A830"/>';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="17" fill="${c}"/><circle cx="14" cy="28" r="2.6" fill="#fff" opacity=".35"/><circle cx="34" cy="28" r="2.6" fill="#fff" opacity=".35"/>${cara}${accMk}${!som||som==="ninguno" ? '<circle cx="24" cy="14" r="3.4" fill="#fff"/><circle cx="24" cy="14" r="2.1" fill="#F0A800"/>' : ""}${somMk}</svg>`;
 }
-function confeti(cont){
-  const colores = ["#3D85C6","#D6488E","#C9922B","#1E8F5F","#01274B"];
-  for(let i=0;i<cont;i++){
-    const d = document.createElement("div");
-    d.className = "confeti";
-    d.style.left = (Math.random()*100)+"vw";
-    d.style.background = colores[i%colores.length];
-    d.style.animationDuration = (2.2+Math.random()*1.6)+"s";
-    d.style.opacity = String(.7+Math.random()*.3);
-    document.body.appendChild(d);
-    setTimeout(()=>d.remove(), 4200);
-  }
+function busWatermark(color, cls){
+  return `<svg class="${cls}" viewBox="0 0 200 90" aria-hidden="true"><rect x="6" y="12" width="176" height="54" rx="14" fill="${color}"/><rect x="6" y="42" width="176" height="8" fill="#D62828"/>${[26,62,98,134].map(x=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#fff"/>`).join("")}<circle cx="188" cy="58" r="5" fill="#F0A800"/>${[46,146].map(x=>`<circle cx="${x}" cy="70" r="13" fill="#0D1730"/><circle cx="${x}" cy="70" r="5.5" fill="#8A93A8"/>`).join("")}</svg>`;
 }
 
-const MARCAS = ["▲","◆","●","■"];
-let PREGUNTAS = [], DURACION = 20, IDX = 0, NOMBRE = "", TOTAL = 0, T0 = 0, TIMER = null, RESPONDIENDO = false, ORDEN = [];
+/* look inicial al azar (distinto cada vez que alguien entra, para que no todos se vean iguales
+   si nadie toca el selector — solo el color se sortea siempre "en el aire", sombrero y accesorio
+   parten en "ninguno" para no saturar, pero el color ya los distingue entre sí). */
+const CLAVES_COLOR = Object.keys(COLORES);
+let MI_COLOR = CLAVES_COLOR[Math.floor(Math.random()*CLAVES_COLOR.length)], MI_SOM = "ninguno", MI_ACC = "ninguno";
+const avatarMarco = document.getElementById("avatar-marco"), pickerColor = document.getElementById("picker-color"), pickerSom = document.getElementById("picker-som"), pickerAcc = document.getElementById("picker-acc");
+function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(MI_COLOR+":"+MI_SOM+":"+MI_ACC, 60); }
+Object.keys(COLORES).forEach(k=>{
+  const b = document.createElement("button"); b.type="button"; b.className="sw"+(k===MI_COLOR?" on":""); b.style.background = COLORES[k]; b.title = NOMBRES_COLOR[k]; b.setAttribute("aria-label", NOMBRES_COLOR[k]);
+  b.addEventListener("click", ()=>{ MI_COLOR = k; [...pickerColor.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
+  pickerColor.appendChild(b);
+});
+SOMBREROS.forEach(k=>{
+  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_SOM?" on":"");
+  b.innerHTML = avatarSVG("navy:"+k+":ninguno", 30) + "<span>"+NOMBRES_SOM[k]+"</span>";
+  b.addEventListener("click", ()=>{ MI_SOM = k; [...pickerSom.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
+  pickerSom.appendChild(b);
+});
+ACCESORIOS.forEach(k=>{
+  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_ACC?" on":"");
+  b.innerHTML = avatarSVG("navy:ninguno:"+k, 30) + "<span>"+NOMBRES_ACC[k]+"</span>";
+  b.addEventListener("click", ()=>{ MI_ACC = k; [...pickerAcc.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
+  pickerAcc.appendChild(b);
+});
+pintarAvatarPreview();
+
+function confeti(cont){
+  const colores = [COLORES.royal, COLORES.green, COLORES.gold, COLORES.red, COLORES.cyan];
+  for(let i=0;i<cont;i++){
+    const d = document.createElement("div"); d.className = "confeti";
+    d.style.left = (Math.random()*100)+"vw"; d.style.background = colores[i%colores.length];
+    d.style.animationDuration = (2.2+Math.random()*1.6)+"s"; d.style.opacity = String(.7+Math.random()*.3);
+    document.body.appendChild(d); setTimeout(()=>d.remove(), 4200);
+  }
+}
+document.getElementById("marca-agua").innerHTML = busWatermark(COLORES.green,"ma-bus1") + busWatermark(COLORES.royal,"ma-bus2");
+
+/* ---------- estado y pantallas ---------- */
+let PREGUNTAS = [], DURACION = 20, TRANSICION = 3, TOTAL = 10, NOMBRE = "", MI_AVATAR = "royal:ninguno:ninguno";
+let PUNTAJE = 0, INICIO = 0, IDX_MOSTRADO = -1, RESPONDIDA = {}, TICK = null;
 
 const pIntro = document.getElementById("p-intro"), pLobby = document.getElementById("p-lobby"), pPregunta = document.getElementById("p-pregunta"), pPodio = document.getElementById("p-podio"), pHost = document.getElementById("p-host");
 const inNombre = document.getElementById("in-nombre"), btnEmpezar = document.getElementById("btn-empezar"), errIntro = document.getElementById("err-intro");
@@ -234,31 +316,25 @@ function mostrarSolo(p){ [pIntro,pLobby,pPregunta,pPodio,pHost].forEach(x=>x.hid
 
 /* ---------- sala de espera ---------- */
 const elRoster = document.getElementById("lobby-roster"), elCuentaSala = document.getElementById("lobby-cuenta");
-let CONOCIDOS = new Set(), POLL_LOBBY = null;
+let POLL_LOBBY = null, POLL_LATIDO = null;
 function pintarRoster(jugadores){
-  jugadores.forEach(j=>{
-    if(CONOCIDOS.has(j)) return;
-    CONOCIDOS.add(j);
-    const chip = document.createElement("span");
-    chip.className = "chip-persona" + (j===NOMBRE ? " tu-chip" : "");
-    chip.innerHTML = `<span class="avatar" style="background:${colorDe(j)}">${inicial(j)}</span>${esc(j)}${j===NOMBRE?" (tú)":""}`;
-    elRoster.appendChild(chip);
-  });
+  elRoster.innerHTML = jugadores.map(j=>`<span class="chip-persona${j.jugador===NOMBRE?' tu-chip':''}">${avatarSVG(j.avatar,26)}${esc(j.jugador)}${j.jugador===NOMBRE?" (tú)":""}</span>`).join("");
   elCuentaSala.textContent = jugadores.length + (jugadores.length===1 ? " persona esperando" : " personas esperando");
 }
 async function empezar(){
   const nom = inNombre.value.trim();
   if(nom.length < 2){ errIntro.textContent = "Escribe tu nombre (mínimo 2 letras)."; return; }
   btnEmpezar.disabled = true; btnEmpezar.textContent = "Entrando…"; errIntro.textContent = "";
+  MI_AVATAR = MI_COLOR+":"+MI_SOM+":"+MI_ACC;
   try{
-    const r = await api("quizUnirse", nom);
-    NOMBRE = nom; mem_get_set("quiz_nombre", nom);
-    CONOCIDOS = new Set();
+    const r = await api("quizUnirse", nom, MI_AVATAR);
+    NOMBRE = nom; mem("quiz_nombre", nom); mem("quiz_avatar", MI_AVATAR);
+    DURACION = r.duracion || DURACION; TRANSICION = r.transicion !== undefined ? r.transicion : TRANSICION; TOTAL = r.totalPreguntas || TOTAL;
     mostrarSolo(pLobby);
     pintarRoster(r.jugadores);
-    if(r.estado === "en_curso"){ await cargarYArrancar(); return; }
-    clearInterval(POLL_LOBBY);
-    POLL_LOBBY = setInterval(sondearLobby, 1300);
+    if(r.estado === "en_curso"){ await cargarYArrancar(parseInt(r.inicio,10)); return; }
+    clearInterval(POLL_LOBBY); POLL_LOBBY = setInterval(sondearLobby, 1500);
+    clearInterval(POLL_LATIDO); POLL_LATIDO = setInterval(()=>api("quizUnirse", NOMBRE, MI_AVATAR).catch(()=>{}), 6000);
   }catch(e){
     errIntro.textContent = e.message; btnEmpezar.disabled = false; btnEmpezar.textContent = "Entrar a la sala →";
   }
@@ -267,72 +343,74 @@ async function sondearLobby(){
   try{
     const r = await api("quizEstadoSesion");
     pintarRoster(r.jugadores);
-    if(r.estado === "en_curso"){ clearInterval(POLL_LOBBY); await cargarYArrancar(); }
+    if(r.estado === "en_curso"){ clearInterval(POLL_LOBBY); clearInterval(POLL_LATIDO); await cargarYArrancar(parseInt(r.inicio,10)); }
   }catch(e){ /* se reintenta solo */ }
 }
-async function cargarYArrancar(){
+async function cargarYArrancar(inicioMs){
   const r = await api("quizPreguntas");
-  PREGUNTAS = r.preguntas; DURACION = r.duracion; IDX = 0; TOTAL = 0;
+  PREGUNTAS = r.preguntas; DURACION = r.duracion; TOTAL = PREGUNTAS.length; PUNTAJE = 0; IDX_MOSTRADO = -1; RESPONDIDA = {};
+  INICIO = inicioMs || Date.now();
   mostrarSolo(pPregunta);
-  mostrarPregunta();
+  clearInterval(POLL_LATIDO); POLL_LATIDO = setInterval(()=>api("quizUnirse", NOMBRE, MI_AVATAR).catch(()=>{}), 8000);
+  clearInterval(TICK); TICK = setInterval(tickReloj, 200);
+  tickReloj();
 }
 btnEmpezar.addEventListener("click", empezar);
 inNombre.addEventListener("keydown", e=>{ if(e.key==="Enter") empezar(); });
 
-/* ---------- pregunta ---------- */
+/* ---------- reloj compartido: todos calculan la MISMA pregunta actual a partir del mismo inicio ---------- */
+const MARCAS = ["▲","◆","●","■"];
 const elContador = document.getElementById("contador"), elTema = document.getElementById("tema-actual"),
       elAnillo = document.getElementById("anillo"), elAnilloNum = document.getElementById("anillo-num"),
-      elPreguntaTx = document.getElementById("pregunta-tx"), elOpciones = document.getElementById("opciones"), elFeedback = document.getElementById("feedback");
-const CIRC = 2*Math.PI*19;
-
-function mostrarPregunta(){
-  const q = PREGUNTAS[IDX];
-  RESPONDIENDO = false;
+      elPreguntaTx = document.getElementById("pregunta-tx"), elOpciones = document.getElementById("opciones"), elFeedback = document.getElementById("feedback"),
+      elEsperando = document.getElementById("esperando");
+const CIRC = 2*Math.PI*20;
+function barajaEstable(n, semilla){
+  let s=0; for(let i=0;i<semilla.length;i++) s=(Math.imul(31,s)+semilla.charCodeAt(i))|0; s=s>>>0;
+  function rand(){ s=(s+0x6D2B79F5)|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
+  const idx=[...Array(n).keys()]; for(let i=idx.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]]; } return idx;
+}
+function tickReloj(){
+  const ciclo = (DURACION+TRANSICION)*1000;
+  const transcurrido = Date.now() - INICIO;
+  const idx = Math.floor(transcurrido / ciclo);
+  const dentro = transcurrido - idx*ciclo;
+  const restante = Math.max(0, DURACION - dentro/1000);
+  if(idx >= TOTAL){ clearInterval(TICK); mostrarPodio(); return; }
+  if(idx !== IDX_MOSTRADO){ IDX_MOSTRADO = idx; mostrarPregunta(idx); }
+  elAnilloNum.textContent = Math.ceil(restante);
+  elAnillo.style.strokeDashoffset = String(CIRC * (1 - Math.max(0,restante)/DURACION));
+  elAnillo.style.stroke = restante <= 5 ? "var(--red)" : "var(--royal)";
+  if(restante <= 0 && !RESPONDIDA[idx]){ RESPONDIDA[idx] = true; responder(idx, -1); }
+}
+let ORDEN = [];
+const elSetpi = document.getElementById("setpi-mira");
+function mostrarPregunta(idx){
+  const q = PREGUNTAS[idx];
+  elFeedback.innerHTML = ""; elEsperando.hidden = true;
+  if(elSetpi) elSetpi.innerHTML = avatarSVG("gold:casco:ninguno", 44);
   ORDEN = barajaEstable(q.opciones.length, NOMBRE + ":" + q.id);
-  elContador.textContent = "Pregunta " + (IDX+1) + " de " + PREGUNTAS.length;
+  elContador.textContent = "Pregunta " + (idx+1) + " de " + TOTAL;
   elTema.textContent = q.tema;
   elPreguntaTx.textContent = q.pregunta;
-  elFeedback.innerHTML = "";
-  elOpciones.innerHTML = ORDEN.map((origIdx,pos)=>
-    `<button type="button" class="opcion op-${pos}" data-orig="${origIdx}"><span class="marca">${MARCAS[pos]}</span><span>${esc(q.opciones[origIdx])}</span></button>`
-  ).join("");
-  elOpciones.querySelectorAll(".opcion").forEach(b=>b.addEventListener("click", ()=>responder(+b.dataset.orig)));
-  elAnillo.style.transition = "none"; elAnillo.setAttribute("stroke-dasharray", String(CIRC)); elAnillo.style.strokeDashoffset = "0"; elAnillo.setAttribute("stroke", "var(--blue)");
-  elAnilloNum.textContent = DURACION;
-  T0 = Date.now();
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    elAnillo.style.transition = "stroke-dashoffset " + DURACION + "s linear, stroke .3s";
-    elAnillo.style.strokeDashoffset = String(CIRC);
-  }));
-  clearTimeout(TIMER);
-  TIMER = setTimeout(()=>{ if(!RESPONDIENDO) responder(-1); }, DURACION*1000 + 80);
-  clearInterval(mostrarPregunta._t);
-  mostrarPregunta._t = setInterval(()=>{
-    const rest = Math.max(0, DURACION - (Date.now()-T0)/1000);
-    elAnilloNum.textContent = Math.ceil(rest);
-    if(rest <= 5) elAnillo.setAttribute("stroke", "var(--red)");
-    if(rest <= 0) clearInterval(mostrarPregunta._t);
-  }, 200);
+  elOpciones.hidden = false;
+  elOpciones.innerHTML = ORDEN.map((origIdx,pos)=>`<button type="button" class="opcion op-${pos}" data-orig="${origIdx}"><span>${MARCAS[pos]}</span><span>${esc(q.opciones[origIdx])}</span></button>`).join("");
+  elOpciones.querySelectorAll(".opcion").forEach(b=>b.addEventListener("click", ()=>{ if(!RESPONDIDA[idx]){ RESPONDIDA[idx]=true; responder(idx, +b.dataset.orig); } }));
 }
-
-async function responder(opcionIdx){
-  if(RESPONDIENDO) return;
-  RESPONDIENDO = true;
-  clearTimeout(TIMER); clearInterval(mostrarPregunta._t);
-  const ms = Date.now() - T0;
+async function responder(idx, opcionIdx){
   const botones = [...elOpciones.querySelectorAll(".opcion")];
   botones.forEach(b=>b.disabled = true);
-  const q = PREGUNTAS[IDX];
+  const q = PREGUNTAS[idx];
   let r;
-  try{ r = await api("quizResponder", NOMBRE, q.id, opcionIdx, ms); }
-  catch(e){ r = {correcta:false, puntos:0, error:e.message}; }
-  TOTAL += r.puntos || 0;
-  if(opcionIdx >= 0) botones.find(b=>+b.dataset.orig===opcionIdx).classList.add(r.correcta ? "correcta" : "incorrecta");
-  if(r.correcta) confeti(14);
+  try{ r = await api("quizResponder", NOMBRE, q.id, opcionIdx, opcionIdx<0 ? DURACION*1000 : 1); }
+  catch(e){ r = {correcta:false, puntos:0}; }
+  PUNTAJE += r.puntos || 0;
+  if(opcionIdx >= 0){ const b = botones.find(x=>+x.dataset.orig===opcionIdx); if(b) b.classList.add(r.correcta ? "correcta" : "incorrecta"); }
+  if(r.correcta) confeti(12);
   elFeedback.innerHTML = r.correcta
-    ? `<div class="feedback ok">✓ ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${TOTAL}</small></div>`
-    : `<div class="feedback no">${opcionIdx<0 ? "⏱ Se acabó el tiempo" : "✕ No era esa"}<small>Total hasta ahora: ${TOTAL}</small></div>`;
-  setTimeout(()=>{ IDX++; if(IDX < PREGUNTAS.length) mostrarPregunta(); else mostrarPodio(); }, 1500);
+    ? `<div class="feedback ok">✓ ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${PUNTAJE}</small></div>`
+    : `<div class="feedback no">${opcionIdx<0 ? "⏱ Se acabó el tiempo" : "✕ No era esa"}<small>Total hasta ahora: ${PUNTAJE}</small></div>`;
+  elEsperando.hidden = false;
 }
 
 /* ---------- podio ---------- */
@@ -341,31 +419,16 @@ const elMiFila = document.getElementById("mi-puntaje-fila"), elCuenta = document
 let POLL_PODIO = null, PODIO_PINTADO = false;
 function mostrarPodio(){
   mostrarSolo(pPodio);
-  elMiFila.textContent = "Tu puntaje: " + TOTAL + " pts";
-  actualizarClasificacion();
-  confeti(28);
-  clearInterval(POLL_PODIO);
-  POLL_PODIO = setInterval(actualizarClasificacion, 4000);
-}
-function muneco(color, corona){
-  return `<svg width="46" height="46" viewBox="0 0 46 46">
-    ${corona?'<polygon points="15,14 18,7 23,12 28,7 31,14" fill="var(--gold)"/>':''}
-    <circle cx="23" cy="18" r="10" fill="${color}"/>
-    <circle cx="19.5" cy="17" r="1.6" fill="#fff"/><circle cx="26.5" cy="17" r="1.6" fill="#fff"/>
-    <path d="M18,21 q5,5 10,0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <path d="M11,44 q12,-14 24,0 Z" fill="${color}"/>
-  </svg>`;
+  elMiFila.textContent = "Tu puntaje: " + PUNTAJE + " pts";
+  actualizarClasificacion(); confeti(28);
+  clearInterval(POLL_PODIO); POLL_PODIO = setInterval(actualizarClasificacion, 3500);
 }
 function pintarEscenario(tabla){
-  const orden = [tabla[1], tabla[0], tabla[2]]; // 2do, 1ro, 3ro (para la disposición visual del podio)
-  const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"], colores = ["var(--blue)","var(--gold)","var(--ocobo)"];
+  const orden = [tabla[1], tabla[0], tabla[2]];
+  const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"];
   elEscenario.innerHTML = orden.map((f,i)=>{
     if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><span class="num">${num[i]}</span></div>`;
-    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s">
-      <span class="nom">${esc(f.jugador)}</span>
-      <span class="muneco">${muneco(colores[i], num[i]==="1")}</span>
-      <span class="num">${num[i]}°</span>
-    </div>`;
+    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="nom">${esc(f.jugador)}</span><span class="muneco">${avatarSVG(f.avatar,52)}</span><span class="num">${num[i]}°</span></div>`;
   }).join("");
 }
 async function actualizarClasificacion(){
@@ -377,65 +440,61 @@ async function actualizarClasificacion(){
     elTabla.innerHTML = r.tabla.map((f,i)=>{
       const top = i===0?"top1":i===1?"top2":i===2?"top3":"";
       const yo = f.jugador===NOMBRE ? "yo" : "";
-      return `<div class="fila ${top} ${yo}"><span class="pos">${i+1}</span><span class="nom">${esc(f.jugador)}</span><span class="pts mono">${f.puntos}</span></div>`;
+      return `<div class="fila ${top} ${yo}">${avatarSVG(f.avatar,28)}<span class="pos">${i+1}</span><span class="nom">${esc(f.jugador)}</span><span class="pts mono">${f.puntos}</span></div>`;
     }).join("");
   }catch(e){ /* silencioso: se reintenta en el próximo ciclo */ }
 }
-window.addEventListener("beforeunload", ()=>{ clearInterval(POLL_PODIO); clearInterval(POLL_LOBBY); });
+window.addEventListener("beforeunload", ()=>{ clearInterval(POLL_PODIO); clearInterval(POLL_LOBBY); clearInterval(POLL_LATIDO); clearInterval(TICK); });
 
 /* ---------- modo anfitrión ---------- */
 const btnModoHost = document.getElementById("btn-modo-host");
 const hostLogin = document.getElementById("host-login"), hostPanel = document.getElementById("host-panel");
-const hostUsuario = document.getElementById("host-usuario"), hostClave = document.getElementById("host-clave"), hostErr = document.getElementById("host-err");
+const hostPin = document.getElementById("host-pin"), hostErr = document.getElementById("host-err");
 const hostLista = document.getElementById("host-lista"), hostCuenta = document.getElementById("host-cuenta"), hostEstadoPill = document.getElementById("host-estado-pill"), hostErr2 = document.getElementById("host-err2");
-let HOST_TOKEN = "", POLL_HOST = null;
-function abrirHost(){ clearInterval(POLL_LOBBY); clearInterval(POLL_PODIO); mostrarSolo(pHost); }
+let HOST_PIN = "", POLL_HOST = null;
+function abrirHost(){ clearInterval(POLL_LOBBY); clearInterval(POLL_PODIO); clearInterval(POLL_LATIDO); clearInterval(TICK); mostrarSolo(pHost); hostPin.focus(); }
 btnModoHost.addEventListener("click", abrirHost);
 if(new URLSearchParams(location.search).get("host")==="1") abrirHost();
 
-document.getElementById("host-btn-entrar").addEventListener("click", async ()=>{
+function desbloquearHost(){
   hostErr.textContent = "";
-  try{
-    const r = await api("login", hostUsuario.value.trim(), hostClave.value);
-    HOST_TOKEN = r.token;
-    hostLogin.hidden = true; hostPanel.hidden = false;
-    sondearHost(); clearInterval(POLL_HOST); POLL_HOST = setInterval(sondearHost, 1500);
-  }catch(e){ hostErr.textContent = e.message; }
-});
+  const pin = hostPin.value.trim();
+  if(pin.length !== 4){ hostErr.textContent = "El PIN tiene 4 dígitos."; return; }
+  HOST_PIN = pin;
+  hostLogin.hidden = true; hostPanel.hidden = false;
+  sondearHost(); clearInterval(POLL_HOST); POLL_HOST = setInterval(sondearHost, 1500);
+}
+document.getElementById("host-btn-entrar").addEventListener("click", desbloquearHost);
+hostPin.addEventListener("keydown", e=>{ if(e.key==="Enter") desbloquearHost(); });
 async function sondearHost(){
   try{
     const r = await api("quizEstadoSesion");
     hostEstadoPill.textContent = r.estado === "en_curso" ? "en curso" : "sala de espera";
     hostEstadoPill.className = "estado-pill " + (r.estado === "en_curso" ? "curso" : "lobby");
     hostCuenta.textContent = r.jugadores.length + (r.jugadores.length===1 ? " persona conectada" : " personas conectadas");
-    hostLista.innerHTML = r.jugadores.length ? r.jugadores.map(j=>`<div class="host-fila"><span>${esc(j)}</span></div>`).join("") : '<div class="vacio">Nadie ha entrado todavía.</div>';
+    hostLista.innerHTML = r.jugadores.length ? r.jugadores.map(j=>`<div class="host-fila">${avatarSVG(j.avatar,22)}<span>${esc(j.jugador)}</span></div>`).join("") : '<div class="vacio">Nadie ha entrado todavía.</div>';
   }catch(e){ /* reintenta solo */ }
 }
 document.getElementById("host-btn-iniciar").addEventListener("click", async ()=>{
   hostErr2.textContent = "";
-  try{ const r = await api("quizIniciar", HOST_TOKEN); if(!r.ok) hostErr2.textContent = r.error || "No se pudo iniciar."; }
+  try{ const r = await api("quizIniciar", HOST_PIN); if(!r.ok) hostErr2.textContent = r.error || "No se pudo iniciar."; }
   catch(e){ hostErr2.textContent = e.message; }
 });
 document.getElementById("host-btn-reiniciar").addEventListener("click", async ()=>{
   hostErr2.textContent = "";
   if(!confirm("¿Borrar los resultados y volver a la sala de espera para una sesión nueva?")) return;
-  try{ const r = await api("quizReiniciar", HOST_TOKEN); if(!r.ok) hostErr2.textContent = r.error || "No se pudo reiniciar."; }
+  try{ const r = await api("quizReiniciar", HOST_PIN); if(!r.ok) hostErr2.textContent = r.error || "No se pudo reiniciar."; }
   catch(e){ hostErr2.textContent = e.message; }
 });
 
-/* semáforo del encabezado: cicla ámbar/verde despacio, solo decorativo */
-(function(){
-  const luces = [document.getElementById("lucA"), document.getElementById("lucV")];
-  const ambar = ["#4A3A16", "#F5A623"], verde = ["#173B2C", "#26B67A"];
-  let i = 0;
-  setInterval(()=>{ i = (i+1) % 2;
-    luces[0].setAttribute("fill", i===0 ? ambar[1] : ambar[0]);
-    luces[1].setAttribute("fill", i===1 ? verde[1] : verde[0]);
-  }, 1400);
-})();
-
-const guardado = mem_get_set("quiz_nombre");
-if(guardado) inNombre.value = guardado;
+const guardado = mem("quiz_nombre"); if(guardado) inNombre.value = guardado;
+const avGuardado = mem("quiz_avatar");
+if(avGuardado){ const [c,s,a] = avGuardado.split(":"); if(COLORES[c]) MI_COLOR=c; if(SOMBREROS.includes(s)) MI_SOM=s; if(ACCESORIOS.includes(a)) MI_ACC=a;
+  [...pickerColor.children].forEach((el,i)=>el.classList.toggle("on", CLAVES_COLOR[i]===MI_COLOR));
+  [...pickerSom.children].forEach((el,i)=>el.classList.toggle("on", SOMBREROS[i]===MI_SOM));
+  [...pickerAcc.children].forEach((el,i)=>el.classList.toggle("on", ACCESORIOS[i]===MI_ACC));
+  pintarAvatarPreview();
+}
 })();
 </script>
 </body>
