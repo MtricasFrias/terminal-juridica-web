@@ -241,29 +241,49 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;
 function mem(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
 
 /* ---------- personajes: color + accesorio, al estilo "vístete tu jugador" ---------- */
-const COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828"};
-const NOMBRES_COLOR = {navy:"Azul noche", royal:"Azul rey", cyan:"Celeste", green:"Verde", gold:"Dorado", red:"Rojo"};
-/* SETPI: la mascota del SETP. Cara fija, chaleco de color a elegir, y dos capas independientes
-   (sombrero + accesorio) — igual que el mascotario oficial, en versión SVG liviana. */
-const SOMBREROS = ["ninguno","gorra","casco","corona"];
-const NOMBRES_SOM = {ninguno:"Ninguno", gorra:"Gorra SETP", casco:"Casco de obra", corona:"Corona"};
-const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla"];
-const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla"};
+const COLORES = {navy:"#0B1F5C", royal:"#1D4ED8", cyan:"#159BD6", green:"#00A830", gold:"#F0A800", red:"#D62828", purple:"#7C3AED", orange:"#EA580C", gris:"#5B6A88", blanco:"#F4F6FB"};
+const NOMBRES_COLOR = {navy:"Azul noche", royal:"Azul rey", cyan:"Celeste", green:"Verde", gold:"Dorado", red:"Rojo", purple:"Morado", orange:"Naranja", gris:"Gris", blanco:"Blanco"};
+/* SETPI: la mascota del SETP. Cara fija, traje de color a elegir, y dos capas independientes
+   (sombrero + accesorio) — igual que el mascotario oficial, en versión SVG liviana. Con 10 colores,
+   8 sombreros y 8 accesorios hay 640 combinaciones posibles, más el color al azar de cada persona. */
+const SOMBREROS = ["ninguno","gorra","casco","corona","boina","deportiva","explorador","tolimense"];
+const NOMBRES_SOM = {ninguno:"Ninguno", gorra:"Gorra SETP", casco:"Casco de obra", corona:"Corona", boina:"Boina", deportiva:"Gorra deportiva", explorador:"Sombrero explorador", tolimense:"Sombrero tolimense"};
+const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla","bufanda","audifonos","panuelo","moño"];
+const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla", bufanda:"Bufanda", audifonos:"Audífonos", panuelo:"Pañuelo", "moño":"Moño"};
+/* SETPI siempre tiene: capucha/casco gris claro con la insignia del SETP en la frente, y ojos
+   grandes de caricatura — eso es lo que lo hace reconocible. El color elegido va en el traje,
+   no en la cabeza (igual que en el mascotario: "cara fija" + "traje" + capas encima). */
 function avatarSVG(spec, sz){
   sz = sz || 40;
   const partes = String(spec||"royal:ninguno:ninguno").split(":");
   const color = COLORES[partes[0]] ? partes[0] : "royal", som = SOMBREROS.includes(partes[1]) ? partes[1] : "ninguno", acc = ACCESORIOS.includes(partes[2]) ? partes[2] : "ninguno";
   const c = COLORES[color];
-  let cara = '<circle cx="18.5" cy="24" r="2.3" fill="#fff"/><circle cx="29.5" cy="24" r="2.3" fill="#fff"/><path d="M17,30 q7,7 14,0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
-  if(acc==="gafas") cara = '<rect x="14.5" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/><rect x="25" y="21.5" width="8.5" height="6" rx="2.5" fill="#0D1730"/><rect x="23" y="23" width="2" height="1.6" fill="#0D1730"/><path d="M18,30 q6,5 12,0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
-  else if(acc==="mascarilla") cara = '<circle cx="18.5" cy="23" r="2.1" fill="#fff"/><circle cx="29.5" cy="23" r="2.1" fill="#fff"/><path d="M14,29 Q24,36 34,29 L34,33 Q24,40 14,33 Z" fill="#E6F4FB" stroke="#159BD6" stroke-width="1.2"/>';
+
+  const cuerpo = `<path d="M9,30 Q24,36 39,30 L39,43 Q24,47 9,43 Z" fill="${c}" stroke="#C7D0E0" stroke-width=".7"/><rect x="16.5" y="34.5" width="15" height="3.6" rx="1.6" fill="#0D1730" opacity=".18"/>`;
+  const casco = `<path d="M7,23 Q7,3 24,3 Q41,3 41,23 L41,27 Q24,31.5 7,27 Z" fill="#EAEEF5" stroke="#C7D0E0" stroke-width="1.1"/>
+    <circle cx="24" cy="9.5" r="4.6" fill="#fff" stroke="#C7D0E0" stroke-width=".9"/><circle cx="24" cy="9.5" r="2.6" fill="${COLORES.royal}"/><path d="M21.6,9.5 q2.4,-2.6 4.8,0" stroke="#fff" stroke-width=".9" fill="none"/>`;
+
+  let ojos = '<ellipse cx="17" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><ellipse cx="31" cy="20.5" rx="4.6" ry="5.4" fill="#fff" stroke="#C7D0E0" stroke-width=".6"/><circle cx="18.2" cy="21.6" r="2.5" fill="#0D1730"/><circle cx="29.8" cy="21.6" r="2.5" fill="#0D1730"/><circle cx="19.2" cy="20.4" r=".9" fill="#fff"/><circle cx="30.8" cy="20.4" r=".9" fill="#fff"/>';
+  let boca = '<path d="M19,28 q5,3.6 10,0" stroke="#8A93A8" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+  if(acc==="gafas"){ ojos = '<rect x="11.5" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="26" y="17.5" width="10.5" height="8" rx="3.4" fill="#0D1730"/><rect x="22" y="20.5" width="4" height="2" fill="#0D1730"/><ellipse cx="16.8" cy="20.8" rx="1.6" ry="1.2" fill="#fff" opacity=".5"/><ellipse cx="31.3" cy="20.8" rx="1.6" ry="1.2" fill="#fff" opacity=".5"/>'; }
+  else if(acc==="mascarilla"){ boca = '<path d="M13,26.5 Q24,34.5 35,26.5 L35,31 Q24,39 13,31 Z" fill="#E6F4FB" stroke="#159BD6" stroke-width="1.2"/>'; }
   let accMk = "";
-  if(acc==="corbata") accMk = '<polygon points="21,33 27,33 29,44 24,50 19,44" fill="#D62828"/><polygon points="21,33 27,33 24,38" fill="#0B1F5C"/>';
+  if(acc==="corbata") accMk = '<polygon points="21,32 27,32 29,42 24,46 19,42" fill="#D62828"/><polygon points="21,32 27,32 24,36.5" fill="#0B1F5C"/>';
+  else if(acc==="moño") accMk = '<polygon points="15,33 22,30.5 22,36.5" fill="#D62828"/><polygon points="33,33 26,30.5 26,36.5" fill="#D62828"/><circle cx="24" cy="33" r="2.2" fill="#a01e1e"/>';
+  else if(acc==="bufanda") accMk = '<path d="M9,29 Q24,35 39,29 L39,33.5 Q24,39.5 9,33.5 Z" fill="#D62828"/><rect x="20" y="33" width="7" height="13" rx="2" fill="#D62828"/><rect x="20" y="42" width="7" height="3.4" fill="#a01e1e"/>';
+  else if(acc==="audifonos") accMk = '<path d="M9,17 Q9,1 24,1 Q39,1 39,17" fill="none" stroke="#0D1730" stroke-width="2.6"/><rect x="5.5" y="14" width="7" height="11" rx="3.5" fill="#0D1730"/><rect x="35.5" y="14" width="7" height="11" rx="3.5" fill="#0D1730"/>';
+  else if(acc==="panuelo") accMk = '<path d="M8,28.5 Q24,34.5 40,28.5 L40,33 Q24,39 8,33 Z" fill="#EA580C"/><circle cx="12" cy="30" r="1.3" fill="#fff" opacity=".7"/><circle cx="36" cy="30" r="1.3" fill="#fff" opacity=".7"/><circle cx="24" cy="32.5" r="1.3" fill="#fff" opacity=".7"/>';
+
   let somMk = "";
-  if(som==="gorra") somMk = '<path d="M9,19 a15,11 0 0 1 30,0 Z" fill="#0B1F5C"/><rect x="7" y="18" width="34" height="4" rx="2" fill="#0B1F5C"/><rect x="20" y="10" width="8" height="4" rx="1" fill="#00A830"/><circle cx="24" cy="12" r="2" fill="#F0A800"/>';
-  else if(som==="casco") somMk = '<path d="M8,18 a16,13 0 0 1 32,0 Z" fill="#F0A800"/><rect x="6" y="17" width="36" height="4" rx="2" fill="#c98c00"/><rect x="21" y="6" width="6" height="6" rx="1" fill="#c98c00"/>';
-  else if(som==="corona") somMk = '<polygon points="10,18 15,7 20,15 24,5 28,15 33,7 38,18" fill="#F0A800" stroke="#c98c00" stroke-width="1"/><circle cx="15" cy="7" r="2" fill="#D62828"/><circle cx="24" cy="5" r="2" fill="#159BD6"/><circle cx="33" cy="7" r="2" fill="#00A830"/>';
-  return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="17" fill="${c}"/><circle cx="14" cy="28" r="2.6" fill="#fff" opacity=".35"/><circle cx="34" cy="28" r="2.6" fill="#fff" opacity=".35"/>${cara}${accMk}${!som||som==="ninguno" ? '<circle cx="24" cy="14" r="3.4" fill="#fff"/><circle cx="24" cy="14" r="2.1" fill="#F0A800"/>' : ""}${somMk}</svg>`;
+  if(som==="gorra") somMk = '<path d="M6,12 a18,12 0 0 1 36,0 Z" fill="#0B1F5C"/><rect x="4" y="11" width="40" height="4.4" rx="2.2" fill="#0B1F5C"/><rect x="20" y="2" width="8" height="4" rx="1" fill="#00A830"/><circle cx="24" cy="4" r="1.8" fill="#F0A800"/>';
+  else if(som==="casco") somMk = '<path d="M5,12 a19,14 0 0 1 38,0 Z" fill="#F0A800"/><rect x="3" y="11" width="42" height="4.4" rx="2.2" fill="#c98c00"/><rect x="20" y="1" width="8" height="6" rx="1.4" fill="#c98c00"/>';
+  else if(som==="corona") somMk = '<polygon points="8,12 13,2 19,9 24,1 29,9 35,2 40,12" fill="#F0A800" stroke="#c98c00" stroke-width="1"/><circle cx="13" cy="2" r="2" fill="#D62828"/><circle cx="24" cy="1" r="2" fill="#159BD6"/><circle cx="35" cy="2" r="2" fill="#00A830"/>';
+  else if(som==="boina") somMk = '<ellipse cx="24" cy="8" rx="18" ry="8" fill="#7C3AED"/><ellipse cx="24" cy="10" rx="14" ry="4.5" fill="#EAEEF5"/><circle cx="24" cy="1" r="1.8" fill="#7C3AED"/>';
+  else if(som==="deportiva") somMk = '<path d="M7,13 a17,11 0 0 1 34,0 Z" fill="#D62828"/><path d="M38,12 q10,-1 11,4 q-9,2 -12,-1 Z" fill="#D62828"/><circle cx="24" cy="4" r="1.6" fill="#fff"/>';
+  else if(som==="explorador") somMk = '<ellipse cx="24" cy="13" rx="23" ry="4.6" fill="#c98c00"/><path d="M9,13 a15,10 0 0 1 30,0 Z" fill="#EA580C"/><rect x="6" y="11.5" width="36" height="3" fill="#a04d05"/>';
+  else if(som==="tolimense") somMk = '<ellipse cx="24" cy="12" rx="22" ry="4.2" fill="#F4F6FB" stroke="#C7D0E0" stroke-width=".8"/><path d="M9,12 a15,10 0 0 1 30,0 Z" fill="#F4F6FB" stroke="#C7D0E0" stroke-width=".8"/><path d="M6,10 h36 M6,12.5 h36" stroke="#0D1730" stroke-width=".7" opacity=".5"/>';
+
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 48 48" aria-hidden="true">${cuerpo}${casco}${ojos}${boca}${accMk}${somMk}</svg>`;
 }
 function busWatermark(color, cls){
   return `<svg class="${cls}" viewBox="0 0 200 90" aria-hidden="true"><rect x="6" y="12" width="176" height="54" rx="14" fill="${color}"/><rect x="6" y="42" width="176" height="8" fill="#D62828"/>${[26,62,98,134].map(x=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#fff"/>`).join("")}<circle cx="188" cy="58" r="5" fill="#F0A800"/>${[46,146].map(x=>`<circle cx="${x}" cy="70" r="13" fill="#0D1730"/><circle cx="${x}" cy="70" r="5.5" fill="#8A93A8"/>`).join("")}</svg>`;
