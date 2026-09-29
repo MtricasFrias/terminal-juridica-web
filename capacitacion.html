@@ -16,6 +16,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box;}
+[hidden]{display:none !important;}
 html,body{margin:0; height:100%; background:var(--navy); overflow:hidden;}
 body{font-family:'Manrope',system-ui,sans-serif; color:var(--ink);}
 h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; text-wrap:balance;}
@@ -23,7 +24,7 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; text-wrap:balance;}
 button{font-family:inherit; cursor:pointer;}
 #deck{position:relative; width:100vw; height:100vh; overflow:hidden;}
 .slide{position:absolute; inset:0; display:flex; flex-direction:column; padding:6.5vh 6.5vw 10.5vh; opacity:0; pointer-events:none; transition:opacity .5s ease; background:var(--cream); color:var(--ink);}
-.slide.activa{opacity:1; pointer-events:auto; position:relative;}
+.slide.activa{opacity:1; pointer-events:auto; z-index:1;}
 .slide.navy{background:linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%); color:var(--cream);}
 .slide.cream2{background:linear-gradient(160deg, var(--cream) 0%, #ECE6D8 100%);}
 
@@ -45,6 +46,26 @@ button{font-family:inherit; cursor:pointer;}
 @keyframes petaloCaer{ from{transform:translateY(-10vh) rotate(0deg); opacity:0;} 10%{opacity:.7;} to{transform:translateY(110vh) rotate(340deg); opacity:0;} }
 .petalos-fondo{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
 .petalos-fondo span{position:absolute; top:0; width:9px; height:9px; border-radius:60% 0; background:var(--ocobo); opacity:.55; animation:petaloCaer linear infinite;}
+.escena-viva{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+.escena-viva svg{width:100%; height:100%; display:block;}
+.ev-bal{transform-origin:800px 60px; animation:balancearKF 4.6s ease-in-out infinite;}
+.ev-bus1{animation:evCruza 15s linear infinite;}
+.ev-bus2{animation:evCruzaIzq 21s linear infinite; animation-delay:-9s;}
+@keyframes evCruza{ from{transform:translateX(-220px);} to{transform:translateX(1820px);} }
+@keyframes evCruzaIzq{ from{transform:translate(1820px,0) scale(-1,1);} to{transform:translate(-220px,0) scale(-1,1);} }
+.ev-arbol{transform-box:fill-box; transform-origin:50% 100%; animation:meceKF 5s ease-in-out infinite;}
+@keyframes meceKF{ 0%,100%{transform:rotate(-2.2deg);} 50%{transform:rotate(2.2deg);} }
+.ev-sem-luz{opacity:.2; animation:semCicloKF 6s steps(1) infinite;}
+.ev-sem-luz.ev-l2{animation-delay:-2s;} .ev-sem-luz.ev-l3{animation-delay:-4s;}
+@keyframes semCicloKF{ 0%,32%{opacity:1;} 33%,100%{opacity:.2;} }
+.ev-nube{animation:nubeKF 50s linear infinite;}
+.ev-nube.ev-n2{animation-duration:65s; animation-delay:-20s;}
+/* personaje: abogado con globo de pregunta */
+.abogado{position:relative;}
+.abogado .globo{animation:globoKF 3.4s ease-in-out infinite;}
+@keyframes globoKF{ 0%,16%{opacity:0; transform:translateY(6px) scale(.8);} 26%,74%{opacity:1; transform:none;} 84%,100%{opacity:0; transform:translateY(-4px) scale(.9);} }
+.abogado .brazo{transform-origin:top center; animation:brazoKF 3.4s ease-in-out infinite;}
+@keyframes brazoKF{ 0%,16%{transform:rotate(0deg);} 26%,74%{transform:rotate(-18deg);} 84%,100%{transform:rotate(0deg);} }
 
 .eyebrow{display:inline-flex; align-items:center; gap:8px; background:var(--blue-soft); color:var(--navy); font-size:clamp(11px,1.1vw,15px); font-weight:700; letter-spacing:.09em; text-transform:uppercase; padding:7px 18px; border-radius:999px; margin:0 0 2.2vh; align-self:flex-start; position:relative; z-index:1;}
 .navy .eyebrow{background:rgba(255,255,255,.14); color:var(--cream);}
@@ -206,6 +227,41 @@ function svgTramites(){ const carriles=[["15 días","var(--navy)","Regla general
   </div>`).join("");
 }
 
+function busG(color){ return `<rect x="1" y="2" width="60" height="22" rx="5" fill="${color}"/><rect x="1" y="14.5" width="60" height="3" fill="#D6488E"/>${[5,14,23,32,41].map(x=>`<rect x="${x}" y="6" width="7.5" height="7" rx="1.5" fill="#CDE5F7"/>`).join("")}<rect x="50" y="5.5" width="8.5" height="9" rx="1.5" fill="#AACDEC"/><circle cx="60.5" cy="19.5" r="1.6" fill="#FFE282"/>${[12,49].map(x=>`<circle cx="${x}" cy="25" r="4.6" fill="#141E2C"/><circle cx="${x}" cy="25" r="1.9" fill="#96A0AF"/>`).join("")}`; }
+
+/* la "calle viva" del producto: balanza, buses en movimiento, ocobos, semáforo y skyline con el Palacio de Justicia —
+   el mismo mundo animado de la portada de la app, reutilizado aquí para que la capacitación se sienta parte del mismo sitio. */
+function escenaViva(){ return `<div class="escena-viva" aria-hidden="true"><svg viewBox="0 0 1600 260" preserveAspectRatio="xMidYMax slice">
+  <polygon points="0,120 170,80 360,110 560,66 760,105 970,78 1170,108 1380,72 1580,102 1600,100 1600,260 0,260" fill="#0A3A6B" fill-opacity=".55"/>
+  <rect x="700" y="112" width="200" height="8" fill="#F6F3EC" fill-opacity=".5"/>
+  <rect x="713" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/><rect x="737" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/>
+  <rect x="761" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/><rect x="785" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/><rect x="809" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/>
+  <polygon points="696,84 906,84 800,56" fill="#F6F3EC" fill-opacity=".5"/>
+  <g class="ev-bal" transform="translate(370,10)"><line x1="0" y1="0" x2="0" y2="76" stroke="#F6F3EC" stroke-width="4" stroke-linecap="round"/><circle cx="0" cy="-6" r="4.4" fill="#C9922B"/>
+    <line x1="-40" y1="0" x2="40" y2="0" stroke="#F6F3EC" stroke-width="3" stroke-linecap="round"/>
+    <line x1="-40" y1="0" x2="-40" y2="18" stroke="#F6F3EC" stroke-width="2"/><path d="M-51,18 a11,7 0 0 0 22,0 Z" fill="#3D85C6"/>
+    <line x1="40" y1="0" x2="40" y2="18" stroke="#F6F3EC" stroke-width="2"/><path d="M29,18 a11,7 0 0 0 22,0 Z" fill="#D6488E"/></g>
+  <g transform="translate(1260,58)"><rect class="ev-arbol" x="-5" y="40" width="10" height="46" rx="3" fill="#0A3A6B" fill-opacity=".6"/>
+    <circle class="ev-arbol" cx="0" cy="26" r="27" fill="#D6488E" fill-opacity=".4"/><circle class="ev-arbol" cx="-21" cy="40" r="18" fill="#D6488E" fill-opacity=".4"/><circle class="ev-arbol" cx="21" cy="40" r="18" fill="#D6488E" fill-opacity=".4"/></g>
+  <line x1="0" y1="150" x2="1600" y2="150" stroke="#F6F3EC" stroke-opacity=".3" stroke-width="2" stroke-dasharray="16 12"/>
+  <g transform="translate(60,116)"><rect x="0" y="0" width="6" height="34" fill="#F6F3EC" fill-opacity=".5"/><rect x="-5" y="-2" width="16" height="36" rx="8" fill="#0B1420"/>
+    <circle class="ev-sem-luz ev-l1" cx="3" cy="7" r="4.2" fill="#E5483B"/><circle class="ev-sem-luz ev-l2" cx="3" cy="17" r="4.2" fill="#F5A623"/><circle class="ev-sem-luz ev-l3" cx="3" cy="27" r="4.2" fill="#26B67A"/></g>
+  <g class="ev-bus1" transform="translate(0,120)"><g transform="scale(2.3)">${busG("#3D85C6")}</g></g>
+  <g class="ev-bus2" transform="translate(0,135)"><g transform="scale(2.3)">${busG("#D6488E")}</g></g>
+</svg></div>`; }
+
+function svgAbogado(sz){ return `<svg class="abogado" width="${sz}" height="${sz}" viewBox="0 0 140 160" aria-hidden="true">
+  <g class="globo" transform="translate(78,4)"><rect width="58" height="40" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><polygon points="10,40 6,52 22,40" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><text x="29" y="27" text-anchor="middle" font-family="Fraunces" font-weight="800" font-size="24" fill="var(--ocobo)">¿?</text></g>
+  <circle cx="60" cy="46" r="26" fill="#E7B486"/>
+  <path d="M36,40 q24,-30 48,0 q2,-18 -24,-20 q-26,2 -24,20 Z" fill="var(--navy)"/>
+  <circle cx="51" cy="46" r="2.6" fill="#2B1B0F"/><circle cx="69" cy="46" r="2.6" fill="#2B1B0F"/>
+  <path d="M50,56 q10,7 20,0" stroke="#2B1B0F" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M26,150 q4,-46 34,-46 q30,0 34,46 Z" fill="var(--navy)"/>
+  <path d="M52,106 l8,10 l8,-10 l-4,44 h-8 Z" fill="#fff"/>
+  <line x1="60" y1="112" x2="60" y2="150" stroke="var(--ocobo)" stroke-width="6"/>
+  <g class="brazo"><path d="M90,112 q20,6 16,32" stroke="var(--navy)" stroke-width="12" fill="none" stroke-linecap="round"/><rect x="92" y="134" width="26" height="20" rx="4" fill="#6b4d15"/><rect x="100" y="130" width="10" height="6" rx="2" fill="#6b4d15"/></g>
+</svg>`; }
+
 function skySVG(){ return `<svg viewBox="0 0 1920 260" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <polygon points="0,200 170,140 360,185 560,110 760,175 970,125 1170,180 1380,115 1580,172 1780,130 1920,182 1920,260 0,260" fill="#0A3A6B" fill-opacity="0.5"/>
   <rect x="815" y="180" width="290" height="12" fill="#F6F3EC" fill-opacity="0.5"/>
@@ -219,16 +275,13 @@ const SLIDES = [];
 function slide(id, cls, html){ SLIDES.push({id, cls: cls||"", html}); }
 
 slide("cover","navy",`
-  ${petalos(10)}
+  <div style="position:absolute; left:0; right:0; bottom:0; height:26vh; opacity:.85">${escenaViva()}</div>
+  ${petalos(6)}
   <p class="eyebrow entra">Capacitación SETP · Dependencia Jurídica</p>
-  <div class="split" style="align-items:center">
-    <div class="cont entra" style="animation-delay:.08s; justify-content:center">
-      <h1 style="font-size:clamp(34px,5.4vw,80px); font-weight:800; line-height:1.05; margin-bottom:2vh;">Derecho de Petición<br>y Terminal Jurídica</h1>
-      <p style="font-size:clamp(15px,1.5vw,23px); color:var(--blue-soft); max-width:34vw; line-height:1.5;">Lo legal, lo que hacemos distinto, y la herramienta que construimos para cumplirlo mejor.</p>
-    </div>
-    <div class="ilustra entra" style="animation-delay:.2s">${svgBalanza(260)}</div>
+  <div class="cont entra" style="animation-delay:.08s; justify-content:flex-start; margin-top:2vh; max-width:56vw">
+    <h1 style="font-size:clamp(34px,5.4vw,80px); font-weight:800; line-height:1.05; margin-bottom:2vh;">Derecho de Petición<br>y Terminal Jurídica</h1>
+    <p style="font-size:clamp(15px,1.5vw,23px); color:var(--blue-soft); line-height:1.5;">Lo legal, lo que hacemos distinto, y la herramienta que construimos para cumplirlo mejor.</p>
   </div>
-  <div style="position:absolute; left:0; right:0; bottom:9vh; height:20vh; opacity:.9">${skySVG()}</div>
   <div class="footer"><span>Ibagué · SETP</span><span>Elemento visual interactivo</span></div>
 `);
 
@@ -267,14 +320,11 @@ slide("agenda","",`
 `);
 
 slide("div1","navy",`
-  ${petalos(6)}
-  <div class="split" style="align-items:center">
-    <div class="cont entra">
-      <p class="eyebrow">Bloque 1</p>
-      <h1 style="font-size:clamp(36px,5.4vw,78px); font-weight:800;">Derecho de Petición</h1>
-      <div class="badge-tema"><span>Constitución art. 23</span><span>Ley 1755 de 2015</span><span>Decreto 2591 de 1991</span></div>
-    </div>
-    <div class="ilustra entra" style="animation-delay:.15s">${svgMazo("#F6F3EC",220)}</div>
+  <div style="position:absolute; left:0; right:0; bottom:0; height:26vh; opacity:.8">${escenaViva()}</div>
+  <div class="cont entra" style="justify-content:flex-start; margin-top:4vh">
+    <p class="eyebrow">Bloque 1</p>
+    <h1 style="font-size:clamp(36px,5.4vw,78px); font-weight:800;">Derecho de Petición</h1>
+    <div class="badge-tema"><span>Constitución art. 23</span><span>Ley 1755 de 2015</span><span>Decreto 2591 de 1991</span></div>
   </div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">04 / 19</span></div>
 `);
@@ -289,7 +339,7 @@ slide("que-es","",`
         ${["Oportuna","De fondo","Clara","Precisa","Congruente","Comunicada"].map((t,i)=>`<div class="card entra" style="animation-delay:${.16+i*.05}s; text-align:center; padding:1vw .6vw"><b style="width:2vw;height:2vw;min-width:26px;min-height:26px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-family:Fraunces;margin:0 auto .5vh; font-size:.8rem">${i+1}</b><div style="font-weight:800; font-size:clamp(10px,.85vw,13px); color:var(--navy)">${t}</div></div>`).join("")}
       </div>
     </div>
-    <div class="ilustra entra" style="animation-delay:.2s">${svgSobre("#3D85C6",210)}</div>
+    <div class="ilustra entra" style="animation-delay:.2s">${svgAbogado(210)}</div>
   </div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">05 / 19</span></div>
 `);
@@ -479,20 +529,43 @@ slide("fuentes","",`
 `);
 
 slide("cuestionario","navy",`
-  ${petalos(8)}
+  ${petalos(6)}
   <p class="eyebrow entra">Ahora te toca a ti</p>
-  <div class="split" style="align-items:center">
-    <div class="cont entra" style="animation-delay:.05s">
-      <h2 class="tit">¿Qué tanto quedó claro?</h2>
-      <p style="font-size:clamp(13px,1.25vw,18px); color:var(--blue-soft); line-height:1.5">Escanea, escribe tu nombre y espera en la sala: el cuestionario arranca <b style="color:#fff">para todos a la vez</b> cuando lo indiquemos. 12 preguntas, puntos por rapidez, clasificación en vivo.</p>
-      <div class="card entra" style="animation-delay:.15s; display:flex; align-items:center; gap:10px"><span style="font-size:1.5rem">🏆</span><span style="font-weight:700; font-size:clamp(11px,1vw,14px)">Premio para el 1°, 2° y 3° puesto — ¡juégatela!</span></div>
-      <span class="link">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
+  <div class="split" style="align-items:stretch; gap:2.4vw">
+    <div class="cont entra" style="animation-delay:.05s; justify-content:center">
+      <h2 class="tit" style="font-size:clamp(24px,2.8vw,40px)">¿Qué tanto quedó claro?</h2>
+      <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, escribe tu nombre y espera en la sala. 12 preguntas, puntos por rapidez.</p>
+      <div style="display:flex; align-items:center; gap:1vw">
+        <img src="qr_cuestionario.png" alt="Código QR del cuestionario" width="118" height="118" style="border-radius:14px; box-shadow:var(--shadow); background:#fff; padding:8px; flex:none">
+        <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.3rem">🏆</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
+      </div>
+      <span class="link" style="font-size:clamp(9px,.85vw,12px)">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
     </div>
-    <div style="display:flex; align-items:center; gap:2vw; justify-content:center">
-      <img class="entra" style="animation-delay:.1s" src="qr_cuestionario.png" alt="Código QR del cuestionario" width="200" height="200" style="border-radius:16px; box-shadow:var(--shadow); background:#fff; padding:12px">
+    <div class="card entra" id="mini-host" style="animation-delay:.15s; flex:1.3; display:flex; flex-direction:column; min-height:0; background:rgba(255,255,255,.95); color:var(--ink); padding:1.4vw 1.6vw;">
+      <div id="mh-login">
+        <b style="color:var(--navy); font-size:clamp(12px,1.05vw,15px)">Panel del anfitrión</b>
+        <p style="margin:.6vh 0 1vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">Entra con tu usuario de la Dirección Jurídica para controlar la sala desde aquí.</p>
+        <input id="mh-usuario" type="text" placeholder="Usuario" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:.85rem;">
+        <input id="mh-clave" type="password" placeholder="Clave" style="width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:8px; font-size:.85rem;">
+        <button id="mh-btn-entrar" style="width:100%; background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:.82rem;">Entrar como anfitrión</button>
+        <div id="mh-err" style="color:var(--red); font-size:.75rem; min-height:1.1em; margin-top:4px;"></div>
+      </div>
+      <div id="mh-lobby" hidden style="display:flex; flex-direction:column; min-height:0; flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center"><b style="color:var(--navy); font-size:clamp(11px,1vw,14px)">Sala de espera</b><span class="pulso-dot" style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span></div>
+        <div id="mh-roster" style="display:flex; flex-wrap:wrap; align-content:flex-start; align-items:flex-start; gap:6px; margin:.8vh 0; min-height:30px; overflow:auto; flex:1;"></div>
+        <div id="mh-cuenta" style="font-size:.72rem; color:var(--ink-soft); margin-bottom:.6vh"></div>
+        <button id="mh-btn-iniciar" style="width:100%; background:var(--green); color:#fff; border:none; border-radius:8px; padding:11px; font-weight:800; font-size:.88rem;">▶ Comenzar cuando estés listo</button>
+      </div>
+      <div id="mh-curso" hidden style="display:flex; flex-direction:column; min-height:0; flex:1; align-items:center; text-align:center;">
+        <div id="mh-pregunta-num" style="font-size:clamp(11px,1vw,14px); font-weight:700; color:var(--navy)"></div>
+        <div style="position:relative; width:min(9vw,84px); height:min(9vw,84px); margin:.8vh 0;">
+          <svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--line)" stroke-width="8"/><circle id="mh-anillo" cx="50" cy="50" r="44" fill="none" stroke="var(--blue)" stroke-width="8" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0" transform="rotate(-90 50 50)"/></svg>
+          <span id="mh-anillo-num" class="mono" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:clamp(16px,1.6vw,22px); color:var(--navy)"></span>
+        </div>
+        <div id="mh-podio" style="display:flex; align-items:flex-end; justify-content:center; gap:8px; flex:1; min-height:0;"></div>
+      </div>
     </div>
   </div>
-  <div class="ilustra entra" style="animation-delay:.3s; height:15vh; margin-top:1vh">${svgPodiumMini()}</div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">19 / 19 · Gracias</span></div>
 `);
 
@@ -532,6 +605,138 @@ deck.addEventListener("touchend", e=>{
   touchX=null;
 }, {passive:true});
 ir(IDX);
+
+/* ===================== panel del anfitrión (en vivo, dentro de la presentación) ===================== */
+(function(){
+  "use strict";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg/exec";
+  async function api(fn, ...args){
+    const resp = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({fn, args}), redirect:"follow"});
+    const r = await resp.json();
+    if(r && r.ok===false) throw new Error(r.error || "No se pudo conectar con el servidor.");
+    return r;
+  }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+  const AVATAR_COLORES = ["#01274B","#3D85C6","#D6488E","#C9922B","#1E8F5F"];
+  function colorDe(n){ let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))|0; return AVATAR_COLORES[Math.abs(h)%AVATAR_COLORES.length]; }
+
+  const mhLogin = document.getElementById("mh-login"), mhLobby = document.getElementById("mh-lobby"), mhCurso = document.getElementById("mh-curso");
+  const mhUsuario = document.getElementById("mh-usuario"), mhClave = document.getElementById("mh-clave"), mhBtnEntrar = document.getElementById("mh-btn-entrar"), mhErr = document.getElementById("mh-err");
+  const mhRoster = document.getElementById("mh-roster"), mhCuenta = document.getElementById("mh-cuenta"), mhBtnIniciar = document.getElementById("mh-btn-iniciar");
+  const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio");
+  if(!mhLogin) return; // esta diapositiva no está en esta página
+
+  let TOKEN = "", conocidos = new Set(), pollLobby = null, pollClasif = null, tickAnillo = null;
+  const DURACION_REF = 20, PAUSA_REF = 1.5, TOTAL_PREGUNTAS = 12;
+  const CIRC = 2*Math.PI*44;
+
+  function fase(nombre){ mhLogin.hidden = nombre!=="login"; mhLobby.hidden = nombre!=="lobby"; mhCurso.hidden = nombre!=="curso"; }
+
+  function pintarRoster(jugadores){
+    jugadores.forEach(j=>{
+      if(conocidos.has(j)) return; conocidos.add(j);
+      const chip = document.createElement("span");
+      chip.style.cssText = "display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;font-size:.72rem;font-weight:700;color:var(--navy);animation:entraKF .35s both;";
+      chip.innerHTML = `<span style="width:18px;height:18px;border-radius:50%;background:${colorDe(j)};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800">${(j.trim()[0]||"?").toUpperCase()}</span>${esc(j)}`;
+      mhRoster.appendChild(chip);
+    });
+    mhCuenta.textContent = jugadores.length + (jugadores.length===1 ? " persona en la sala" : " personas en la sala");
+  }
+
+  function munecoMini(color, corona){ return `<svg width="34" height="34" viewBox="0 0 46 46">${corona?'<polygon points="15,14 18,7 23,12 28,7 31,14" fill="var(--gold)"/>':''}<circle cx="23" cy="18" r="10" fill="${color}"/><circle cx="19.5" cy="17" r="1.6" fill="#fff"/><circle cx="26.5" cy="17" r="1.6" fill="#fff"/><path d="M18,21 q5,5 10,0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`; }
+
+  let podioPintado = false;
+  async function actualizarPodio(){
+    try{
+      const r = await api("quizClasificacion");
+      if(!r.tabla.length) return;
+      const top3 = r.tabla.slice(0,3);
+      const orden = [top3[1], top3[0], top3[2]];
+      const alturas = [46, 66, 34], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"];
+      mhPodio.innerHTML = orden.map((f,i)=>{
+        if(!f) return `<div style="width:26%; opacity:.2; height:${alturas[i]}px; background:var(--line); border-radius:6px 6px 0 0"></div>`;
+        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%;">
+          <div style="font-size:clamp(8px,.65vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:1px 6px; margin-bottom:2px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
+          ${munecoMini(colores[i], nums[i]==="1°")}
+          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Fraunces; font-weight:800; font-size:.8rem;">${nums[i]}</div>
+        </div>`;
+      }).join("");
+      podioPintado = true;
+    }catch(e){ /* reintenta solo */ }
+  }
+
+  function pasoAReferencia(inicioMs){
+    const transcurrido = (Date.now() - inicioMs) / 1000;
+    const paso = DURACION_REF + PAUSA_REF;
+    const idx = Math.min(TOTAL_PREGUNTAS - 1, Math.floor(transcurrido / paso));
+    const restante = Math.max(0, DURACION_REF - (transcurrido - idx*paso));
+    return { idx, restante, terminado: transcurrido >= TOTAL_PREGUNTAS*paso };
+  }
+  function iniciarCurso(inicioMs){
+    fase("curso");
+    clearInterval(pollLobby);
+    clearInterval(tickAnillo);
+    tickAnillo = setInterval(()=>{
+      const p = pasoAReferencia(inicioMs);
+      if(p.terminado){
+        mhPreguntaNum.textContent = "Cuestionario terminado";
+        mhAnillo.style.stroke = "var(--green)"; mhAnillo.style.strokeDashoffset = "0"; mhAnilloNum.textContent = "🏆";
+        clearInterval(tickAnillo);
+        return;
+      }
+      mhPreguntaNum.textContent = "Pregunta " + (p.idx+1) + " de " + TOTAL_PREGUNTAS + " (referencia)";
+      mhAnilloNum.textContent = Math.ceil(p.restante);
+      mhAnillo.style.strokeDashoffset = String(CIRC * (1 - p.restante/DURACION_REF));
+      mhAnillo.style.stroke = p.restante <= 5 ? "var(--red)" : "var(--blue)";
+    }, 250);
+    actualizarPodio();
+    clearInterval(pollClasif);
+    pollClasif = setInterval(actualizarPodio, 2500);
+  }
+
+  async function sondearLobby(){
+    try{
+      const r = await api("quizEstadoSesion");
+      pintarRoster(r.jugadores);
+      if(r.estado === "en_curso" && r.inicio) iniciarCurso(parseInt(r.inicio,10));
+    }catch(e){ /* reintenta solo */ }
+  }
+
+  function mostrarLobby(){
+    fase("lobby");
+    conocidos = new Set(); mhRoster.innerHTML = "";
+    sondearLobby();
+    clearInterval(pollLobby);
+    pollLobby = setInterval(sondearLobby, 1400);
+  }
+
+  mhBtnEntrar.addEventListener("click", async ()=>{
+    mhErr.textContent = "";
+    const u = mhUsuario.value.trim(), c = mhClave.value;
+    if(!u || !c){ mhErr.textContent = "Escribe tu usuario y tu clave."; return; }
+    try{
+      const r = await api("login", u, c);
+      TOKEN = r.token;
+      try{ sessionStorage.setItem("tj_host_token", TOKEN); }catch(e){}
+      mostrarLobby();
+    }catch(e){ mhErr.textContent = e.message; }
+  });
+  mhUsuario.addEventListener("keydown", e=>{ if(e.key==="Enter") mhClave.focus(); });
+  mhClave.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
+
+  mhBtnIniciar.addEventListener("click", async ()=>{
+    mhBtnIniciar.disabled = true; mhBtnIniciar.textContent = "Iniciando…";
+    try{
+      const r = await api("quizIniciar", TOKEN);
+      if(!r.ok){ alert(r.error || "No se pudo iniciar."); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; return; }
+    }catch(e){ alert(e.message); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; }
+  });
+
+  try{
+    const saved = sessionStorage.getItem("tj_host_token");
+    if(saved){ TOKEN = saved; mostrarLobby(); } else { fase("login"); }
+  }catch(e){ fase("login"); }
+})();
 </script>
 </body>
 </html>

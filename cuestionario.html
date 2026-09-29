@@ -398,7 +398,6 @@ document.getElementById("host-btn-entrar").addEventListener("click", async ()=>{
   try{
     const r = await api("login", hostUsuario.value.trim(), hostClave.value);
     HOST_TOKEN = r.token;
-    if(r.yo.rol !== "coord"){ hostErr.textContent = "Solo la Dirección Jurídica puede controlar la sala."; return; }
     hostLogin.hidden = true; hostPanel.hidden = false;
     sondearHost(); clearInterval(POLL_HOST); POLL_HOST = setInterval(sondearHost, 1500);
   }catch(e){ hostErr.textContent = e.message; }
