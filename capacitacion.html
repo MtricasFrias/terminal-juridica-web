@@ -574,6 +574,7 @@ slide("cuestionario","navy",`
           <span id="mh-anillo-num" class="mono" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:clamp(16px,1.6vw,22px); color:var(--navy)"></span>
         </div>
         <div id="mh-podio" style="display:flex; align-items:flex-end; justify-content:center; gap:8px; flex:1; min-height:0;"></div>
+        <button id="mh-btn-reiniciar" style="width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:.78rem; margin-top:8px;">↺ Reiniciar y jugar de nuevo</button>
       </div>
     </div>
   </div>
@@ -628,35 +629,29 @@ ir(IDX);
     return r;
   }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
-  const ICONO_ACC_MINI = {gafas:"🕶️",corbata:"👔",mascarilla:"😷",bufanda:"🧣",audifonos:"🎧",panuelo:"🔺","moño":"🎀"};
-  const ICONO_EL_MINI = {mochila:"🎒",tablet:"📱",mapa:"🗺️",llave:"🔧",radio:"📻",cono:"🚧",semaforo:"🚦",bandera:"🚩",megafono:"📢",planta:"🌱",balon:"⚽",patineta:"🛹",capa:"🦸",libro:"📖",binoculares:"🔭",camara:"📷"};
   const CANVAS_W = 640, CANVAS_H = 880;
   const CARAS_OK = ["confundido","emocionado","enojado","feliz","feliz_ojo_cerrado","muy_feliz_ojo_cerrado","preocupado","sorprendido","triste"];
   const CAMISAS_OK = ["camisa_amarilla_alcaldia_setp","camisa_azul_alcaldia_setp","camisa_azul_claro_alcaldia_setp","camisa_blanca_alcaldia_setp","camisa_negro_amarillo_alcaldia_setp","camisa_tolima_alcaldia_setp","camisa_verde_alcaldia_setp","ruana_tolima","ruana_verde"];
   const SOMBREROS_OK = ["casco_amarillo_setp","casco_blanco_iglesia","casco_blanco_setpp","casco_cicla","gorra_alcaldia_ibague","sombrero_capitan_verde","sombrero_musico","sombrero_volteado_tolimense","sombrero_volteado_tolimense_mujer"];
-  /* mismo sistema de capas (cara+camisa+sombrero) que en cuestionario.html: spec = "cara:camisa:sombrero:accesorio:elemento" */
+  /* mismo sistema de capas (cara+camisa+sombrero) que en cuestionario.html: spec = "cara:camisa:sombrero" */
   function avatarSVG(spec, sz, modo){
     sz = sz || 32;
     const partes = String(spec||"").split(":");
     const cara = CARAS_OK.includes(partes[0]) ? partes[0] : "feliz";
     const camisa = CAMISAS_OK.includes(partes[1]) ? partes[1] : "camisa_azul_alcaldia_setp";
     const sombrero = SOMBREROS_OK.includes(partes[2]) ? partes[2] : "gorra_alcaldia_ibague";
-    const acc = partes[3]||"ninguno", el = partes[4]||"ninguno";
     const capas = `<img src="img/setpi2/camisas/${camisa}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/caras/${cara}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/sombreros/${sombrero}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;">`;
-    const fs = Math.max(10, Math.round(sz*.4));
-    const a = ICONO_ACC_MINI[acc] ? `<span style="position:absolute; right:-2px; bottom:-2px; font-size:${fs}px; line-height:1; z-index:2;">${ICONO_ACC_MINI[acc]}</span>` : "";
-    const e = ICONO_EL_MINI[el] ? `<span style="position:absolute; left:-2px; bottom:-2px; font-size:${fs}px; line-height:1; z-index:2;">${ICONO_EL_MINI[el]}</span>` : "";
     if(modo === "cuerpo"){
       const h = Math.round(sz * CANVAS_H / CANVAS_W);
-      return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}${a}${e}</span>`;
+      return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}</span>`;
     }
-    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#fff;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span>${a}${e}</span>`;
+    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#fff;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span></span>`;
   }
 
   const mhLogin = document.getElementById("mh-login"), mhLobby = document.getElementById("mh-lobby"), mhCurso = document.getElementById("mh-curso");
   const mhPin = document.getElementById("mh-pin"), mhBtnEntrar = document.getElementById("mh-btn-entrar"), mhErr = document.getElementById("mh-err");
   const mhRoster = document.getElementById("mh-roster"), mhCuenta = document.getElementById("mh-cuenta"), mhBtnIniciar = document.getElementById("mh-btn-iniciar");
-  const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio");
+  const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio"), mhBtnReiniciar = document.getElementById("mh-btn-reiniciar");
   if(!mhLogin) return; // esta diapositiva no está en esta página
 
   let TOKEN = "", pollLobby = null, pollClasif = null, tickAnillo = null;
@@ -730,6 +725,8 @@ ir(IDX);
   function mostrarLobby(){
     fase("lobby");
     mhRoster.innerHTML = "";
+    clearInterval(tickAnillo); clearInterval(pollClasif);
+    mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo";
     sondearLobby();
     clearInterval(pollLobby);
     pollLobby = setInterval(sondearLobby, 1400);
@@ -751,6 +748,17 @@ ir(IDX);
       const r = await api("quizIniciar", TOKEN);
       if(!r.ok){ alert(r.error || "No se pudo iniciar."); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; return; }
     }catch(e){ alert(e.message); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; }
+  });
+
+  mhBtnReiniciar.addEventListener("click", async ()=>{
+    if(!confirm("¿Borrar los resultados y volver a la sala de espera para jugar de nuevo?")) return;
+    mhBtnReiniciar.disabled = true; mhBtnReiniciar.textContent = "Reiniciando…";
+    try{
+      const r = await api("quizReiniciar", TOKEN);
+      if(!r.ok){ alert(r.error || "No se pudo reiniciar."); }
+      else { podioPintado = false; mostrarLobby(); }
+    }catch(e){ alert(e.message); }
+    mhBtnReiniciar.disabled = false; mhBtnReiniciar.textContent = "↺ Reiniciar y jugar de nuevo";
   });
 
   try{

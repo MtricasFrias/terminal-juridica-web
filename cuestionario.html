@@ -58,11 +58,6 @@ button{font:inherit; cursor:pointer;}
 .avatar-preview{display:flex; justify-content:center; margin-bottom:14px;}
 .avatar-preview .marco{width:118px; height:162px; border-radius:20px; background:var(--cyan-soft); display:flex; align-items:center; justify-content:center; animation:floaty 3s ease-in-out infinite; overflow:hidden;}
 .picker-tit{font-size:.78rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; margin:14px 0 8px;}
-.picker-row{display:flex; gap:9px; flex-wrap:wrap;}
-.sw{width:38px; height:38px; border-radius:50%; border:3px solid transparent; padding:0; transition:transform .15s;}
-.sw.on{border-color:var(--navy); transform:scale(1.12);}
-.acc-btn{display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--paper); border:2px solid var(--line); border-radius:12px; padding:8px 10px; font-size:.68rem; font-weight:700; color:var(--muted); min-width:64px;}
-.acc-btn.on{border-color:var(--cyan); background:var(--cyan-soft); color:var(--navy);}
 .tabs-personaje{display:flex; gap:6px; margin-bottom:8px;}
 .tab-p{flex:1; background:var(--paper); border:2px solid var(--line); border-radius:10px; padding:7px 4px; font-size:.72rem; font-weight:700; color:var(--muted);}
 .tab-p.on{border-color:var(--royal); background:var(--cyan-soft); color:var(--navy);}
@@ -170,10 +165,6 @@ button{font:inherit; cursor:pointer;}
   <div class="picker-tit">Viste a SETPI</div>
   <div class="tabs-personaje" id="tabs-personaje"></div>
   <div class="picker-gallery" id="picker-gallery"></div>
-  <div class="picker-tit">Accesorio</div>
-  <div class="picker-row" id="picker-acc"></div>
-  <div class="picker-tit">Lleva en la mano</div>
-  <div class="picker-row" id="picker-el"></div>
   <p style="font-size:.72rem; color:var(--muted); margin:6px 0 0">Te asignamos un look al azar entre cientos de combinaciones — cámbialo si quieres, o entra tal cual.</p>
   <button id="btn-empezar" class="btn-grande">Entrar a la sala →</button>
   <div class="err" id="err-intro"></div>
@@ -275,34 +266,22 @@ const EJES = [
   ["camisa", "Camisa", CAMISAS, "camisas"],
   ["sombrero", "Sombrero", SOMBREROS, "sombreros"]
 ];
-const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla","bufanda","audifonos","panuelo","moño"];
-const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla", bufanda:"Bufanda", audifonos:"Audífonos", panuelo:"Pañuelo", "moño":"Moño"};
-const ICONO_ACC = {gafas:"🕶️", corbata:"👔", mascarilla:"😷", bufanda:"🧣", audifonos:"🎧", panuelo:"🔺", "moño":"🎀"};
-const ELEMENTOS = ["ninguno","mochila","tablet","mapa","llave","radio","cono","semaforo","bandera","megafono","planta","balon","patineta","capa","libro","binoculares","camara"];
-const NOMBRES_EL = {ninguno:"Ninguno", mochila:"Mochila", tablet:"Tablet", mapa:"Mapa", llave:"Llave inglesa", radio:"Radio", cono:"Cono", semaforo:"Semáforo portátil", bandera:"Bandera", megafono:"Megáfono", planta:"Planta", balon:"Balón", patineta:"Patineta", capa:"Capa", libro:"Libro", binoculares:"Binoculares", camara:"Cámara"};
-const ICONO_EL = {mochila:"🎒", tablet:"📱", mapa:"🗺️", llave:"🔧", radio:"📻", cono:"🚧", semaforo:"🚦", bandera:"🚩", megafono:"📢", planta:"🌱", balon:"⚽", patineta:"🛹", capa:"🦸", libro:"📖", binoculares:"🔭", camara:"📷"};
-/* spec = "cara:camisa:sombrero:accesorio:elemento" — 9×9×9 = 729 combinaciones de SETPI,
-   más accesorio/elemento como insignias encima. modo "cuerpo" = SETPI completo (respeta el
-   alto real del lienzo); por defecto (retrato) recorta y hace zoom a la cara para los avatares
-   circulares chiquitos (lista de espera, ranking, podio). */
+/* spec = "cara:camisa:sombrero" — 9×9×9 = 729 combinaciones de SETPI. modo "cuerpo" = SETPI
+   completo (respeta el alto real del lienzo); por defecto (retrato) recorta y hace zoom a la
+   cara para los avatares circulares chiquitos (lista de espera, ranking, podio). */
 function avatarSVG(spec, sz, modo){
   sz = sz || 40;
   const partes = String(spec||"").split(":");
   const cara = CARAS[partes[0]] !== undefined ? partes[0] : "feliz";
   const camisa = CAMISAS[partes[1]] !== undefined ? partes[1] : "camisa_azul_alcaldia_setp";
   const sombrero = SOMBREROS[partes[2]] !== undefined ? partes[2] : "gorra_alcaldia_ibague";
-  const acc = ACCESORIOS.includes(partes[3]) ? partes[3] : "ninguno";
-  const el = ELEMENTOS.includes(partes[4]) ? partes[4] : "ninguno";
   const capas = `<img src="img/setpi2/camisas/${camisa}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/caras/${cara}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/sombreros/${sombrero}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;">`;
-  const fs = Math.max(11, Math.round(sz*.4));
-  const accIco = ICONO_ACC[acc] ? `<span style="position:absolute; right:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45)); z-index:2;">${ICONO_ACC[acc]}</span>` : "";
-  const elIco = ICONO_EL[el] ? `<span style="position:absolute; left:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45)); z-index:2;">${ICONO_EL[el]}</span>` : "";
   if(modo === "cuerpo"){
     const h = Math.round(sz * CANVAS_H / CANVAS_W);
-    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}${accIco}${elIco}</span>`;
+    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}</span>`;
   }
   /* retrato: recorta un cuadro centrado en la cara (1/6 de ancho a la izq., 5/12 de alto arriba) */
-  return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#EAF1FB;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span>${accIco}${elIco}</span>`;
+  return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#EAF1FB;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span></span>`;
 }
 function busWatermark(color, cls){
   return `<svg class="${cls}" viewBox="0 0 200 90" aria-hidden="true"><rect x="6" y="12" width="176" height="54" rx="14" fill="${color}"/><rect x="6" y="42" width="176" height="8" fill="#D62828"/>${[26,62,98,134].map(x=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#fff"/>`).join("")}<circle cx="188" cy="58" r="5" fill="#F0A800"/>${[46,146].map(x=>`<circle cx="${x}" cy="70" r="13" fill="#0D1730"/><circle cx="${x}" cy="70" r="5.5" fill="#8A93A8"/>`).join("")}</svg>`;
@@ -312,10 +291,9 @@ function busWatermark(color, cls){
    vean iguales si nadie toca el selector — 9×9×9 = 729 combinaciones posibles de SETPI). */
 function alAzar(obj){ const ks = Object.keys(obj); return ks[Math.floor(Math.random()*ks.length)]; }
 let MI_EJE = { cara: alAzar(CARAS), camisa: alAzar(CAMISAS), sombrero: alAzar(SOMBREROS) };
-let MI_ACC = "ninguno", MI_EL = "ninguno";
 let TAB_ACTIVA = "cara";
-const avatarMarco = document.getElementById("avatar-marco"), tabsPersonaje = document.getElementById("tabs-personaje"), pickerGallery = document.getElementById("picker-gallery"), pickerAcc = document.getElementById("picker-acc"), pickerEl = document.getElementById("picker-el");
-function specActual(){ return [MI_EJE.cara, MI_EJE.camisa, MI_EJE.sombrero, MI_ACC, MI_EL].join(":"); }
+const avatarMarco = document.getElementById("avatar-marco"), tabsPersonaje = document.getElementById("tabs-personaje"), pickerGallery = document.getElementById("picker-gallery");
+function specActual(){ return [MI_EJE.cara, MI_EJE.camisa, MI_EJE.sombrero].join(":"); }
 function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(specActual(), 92, "cuerpo"); }
 function pintarTabs(){
   tabsPersonaje.innerHTML = EJES.map(g=>`<button type="button" class="tab-p${g[0]===TAB_ACTIVA?" on":""}" data-t="${g[0]}">${g[1]}</button>`).join("");
@@ -327,18 +305,6 @@ function pintarGaleria(){
   pickerGallery.querySelectorAll(".pg-item").forEach(b=>b.addEventListener("click", ()=>{ MI_EJE[ejeId] = b.dataset.k; pintarGaleria(); pintarAvatarPreview(); }));
 }
 pintarTabs(); pintarGaleria();
-ACCESORIOS.forEach(k=>{
-  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_ACC?" on":"");
-  b.innerHTML = `<span style="font-size:1.25rem">${ICONO_ACC[k]||"🚫"}</span><span>${NOMBRES_ACC[k]}</span>`;
-  b.addEventListener("click", ()=>{ MI_ACC = k; [...pickerAcc.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
-  pickerAcc.appendChild(b);
-});
-ELEMENTOS.forEach(k=>{
-  const b = document.createElement("button"); b.type="button"; b.className="acc-btn"+(k===MI_EL?" on":"");
-  b.innerHTML = `<span style="font-size:1.25rem">${ICONO_EL[k]||"🚫"}</span><span>${NOMBRES_EL[k]}</span>`;
-  b.addEventListener("click", ()=>{ MI_EL = k; [...pickerEl.children].forEach(c=>c.classList.remove("on")); b.classList.add("on"); pintarAvatarPreview(); });
-  pickerEl.appendChild(b);
-});
 pintarAvatarPreview();
 
 function confeti(cont){
@@ -434,7 +400,7 @@ const elSetpi = document.getElementById("setpi-mira");
 function mostrarPregunta(idx){
   const q = PREGUNTAS[idx];
   elFeedback.innerHTML = ""; elEsperando.hidden = true;
-  if(elSetpi) elSetpi.innerHTML = avatarSVG("feliz:camisa_azul_alcaldia_setp:gorra_alcaldia_ibague:ninguno:ninguno", 46, "cuerpo");
+  if(elSetpi) elSetpi.innerHTML = avatarSVG("feliz:camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 46, "cuerpo");
   ORDEN = barajaEstable(q.opciones.length, NOMBRE + ":" + q.id);
   elContador.textContent = "Pregunta " + (idx+1) + " de " + TOTAL;
   elTema.textContent = q.tema;
@@ -537,12 +503,9 @@ document.getElementById("host-btn-reiniciar").addEventListener("click", async ()
 const guardado = mem("quiz_nombre"); if(guardado) inNombre.value = guardado;
 const avGuardado = mem("quiz_avatar");
 if(avGuardado){
-  const [c,cm,s,a,e] = avGuardado.split(":");
+  const [c,cm,s] = avGuardado.split(":");
   if(CARAS[c]!==undefined) MI_EJE.cara=c; if(CAMISAS[cm]!==undefined) MI_EJE.camisa=cm; if(SOMBREROS[s]!==undefined) MI_EJE.sombrero=s;
-  if(ACCESORIOS.includes(a)) MI_ACC=a; if(ELEMENTOS.includes(e)) MI_EL=e;
   pintarTabs(); pintarGaleria();
-  [...pickerAcc.children].forEach((el,i)=>el.classList.toggle("on", ACCESORIOS[i]===MI_ACC));
-  [...pickerEl.children].forEach((el,i)=>el.classList.toggle("on", ELEMENTOS[i]===MI_EL));
   pintarAvatarPreview();
 }
 })();
