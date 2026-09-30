@@ -87,6 +87,24 @@ button{font:inherit; cursor:pointer;}
 .contador-sala{font-size:.78rem; color:var(--muted); margin-top:4px;}
 .tu-chip{outline:2px solid var(--cyan); outline-offset:1px;}
 
+/* tu SETPI, soñando despierto mientras llega el resto — para que la espera se sienta parte
+   del juego y no un formulario vacío. */
+.lobby-yo{position:relative; display:flex; flex-direction:column; align-items:center; margin:2px 0 18px; padding:18px 10px 12px; background:linear-gradient(180deg,var(--cyan-soft),transparent); border-radius:18px; overflow:hidden;}
+.lobby-yo-setpi{width:min(34vw,140px); animation:lobbySway 3.6s ease-in-out infinite; transform-origin:bottom center;}
+@keyframes lobbySway{0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg) translateY(-3px);}}
+.lobby-zzz{position:absolute; top:10px; right:calc(50% - 56px); display:flex; flex-direction:column; align-items:flex-end; pointer-events:none;}
+.lobby-zzz span{font-family:"Barlow",sans-serif; font-weight:800; color:var(--royal); opacity:0; display:block; animation:zFloat 2.8s ease-in infinite;}
+.lobby-zzz span:nth-child(1){font-size:.85rem; animation-delay:0s;}
+.lobby-zzz span:nth-child(2){font-size:1.05rem; animation-delay:.7s;}
+.lobby-zzz span:nth-child(3){font-size:1.3rem; animation-delay:1.4s;}
+@keyframes zFloat{0%{opacity:0; transform:translate(0,8px) scale(.7);} 25%{opacity:.85;} 100%{opacity:0; transform:translate(16px,-34px) scale(1.15);}}
+.lobby-yo-tx{font-size:.84rem; color:var(--navy); font-weight:800; margin-top:8px; text-align:center;}
+.lobby-yo-tx span{color:var(--royal);}
+.lobby-semaforo{position:absolute; left:10px; bottom:10px; width:16px; opacity:.5;}
+.lobby-semaforo circle{animation:semCiclo 6s steps(1) infinite;}
+.lobby-semaforo .l2{animation-delay:-2s;} .lobby-semaforo .l3{animation-delay:-4s;}
+@keyframes semCiclo{0%,32%{opacity:1;} 33%,100%{opacity:.15;}}
+
 /* pregunta */
 .barra-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px;}
 .contador{font-size:.78rem; color:var(--muted); font-weight:700;}
@@ -125,23 +143,27 @@ button{font:inherit; cursor:pointer;}
 .toast-tardio.no{border-color:var(--red); color:var(--red);}
 .toast-tardio b{color:var(--navy); font-weight:800;}
 
-/* podio */
+/* podio: cada pedestal apila todo en flujo normal (estrellas→nombre→personaje→bloque) — nunca
+   con offsets negativos, así nunca se monta encima del puntaje sin importar cuánto mida el resto
+   de la pantalla. */
 .podio-hero{text-align:center; margin-bottom:6px;}
 .podio-hero .trofeo{font-size:2.4rem; animation:floaty 2.4s ease-in-out infinite;}
-.podio-escenario{position:relative; height:320px; margin:14px 0 8px; display:flex; align-items:flex-end; justify-content:center; gap:8px;}
-.pedestal{position:relative; width:30%; border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; opacity:0; transform:translateY(40px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
+.podio-escenario{display:flex; align-items:flex-end; justify-content:center; gap:10px; margin:18px 0 10px;}
+.pedestal{width:31%; display:flex; flex-direction:column; align-items:center; opacity:0; transform:translateY(30px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
 @keyframes subirPodio{to{opacity:1; transform:translateY(0);}}
-.pedestal .num{font-family:"Barlow",sans-serif; font-weight:800; font-size:1.6rem; color:#fff;}
-.pedestal .nom{position:absolute; top:-32px; left:50%; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 10px; border-radius:999px; white-space:nowrap; max-width:150%; overflow:hidden; text-overflow:ellipsis; box-shadow:var(--shadow); z-index:2;}
-.pedestal .muneco{position:absolute; top:-112px; left:50%; transform:translateX(-50%); animation:floaty 2.6s ease-in-out infinite; z-index:1;}
-.pedestal.ped-1 .muneco{top:-148px; filter:drop-shadow(0 8px 16px rgba(240,168,0,.5));}
-.pedestal.ped-1 .nom{top:-38px; font-size:.86rem; background:var(--gold-bg); border-color:var(--gold);}
-.pedestal .estrellas{position:absolute; top:-172px; left:50%; transform:translateX(-50%); font-size:1rem; letter-spacing:3px; white-space:nowrap; animation:mhTwinkle 1.6s ease-in-out infinite; z-index:2; filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));}
-.pedestal.ped-1 .estrellas{top:-206px; font-size:1.3rem;}
-@keyframes mhTwinkle{0%,100%{opacity:.45; transform:translateX(-50%) scale(.85);} 50%{opacity:1; transform:translateX(-50%) scale(1.1);}}
-.ped-1{height:160px; background:linear-gradient(180deg,var(--gold),#a9781f); order:2;}
-.ped-2{height:120px; background:linear-gradient(180deg,var(--royal),var(--navy)); order:1;}
-.ped-3{height:92px; background:linear-gradient(180deg,var(--cyan),var(--navy)); order:3;}
+.pedestal .estrellas{font-size:.95rem; letter-spacing:2px; animation:mhTwinkle 1.6s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));}
+.pedestal.ped-1 .estrellas{font-size:1.2rem;}
+@keyframes mhTwinkle{0%,100%{opacity:.45; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
+.pedestal .nom{font-size:.74rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 9px; border-radius:999px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; box-shadow:var(--shadow); margin:3px 0 4px;}
+.pedestal.ped-1 .nom{font-size:.82rem; background:var(--gold-bg); border-color:var(--gold);}
+.pedestal .muneco{animation:floaty 2.6s ease-in-out infinite; margin-bottom:-6px; position:relative; z-index:1;}
+.pedestal.ped-1 .muneco{filter:drop-shadow(0 8px 16px rgba(240,168,0,.5));}
+.pedestal .bloque{width:100%; border-radius:10px 10px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 -3px 12px rgba(0,0,0,.12);}
+.pedestal .num{font-family:"Barlow",sans-serif; font-weight:800; font-size:1.4rem; color:#fff;}
+.pedestal .pts-ticker{font-size:.7rem; font-weight:700; color:rgba(255,255,255,.88); margin-top:1px;}
+.ped-1 .bloque{height:128px; background:linear-gradient(180deg,var(--gold),#a9781f);}
+.ped-2 .bloque{height:94px; background:linear-gradient(180deg,var(--royal),var(--navy));}
+.ped-3 .bloque{height:72px; background:linear-gradient(180deg,var(--cyan),var(--navy));}
 .confeti{position:fixed; top:-10px; width:9px; height:14px; border-radius:2px; z-index:5; animation:caer linear forwards;}
 .tabla-tit{display:flex; justify-content:space-between; align-items:baseline; margin:18px 0 10px;}
 .tabla-tit h3{font-size:1rem; color:var(--navy);}
@@ -164,12 +186,38 @@ button{font:inherit; cursor:pointer;}
 .host-fila svg{width:22px; height:22px; border-radius:50%;}
 .estado-pill{display:inline-block; padding:4px 12px; border-radius:999px; font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;}
 .estado-pill.lobby{background:var(--gold-bg); color:#7a5a0a;} .estado-pill.curso{background:var(--green-bg); color:var(--green);}
+
+/* ---- reacción a pantalla completa: imposible de no ver, así que nadie se queda con la duda
+   de si acertó o no — SETPI enorme, sello y frase, y luego se desvanece solo. ---- */
+.reaccion-full{position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; transition:opacity .25s ease;}
+.reaccion-full.mostrar{opacity:1;}
+.reaccion-fondo{position:absolute; inset:0; background:radial-gradient(circle at 50% 42%, rgba(0,168,48,.35), rgba(11,31,92,.72));}
+.reaccion-full.no .reaccion-fondo{background:radial-gradient(circle at 50% 42%, rgba(214,40,40,.32), rgba(11,31,92,.74));}
+.reaccion-contenido{position:relative; display:flex; flex-direction:column; align-items:center; transform:scale(.55) translateY(10px); transition:transform .4s cubic-bezier(.2,1.5,.4,1);}
+.reaccion-full.mostrar .reaccion-contenido{transform:scale(1) translateY(0);}
+.reaccion-setpi{width:min(56vw,230px); filter:drop-shadow(0 14px 22px rgba(0,0,0,.35));}
+.reaccion-sello{font-size:min(15vw,60px); margin:-10px 0 4px; animation:selloPop .55s cubic-bezier(.2,1.7,.4,1) .12s both;}
+@keyframes selloPop{0%{transform:scale(0) rotate(-25deg);} 60%{transform:scale(1.3) rotate(10deg);} 100%{transform:scale(1) rotate(-6deg);}}
+.reaccion-full.no .reaccion-sello{animation-name:selloPopNo;}
+@keyframes selloPopNo{0%{transform:scale(0) rotate(25deg);} 60%{transform:scale(1.25) rotate(-10deg);} 100%{transform:scale(1) rotate(6deg);}}
+.reaccion-texto{font-family:"Barlow",sans-serif; font-weight:800; font-size:min(6.5vw,26px); color:#fff; text-align:center; background:var(--green); padding:9px 26px; border-radius:999px; box-shadow:0 10px 24px rgba(0,0,0,.3); white-space:nowrap;}
+.reaccion-full.no .reaccion-texto{background:var(--red);}
+@media (max-width:380px){.reaccion-texto{white-space:normal; font-size:5.2vw;}}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
 </style>
 </head>
 <body>
 <div class="marca-agua" aria-hidden="true" id="marca-agua"></div>
 <div class="toast-contenedor" id="toast-contenedor" aria-live="polite"></div>
+<div class="reaccion-full" id="reaccion-full" aria-hidden="true">
+  <div class="reaccion-fondo"></div>
+  <div class="reaccion-contenido">
+    <div class="reaccion-setpi" id="reaccion-setpi"></div>
+    <div class="reaccion-sello" id="reaccion-sello"></div>
+    <div class="reaccion-texto" id="reaccion-texto"></div>
+  </div>
+</div>
 <div class="topbar">
   <div class="tbar">
     <div class="lockup"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
@@ -195,6 +243,12 @@ button{font:inherit; cursor:pointer;}
 <div id="p-lobby" class="pantalla card lobby" hidden>
   <div class="lobby-cabeza"><h1 style="font-size:1.3rem">Sala de espera</h1><span class="pulso"><span class="punto"></span> en vivo</span></div>
   <p style="color:var(--muted); font-size:.9rem; margin:6px 0 14px">Ya estás dentro. En cuanto el anfitrión dé la señal, la primera pregunta aparece para todos al mismo tiempo.</p>
+  <div class="lobby-yo" id="lobby-yo">
+    <svg class="lobby-semaforo" viewBox="0 0 20 46" aria-hidden="true"><rect width="20" height="46" rx="6" fill="#0B1730"/><circle class="l1" cx="10" cy="11" r="5" fill="#D62828"/><circle class="l2" cx="10" cy="23" r="5" fill="#F0A800"/><circle class="l3" cx="10" cy="35" r="5" fill="#00A830"/></svg>
+    <div class="lobby-zzz"><span>z</span><span>z</span><span>z</span></div>
+    <div class="lobby-yo-setpi" id="lobby-yo-setpi"></div>
+    <div class="lobby-yo-tx">Listo para el reto, <span id="lobby-yo-nombre"></span> — descansa mientras llega el resto.</div>
+  </div>
   <div class="premio-banner"><span class="ico">🏆</span><span>Los 3 primeros puestos de la clasificación final se llevan premio — ¡a jugársela!</span></div>
   <div id="lobby-roster" class="roster"></div>
   <div class="contador-sala" id="lobby-cuenta"></div>
@@ -364,6 +418,8 @@ async function empezar(){
     NOMBRE = nom; mem("quiz_nombre", nom); mem("quiz_avatar", MI_AVATAR);
     DURACION = r.duracion || DURACION; TRANSICION = r.transicion !== undefined ? r.transicion : TRANSICION; TOTAL = r.totalPreguntas || TOTAL;
     mostrarSolo(pLobby);
+    document.getElementById("lobby-yo-setpi").innerHTML = avatarSVG(MI_AVATAR, 140, "cuerpo");
+    document.getElementById("lobby-yo-nombre").textContent = NOMBRE;
     pintarRoster(r.jugadores);
     if(r.estado === "en_curso"){ await cargarYArrancar(parseInt(r.inicio,10)); return; }
     clearInterval(POLL_LOBBY); POLL_LOBBY = setInterval(sondearLobby, 1500);
@@ -435,6 +491,25 @@ function mostrarToast(idxPregunta, correcta, puntos){
   requestAnimationFrame(()=>t.classList.add("mostrar"));
   setTimeout(()=>{ t.classList.remove("mostrar"); setTimeout(()=>t.remove(), 350); }, 3400);
 }
+/* la reacción grande: nadie se la puede perder — tapa toda la pantalla un instante y se
+   desvanece sola, para que acertar o fallar se sienta de verdad (como pidió el equipo: "que no
+   pasen desapercibidas"). */
+const elReaccionFull = document.getElementById("reaccion-full"), elReaccionSetpi = document.getElementById("reaccion-setpi"),
+      elReaccionSello = document.getElementById("reaccion-sello"), elReaccionTexto = document.getElementById("reaccion-texto");
+let reaccionFullTimer = null;
+const FRASES_OK = ["¡Buen trabajo!", "¡Eso es!", "¡Excelente!", "¡La sacaste!"];
+const FRASES_NO = ["Esa no era…", "¡A la siguiente!", "Casi… ¡sigue así!"];
+function mostrarReaccionFull(correcta, puntos){
+  if(!elReaccionFull) return;
+  clearTimeout(reaccionFullTimer);
+  elReaccionFull.className = "reaccion-full " + (correcta ? "ok" : "no");
+  elReaccionSetpi.innerHTML = avatarSVG((correcta ? "muy_feliz_ojo_cerrado" : "enojado") + ":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 230, "cuerpo");
+  elReaccionSello.textContent = correcta ? "👍" : "✋";
+  const frase = correcta ? FRASES_OK[Math.floor(Math.random()*FRASES_OK.length)] : FRASES_NO[Math.floor(Math.random()*FRASES_NO.length)];
+  elReaccionTexto.textContent = correcta ? `${frase} +${puntos} pts` : frase;
+  requestAnimationFrame(()=>elReaccionFull.classList.add("mostrar"));
+  reaccionFullTimer = setTimeout(()=>elReaccionFull.classList.remove("mostrar"), correcta ? 1750 : 1500);
+}
 function mostrarPregunta(idx){
   const q = PREGUNTAS[idx];
   elFeedback.innerHTML = ""; elEsperando.hidden = true;
@@ -466,8 +541,9 @@ async function responder(idx, opcionIdx, tiempoMs){
   PUNTAJE += r.puntos || 0;
   if(idx === IDX_MOSTRADO){
     if(opcionIdx >= 0){ const b = elOpciones.querySelector('.opcion[data-orig="'+opcionIdx+'"]'); if(b) b.classList.add(r.correcta ? "correcta" : "incorrecta"); }
-    if(r.correcta) confeti(12);
+    if(r.correcta) confeti(18);
     reaccionSetpi(r.correcta);
+    mostrarReaccionFull(r.correcta, r.puntos);
     elFeedback.innerHTML = r.correcta
       ? `<div class="feedback ok">✓ ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${PUNTAJE}</small></div>`
       : `<div class="feedback no">${opcionIdx<0 ? "⏱ Se acabó el tiempo" : "✕ No era esa"}<small>Total hasta ahora: ${PUNTAJE}</small></div>`;
@@ -493,14 +569,24 @@ function caraFeliz(avatar){
   partes[0] = "muy_feliz_ojo_cerrado";
   return partes.join(":");
 }
+function animarConteo(el, hasta, ms){
+  const t0 = performance.now();
+  (function tick(ahora){
+    const t = Math.min(1, (ahora-t0)/ms);
+    const val = Math.round(hasta * (1-Math.pow(1-t,3)));
+    el.textContent = val + " pts";
+    if(t<1) requestAnimationFrame(tick);
+  })(t0);
+}
 function pintarEscenario(tabla){
   const orden = [tabla[1], tabla[0], tabla[2]];
   const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"], tamanos = [64,92,56], estrellas = ["✨✨","👑✨✨✨","✨✨"];
   elEscenario.innerHTML = orden.map((f,i)=>{
-    if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><span class="num">${num[i]}</span></div>`;
+    if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><div class="bloque"><span class="num">${num[i]}°</span></div></div>`;
     const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
-    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="estrellas">${estrellas[i]}</span><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><span class="num">${num[i]}°</span></div>`;
+    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="estrellas">${estrellas[i]}</span><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><div class="bloque"><span class="num">${num[i]}°</span><span class="pts-ticker" data-pts="${f.puntos}">0 pts</span></div></div>`;
   }).join("");
+  elEscenario.querySelectorAll(".pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 500+i*200));
 }
 async function actualizarClasificacion(){
   try{

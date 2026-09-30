@@ -114,23 +114,32 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 .qr-tx h2{color:var(--cream); font-size:clamp(24px,2.8vw,42px); margin-bottom:1.6vh;}
 .qr-tx p{font-size:clamp(13px,1.2vw,18px); color:var(--blue-soft); line-height:1.5;}
 .qr-tx .link{font-family:'IBM Plex Mono',monospace; font-size:clamp(11px,1vw,14px); color:var(--cream); background:rgba(255,255,255,.1); padding:8px 14px; border-radius:8px; display:inline-block; margin-top:1.6vh; word-break:break-all;}
-/* ---- SETPI junto al QR: se balancea y parpadea solo, y si lo tocan se enoja un instante ---- */
-.qr-hero{position:relative; display:flex; align-items:flex-end; gap:0; margin:.6vh 0 .2vh;}
-.qr-setpi{width:min(10vw,108px); flex:none; margin-right:min(-2.2vw,-22px); z-index:2; cursor:pointer; transform-origin:bottom center; animation:qrBalanceo 3.4s ease-in-out infinite;}
-.qr-hero.bloqueado .qr-setpi{animation-duration:5s; filter:saturate(.75);}
+/* ---- SETPI junto al QR: se balancea, parpadea, lo ofrece con la mirada, se impacienta si lo
+   hacen esperar, y si lo tocan se enoja un instante — todo con las capas reales, sin dibujos nuevos. */
+.qr-hero{position:relative; display:flex; align-items:flex-end; gap:0; margin:.8vh 0 .2vh;}
+.qr-setpi{width:min(11vw,118px); flex:none; margin-right:min(-2.4vw,-24px); z-index:2; cursor:pointer; transform-origin:bottom center; animation:qrBalanceo 3.4s ease-in-out infinite;}
+.qr-hero.bloqueado .qr-setpi{animation:qrOfrece 2.6s ease-in-out infinite;}
 @keyframes qrBalanceo{0%,100%{transform:rotate(-3deg);} 50%{transform:rotate(3deg) translateY(-3px);}}
+@keyframes qrOfrece{0%,100%{transform:rotate(-2deg) translateX(0);} 30%{transform:rotate(1deg) translateX(0);} 45%{transform:rotate(5deg) translateX(6px) scale(1.04);} 60%{transform:rotate(1deg) translateX(0);}}
 .qr-setpi.enojado{animation:qrEnojo .5s ease-in-out !important;}
 @keyframes qrEnojo{0%,100%{transform:translateX(0) rotate(0);} 20%{transform:translateX(-7px) rotate(-6deg);} 40%{transform:translateX(7px) rotate(6deg);} 60%{transform:translateX(-5px) rotate(-4deg);} 80%{transform:translateX(5px) rotate(4deg);}}
+.qr-setpi.impaciente{animation:qrImpaciente .55s ease-in-out 4 !important;}
+@keyframes qrImpaciente{0%,100%{transform:translateY(0) rotate(-3deg);} 25%{transform:translateY(-7px) rotate(3deg);} 50%{transform:translateY(0) rotate(-3deg);} 75%{transform:translateY(-7px) rotate(3deg);}}
 @keyframes mhTwinkle{0%,100%{opacity:.45; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
-.qr-globo{position:absolute; left:min(2vw,22px); top:-1.6vh; background:#fff; color:var(--navy); font-weight:800; font-size:clamp(10px,.85vw,12px); padding:5px 12px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:translateY(4px) scale(.9); transition:opacity .25s, transform .25s; z-index:3; white-space:nowrap;}
+.qr-globo{position:absolute; left:min(1vw,14px); top:-2.4vh; background:#fff; color:var(--navy); font-weight:800; font-size:clamp(10px,.85vw,12px); padding:6px 13px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:translateY(4px) scale(.9); transition:opacity .25s, transform .25s; z-index:3; white-space:nowrap;}
+.qr-globo::after{content:""; position:absolute; left:26px; bottom:-6px; border:7px solid transparent; border-top-color:#fff;}
 .qr-globo.show{opacity:1; transform:translateY(0) scale(1);}
-.qr-caja{position:relative; width:min(14vw,148px); height:min(14vw,148px); border-radius:16px; box-shadow:var(--shadow); background:#fff; padding:10px; flex:none; z-index:1;}
+.qr-caja{position:relative; width:min(15vw,158px); height:min(15vw,158px); border-radius:16px; box-shadow:var(--shadow); background:#fff; padding:10px; flex:none; z-index:1; transition:box-shadow .3s;}
 .qr-caja img{width:100%; height:100%; object-fit:contain; border-radius:8px; transition:filter .3s ease, opacity .3s ease;}
 .qr-candado{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(11,31,92,.9); border-radius:16px; color:#fff; text-align:center; padding:8px;}
 .qr-candado-ico{font-size:1.6rem; animation:flotarKF 2.2s ease-in-out infinite;}
 .qr-candado span:last-child{font-size:clamp(8px,.68vw,10.5px); font-weight:700; line-height:1.3;}
 .qr-hero.bloqueado .qr-caja img{filter:blur(7px); opacity:.45;}
 .qr-hero.bloqueado .qr-candado{display:flex;}
+.qr-hero:not(.bloqueado) .qr-caja{animation:qrListo 1.8s ease-in-out infinite;}
+@keyframes qrListo{0%,100%{box-shadow:var(--shadow);} 50%{box-shadow:0 0 0 8px rgba(38,182,122,.22), var(--shadow);}}
+.qr-escanea{position:absolute; right:-6px; top:-14px; background:var(--green,#26B67A); color:#fff; font-size:clamp(8px,.7vw,10px); font-weight:800; padding:4px 9px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:scale(.7); transition:opacity .3s, transform .3s; z-index:3;}
+.qr-hero:not(.bloqueado) .qr-escanea{opacity:1; transform:scale(1);}
 .badge-tema{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.4vh;}
 .badge-tema span{background:rgba(255,255,255,.14); color:var(--cream); font-size:clamp(10px,.9vw,13px); font-weight:700; padding:5px 14px; border-radius:999px;}
 .nav{position:fixed; left:0; right:0; bottom:0; height:60px; display:flex; align-items:center; justify-content:center; gap:14px; background:rgba(1,39,75,.92); backdrop-filter:blur(6px); z-index:50; opacity:0; transition:opacity .3s;}
@@ -256,7 +265,7 @@ function busG(color){ return `<rect x="1" y="2" width="60" height="22" rx="5" fi
 
 /* la "calle viva" del producto: balanza, buses en movimiento, ocobos, semáforo y skyline con el Palacio de Justicia —
    el mismo mundo animado de la portada de la app, reutilizado aquí para que la capacitación se sienta parte del mismo sitio. */
-function escenaViva(){ return `<div class="escena-viva" aria-hidden="true"><svg viewBox="0 0 1600 260" preserveAspectRatio="xMidYMax slice">
+function escenaViva(){ return `<div class="escena-viva" aria-hidden="true"><svg viewBox="0 0 1600 260" preserveAspectRatio="xMidYMax meet">
   <polygon points="0,120 170,80 360,110 560,66 760,105 970,78 1170,108 1380,72 1580,102 1600,100 1600,260 0,260" fill="#0A3A6B" fill-opacity=".55"/>
   <rect x="700" y="112" width="200" height="8" fill="#F6F3EC" fill-opacity=".5"/>
   <rect x="713" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/><rect x="737" y="84" width="9" height="30" fill="#F6F3EC" fill-opacity=".5"/>
@@ -557,7 +566,7 @@ slide("fuentes","",`
 `);
 
 slide("cuestionario","navy",`
-  <div class="foto-marca entra"><img src="img/ocobos-ibague.jpg" alt=""></div>
+  ${escenaViva()}
   <p class="eyebrow entra">Ahora te toca a ti</p>
   <div class="split" style="align-items:stretch; gap:2.4vw">
     <div class="cont entra" style="animation-delay:.05s; justify-content:center">
@@ -568,6 +577,7 @@ slide("cuestionario","navy",`
         <div class="qr-setpi" id="qr-setpi" title="Toca a SETPI"></div>
         <div class="qr-globo" id="qr-globo">¡Vamos!</div>
         <div class="qr-caja">
+          <span class="qr-escanea">¡Escanéame!</span>
           <img id="qr-img" src="qr_cuestionario.png" alt="Código QR del cuestionario">
           <div class="qr-candado"><span class="qr-candado-ico">🔒</span><span>Esperando el PIN del anfitrión…</span></div>
         </div>
@@ -593,11 +603,12 @@ slide("cuestionario","navy",`
       </div>
       <div id="mh-curso" hidden style="display:flex; flex-direction:column; min-height:0; flex:1; align-items:center; text-align:center;">
         <div id="mh-pregunta-num" style="font-size:clamp(11px,1vw,14px); font-weight:700; color:var(--navy)"></div>
-        <div style="position:relative; width:min(9vw,84px); height:min(9vw,84px); margin:.8vh 0;">
+        <div id="mh-anillo-wrap" style="position:relative; width:min(9vw,84px); height:min(9vw,84px); margin:.8vh 0;">
           <svg width="100%" height="100%" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--line)" stroke-width="8"/><circle id="mh-anillo" cx="50" cy="50" r="44" fill="none" stroke="var(--blue)" stroke-width="8" stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="0" transform="rotate(-90 50 50)"/></svg>
           <span id="mh-anillo-num" class="mono" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:clamp(16px,1.6vw,22px); color:var(--navy)"></span>
         </div>
-        <div id="mh-podio" style="display:flex; align-items:flex-end; justify-content:center; gap:8px; flex:1; min-height:0;"></div>
+        <div id="mh-jugando-ahora" style="font-size:clamp(9px,.8vw,11px); font-weight:700; color:var(--ink-soft); margin:.4vh 0;"></div>
+        <div id="mh-podio" style="display:flex; align-items:flex-end; justify-content:center; gap:8px; flex:1; min-height:0; width:100%;"></div>
         <button id="mh-btn-reiniciar" style="width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:9px; font-weight:800; font-size:.78rem; margin-top:8px;">↺ Reiniciar y jugar de nuevo</button>
       </div>
     </div>
@@ -675,15 +686,16 @@ ir(IDX);
   const mhLogin = document.getElementById("mh-login"), mhLobby = document.getElementById("mh-lobby"), mhCurso = document.getElementById("mh-curso");
   const mhPin = document.getElementById("mh-pin"), mhBtnEntrar = document.getElementById("mh-btn-entrar"), mhErr = document.getElementById("mh-err");
   const mhRoster = document.getElementById("mh-roster"), mhCuenta = document.getElementById("mh-cuenta"), mhBtnIniciar = document.getElementById("mh-btn-iniciar");
-  const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio"), mhBtnReiniciar = document.getElementById("mh-btn-reiniciar");
+  const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhAnilloWrap = document.getElementById("mh-anillo-wrap"), mhJugandoAhora = document.getElementById("mh-jugando-ahora"), mhPodio = document.getElementById("mh-podio"), mhBtnReiniciar = document.getElementById("mh-btn-reiniciar");
   if(!mhLogin) return; // esta diapositiva no está en esta página
 
-  /* SETPI junto al QR: parpadea solo mientras espera, y si lo tocan se enoja un instante
-     (con sabor a "no me molestes") antes de volver a la normalidad. Puramente decorativo:
-     no cambia si el QR está bloqueado o no. */
+  /* SETPI junto al QR: parpadea y "ofrece" el QR solo, cada tanto dice algo (y si ya se tardaron
+     mucho se impacienta de verdad), y si lo tocan se enoja un instante antes de calmarse. Todo con
+     las capas reales — nada dibujado a mano. */
   const qrHero = document.getElementById("qr-hero"), qrSetpi = document.getElementById("qr-setpi"), qrGlobo = document.getElementById("qr-globo");
-  let parpadeoTimer = null;
-  function pintarSetpiHero(cara){ if(qrSetpi) qrSetpi.innerHTML = avatarSVG(cara+":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 108, "cuerpo"); }
+  let parpadeoTimer = null, cicloIdleTimer = null, cicloIdx = 0;
+  const MENSAJES_IDLE = ["¡Escanéame y entra!", "¿Ya casi empezamos?", "¡La sala te está esperando!", "¡Vamos, no me dejes esperando!"];
+  function pintarSetpiHero(cara){ if(qrSetpi) qrSetpi.innerHTML = avatarSVG(cara+":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 118, "cuerpo"); }
   function iniciarParpadeo(){
     clearInterval(parpadeoTimer);
     parpadeoTimer = setInterval(()=>{
@@ -691,18 +703,34 @@ ir(IDX);
       setTimeout(()=>pintarSetpiHero("feliz"), 220);
     }, 3800);
   }
+  function decirGlobo(msg, ms){
+    if(!qrGlobo) return;
+    qrGlobo.textContent = msg; qrGlobo.classList.add("show");
+    setTimeout(()=>qrGlobo.classList.remove("show"), ms || 2600);
+  }
+  function cicloIdle(){
+    const impaciente = cicloIdx>0 && cicloIdx%3===2;
+    decirGlobo(MENSAJES_IDLE[cicloIdx % MENSAJES_IDLE.length]);
+    cicloIdx++;
+    if(impaciente && qrSetpi){
+      qrSetpi.classList.remove("impaciente"); void qrSetpi.offsetWidth; qrSetpi.classList.add("impaciente");
+      pintarSetpiHero("confundido");
+      setTimeout(()=>{ qrSetpi.classList.remove("impaciente"); pintarSetpiHero("feliz"); }, 1300);
+    }
+  }
   if(qrSetpi){
     pintarSetpiHero("feliz"); iniciarParpadeo();
+    cicloIdleTimer = setInterval(cicloIdle, 8500);
+    setTimeout(cicloIdle, 3200);
     qrSetpi.addEventListener("click", ()=>{
       clearInterval(parpadeoTimer);
-      qrSetpi.classList.remove("enojado"); void qrSetpi.offsetWidth; qrSetpi.classList.add("enojado");
+      qrSetpi.classList.remove("enojado","impaciente"); void qrSetpi.offsetWidth; qrSetpi.classList.add("enojado");
       pintarSetpiHero("enojado");
-      if(qrGlobo){ qrGlobo.textContent = "¡Oye, ya casi empezamos!"; qrGlobo.classList.add("show"); }
+      decirGlobo("¡Oye, ya casi empezamos!", 1500);
       setTimeout(()=>{
         qrSetpi.classList.remove("enojado");
         pintarSetpiHero("feliz");
         iniciarParpadeo();
-        if(qrGlobo) qrGlobo.classList.remove("show");
       }, 1500);
     });
   }
@@ -723,24 +751,40 @@ ir(IDX);
     partes[0] = "muy_feliz_ojo_cerrado";
     return partes.join(":");
   }
+  function animarConteo(el, hasta, ms){
+    const t0 = performance.now();
+    (function tick(ahora){
+      const t = Math.min(1, (ahora-t0)/ms);
+      const val = Math.round(hasta * (1-Math.pow(1-t,3)));
+      el.textContent = val + " pts";
+      if(t<1) requestAnimationFrame(tick);
+    })(t0);
+  }
   let podioPintado = false;
   async function actualizarPodio(){
     try{
       const r = await api("quizClasificacion");
+      mhJugandoAhora.textContent = "👥 " + r.jugadores + (r.jugadores===1 ? " persona jugando ahora" : " personas jugando ahora");
       if(!r.tabla.length) return;
       const top3 = r.tabla.slice(0,3);
       const orden = [top3[1], top3[0], top3[2]];
-      const alturas = [78, 116, 58], tamanos = [54, 78, 46], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"], estrellas = ["✨✨","👑 ✨✨✨","✨✨"];
+      const tamanos = [46, 66, 40], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"], estrellas = ["✨✨","👑✨✨✨","✨✨"];
+      const yaEstaba = podioPintado;
       mhPodio.innerHTML = orden.map((f,i)=>{
-        if(!f) return `<div style="width:26%; opacity:.2; height:${alturas[i]}px; background:var(--line); border-radius:6px 6px 0 0"></div>`;
+        if(!f) return `<div style="width:26%; opacity:.2; height:60px; background:var(--line); border-radius:6px 6px 0 0; align-self:flex-end;"></div>`;
         const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
-        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%; position:relative;">
-          <div style="font-size:${i===1?'1.05rem':'.8rem'}; letter-spacing:2px; animation:mhTwinkle 1.6s ease-in-out infinite; margin-bottom:2px;">${estrellas[i]}</div>
-          <div style="font-size:clamp(8px,.68vw,11px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:2px 8px; margin-bottom:3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
+        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%;">
+          <div style="font-size:${i===1?'.95rem':'.72rem'}; letter-spacing:1px; animation:mhTwinkle 1.6s ease-in-out infinite;">${estrellas[i]}</div>
+          <div style="font-size:clamp(7px,.62vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:2px 7px; margin:2px 0 3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
           <div style="margin-bottom:-4px">${muneco}</div>
-          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800; font-size:1rem; box-shadow:0 -2px 10px rgba(0,0,0,.12);">${nums[i]}</div>
+          <div style="width:100%; height:${i===1?64:i===0?48:38}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:Barlow; box-shadow:0 -2px 10px rgba(0,0,0,.12);">
+            <span style="font-weight:800; font-size:.8rem;">${nums[i]}</span>
+            <span class="mh-pts-ticker" data-pts="${f.puntos}" style="font-size:.6rem; font-weight:700; opacity:.9;">0 pts</span>
+          </div>
         </div>`;
       }).join("");
+      if(!yaEstaba) mhPodio.querySelectorAll(".mh-pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 300+i*180));
+      else mhPodio.querySelectorAll(".mh-pts-ticker").forEach(el=>{ el.textContent = el.dataset.pts + " pts"; });
       podioPintado = true;
     }catch(e){ /* reintenta solo */ }
   }
@@ -757,8 +801,8 @@ ir(IDX);
       const idx = Math.floor(transcurrido / ciclo);
       const restante = Math.max(0, DURACION - (transcurrido - idx*ciclo)/1000);
       if(idx >= TOTAL_PREGUNTAS){
-        mhPreguntaNum.textContent = "Cuestionario terminado";
-        mhAnillo.style.stroke = "var(--green)"; mhAnillo.style.strokeDashoffset = "0"; mhAnilloNum.textContent = "🏆";
+        mhPreguntaNum.textContent = "🏆 ¡Cuestionario terminado!";
+        mhAnilloWrap.hidden = true;
         clearInterval(tickAnillo);
         return;
       }
@@ -786,6 +830,7 @@ ir(IDX);
     mhRoster.innerHTML = "";
     clearInterval(tickAnillo); clearInterval(pollClasif);
     mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo";
+    mhAnilloWrap.hidden = false; mhJugandoAhora.textContent = ""; podioPintado = false;
     sondearLobby();
     clearInterval(pollLobby);
     pollLobby = setInterval(sondearLobby, 1400);
