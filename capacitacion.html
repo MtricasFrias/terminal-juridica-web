@@ -135,7 +135,7 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
    .setpi-cuerpo) es una transformación (bote, aplastado, inclinado, etc.) del mismo compuesto
    real de capas — nunca se dibuja nada nuevo, solo se mueve y se deforma el mismo gráfico. */
 .setpi-stage{position:absolute; inset:0; pointer-events:none; z-index:6; overflow:visible;}
-.setpi-actor{position:absolute; left:8%; bottom:4%; width:min(9vw,94px); transition:left 1s cubic-bezier(.4,0,.2,1), bottom 1s cubic-bezier(.4,0,.2,1); will-change:left,bottom; pointer-events:auto; cursor:pointer;}
+.setpi-actor{position:absolute; left:8%; bottom:4%; width:min(9vw,94px); transform-origin:bottom center; transition:left 1s cubic-bezier(.4,0,.2,1), bottom 1s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.3,1.3,.4,1); will-change:left,bottom,transform; pointer-events:auto; cursor:pointer;}
 .setpi-actor.veloz{transition-duration:.55s;}
 .setpi-actor.instantaneo{transition-duration:0s;}
 .setpi-sombra{position:absolute; left:50%; bottom:-4px; width:70%; height:10px; background:radial-gradient(ellipse at center,rgba(0,0,0,.35),transparent 70%); transform:translateX(-50%); transition:width .3s, opacity .3s;}
@@ -767,13 +767,25 @@ ir(IDX);
     setpiActorEl.className = "setpi-actor pose-" + pose + extra;
     if(ms) setTimeout(()=>{ if(setpiActorEl.classList.contains("pose-"+pose)) ponPose("idle"); }, ms);
   }
-  function moverA(punto, modo){
+  /* nunca al mismo píxel exacto ni al mismo tamaño dos veces: cada viaje suma una pizca de
+     variación (jitter) a las coordenadas, y `escala` cambia su tamaño aparente — más grande
+     cuando está cerca/protagonizando un momento, más chico cuando está lejos (efecto de
+     profundidad) — para que se sienta vivo e impredecible, no una imagen fija que solo cambia
+     de lugar. */
+  function moverA(punto, modo, escala){
     if(!setpiActorEl) return;
     setpiActorEl.classList.remove("veloz","instantaneo");
     if(modo==="run") setpiActorEl.classList.add("veloz");
     if(modo==="instant") setpiActorEl.classList.add("instantaneo");
-    setpiActorEl.style.left = punto.left + "%";
-    setpiActorEl.style.bottom = punto.bottom + "%";
+    const jx = (Math.random()*8-4), jy = (Math.random()*5-2.5);
+    setpiActorEl.style.left = Math.max(2, Math.min(90, punto.left+jx)) + "%";
+    setpiActorEl.style.bottom = Math.max(2, Math.min(55, punto.bottom+jy)) + "%";
+    if(escala) setpiActorEl.style.transform = "scale(" + escala + ")";
+  }
+  function ponEscala(v, ms){
+    if(!setpiActorEl) return;
+    setpiActorEl.style.transform = "scale(" + v + ")";
+    if(ms) setTimeout(()=>{ setpiActorEl.style.transform = "scale(1)"; }, ms);
   }
   function decirGlobo(msg, ms){
     if(!setpiGlobo) return;
@@ -796,22 +808,22 @@ ir(IDX);
   /* ---- beats: pequeñas secuencias guionizadas por estado ---- */
   function beatEsperaPin(){
     beat(()=>{
-      moverA(PUNTOS.QR, "walk"); ponPose("walk");
+      moverA(PUNTOS.QR, "walk", 1.12); ponPose("walk");
       setTimeout(()=>{ ponPose("idle"); mostrarIcono("🔒", 1400); }, 1050);
-      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 2500);
+      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk", .95); ponPose("walk"); }, 2500);
       setTimeout(()=>{ ponPose("idle"); }, 3550);
     }, 3700);
   }
   function beatImpacientePin(){
     beat(()=>{
-      pintarSetpi("preocupado"); ponPose("impatient", 1700);
+      pintarSetpi("preocupado"); ponPose("impatient", 1700); ponEscala(1.08, 1700);
       decirGlobo(azar(["¿Ya casi ponen el PIN?","¡Estoy listo para empezar!","Psst… ¡el candado sigue ahí!"]), 2200);
       setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1750);
     }, 2500);
   }
   function beatPinError(){
     beat(()=>{
-      pintarSetpi("confundido"); ponPose("confused", 1100);
+      pintarSetpi("confundido"); ponPose("confused", 1100); ponEscala(.92, 1100);
       decirGlobo("Mmm… ¿ese PIN está bien?", 1900);
       setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1150);
     }, 1950);
@@ -822,23 +834,23 @@ ir(IDX);
      silenciosamente no hace nada si ya había algo en curso (eso rompería el desbloqueo real). */
   function beatDesbloqueo(cb){
     enBeat = true;
-    pintarSetpi("sorprendido"); ponPose("surprised");
-    setTimeout(()=>{ pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1250); mostrarIcono("🎉", 1400); }, 450);
+    pintarSetpi("sorprendido"); ponPose("surprised"); ponEscala(1.15);
+    setTimeout(()=>{ pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1250); ponEscala(1.35); mostrarIcono("🎉", 1400); }, 450);
     setTimeout(()=>{ decirGlobo("¡Vamos a jugar!", 1900); mostrarIcono("👍", 1300); }, 1250);
-    setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); enBeat = false; if(cb) cb(); }, 2050);
+    setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); ponEscala(1); enBeat = false; if(cb) cb(); }, 2050);
   }
   function beatInvitaQR(){
     beat(()=>{
-      moverA(PUNTOS.QR, "walk"); ponPose("walk");
+      moverA(PUNTOS.QR, "walk", 1.15); ponPose("walk");
       setTimeout(()=>{ ponPose("point", 950); }, 1050);
       setTimeout(()=>{ mostrarIcono("👍", 1200); decirGlobo(azar(["¡Escanéame!","¡Entra a jugar!","Aquí está el código 👉"]), 2000); }, 1550);
-      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 3250);
+      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk", 1); ponPose("walk"); }, 3250);
       setTimeout(()=>{ ponPose("idle"); }, 4300);
     }, 4350);
   }
   function beatImpacienteJugadores(){
     beat(()=>{
-      pintarSetpi("preocupado"); ponPose("impatient", 1800);
+      pintarSetpi("preocupado"); ponPose("impatient", 1800); ponEscala(1.08, 1800);
       decirGlobo(azar(["¿Nadie va a jugar?","¡La sala los está esperando!","Escanea el QR… ¡vamos!"]), 2200);
       setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1850);
     }, 2600);
@@ -846,25 +858,38 @@ ir(IDX);
   function beatCelebraJugador(grande){
     beat(()=>{
       pintarSetpi("muy_feliz_ojo_cerrado"); ponPose(grande ? "celebrate" : "jump", grande ? 1300 : 700);
+      ponEscala(grande ? 1.3 : 1.15, grande ? 1300 : 700);
       mostrarIcono(grande ? "🎉" : "✨", 1200);
       if(grande) decirGlobo("¡Se está llenando la sala!", 1900);
       setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, grande ? 1450 : 800);
     }, grande ? 1600 : 950);
   }
+  /* deambular libre: a un punto y tamaño aleatorios dentro de la zona segura (nunca sobre el
+     QR), para que nunca se sienta que repite el mismo recorrido una y otra vez. */
+  function beatMerodea(){
+    beat(()=>{
+      const destino = { left: 32 + Math.random()*52, bottom: 6 + Math.random()*28 };
+      const escala = .8 + Math.random()*.45;
+      const corre = Math.random() < .3;
+      moverA(destino, corre ? "run" : "walk", escala);
+      ponPose(corre ? "run" : "walk");
+      setTimeout(()=>ponPose("idle"), corre ? 700 : 1100);
+    }, 1400);
+  }
   function beatBus(){
     beat(()=>{
-      moverA(PUNTOS.BUS, "run"); ponPose("run");
+      moverA(PUNTOS.BUS, "run", .82); ponPose("run");
       setTimeout(()=>{
         ponPose("idle");
         const subio = Math.random() < .4;
         if(subio){
-          ponPose("jump", 600);
+          ponPose("jump", 600); ponEscala(.7, 600);
           setTimeout(()=>setpiActorEl.classList.add("oculto"), 500);
-          setTimeout(()=>{ setpiActorEl.classList.remove("oculto"); moverA(PUNTOS.HOME, "instant"); ponPose("wave", 900); mostrarIcono("👋", 1200); }, 2100);
+          setTimeout(()=>{ setpiActorEl.classList.remove("oculto"); moverA(PUNTOS.HOME, "instant", 1); ponPose("wave", 900); mostrarIcono("👋", 1200); }, 2100);
           setTimeout(()=>{ ponPose("idle"); }, 3100);
         } else {
           ponPose("wave", 900); mostrarIcono("👋", 1200);
-          setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 1300);
+          setTimeout(()=>{ moverA(PUNTOS.HOME, "walk", 1); ponPose("walk"); }, 1300);
           setTimeout(()=>{ ponPose("idle"); }, 2350);
         }
       }, 950);
@@ -877,13 +902,18 @@ ir(IDX);
     const ahora = Date.now(), inactivo = ahora - ultimaAccion;
     if(miEstado === "WAITING_FOR_PIN"){
       if(inactivo > 11000 && ahora - ultimaImpaciencia > 9000){ ultimaImpaciencia = ahora; ultimaAccion = ahora; beatImpacientePin(); }
-      else if(Math.random() < .3){ ultimaAccion = ahora; beatEsperaPin(); }
+      else{
+        const r = Math.random();
+        if(r < .22){ ultimaAccion = ahora; beatEsperaPin(); }
+        else if(r < .34){ ultimaAccion = ahora; beatMerodea(); }
+      }
     } else if(miEstado === "WAITING_PLAYERS"){
       if(jugadoresPrevios === 0 && inactivo > 11000 && ahora - ultimaImpaciencia > 9000){ ultimaImpaciencia = ahora; ultimaAccion = ahora; beatImpacienteJugadores(); }
       else {
         const r = Math.random();
-        if(r < .28){ ultimaAccion = ahora; beatInvitaQR(); }
-        else if(r < .42){ ultimaAccion = ahora; beatBus(); }
+        if(r < .24){ ultimaAccion = ahora; beatInvitaQR(); }
+        else if(r < .36){ ultimaAccion = ahora; beatBus(); }
+        else if(r < .48){ ultimaAccion = ahora; beatMerodea(); }
       }
     }
     /* QUIZ_RUNNING / PODIUM: sin deambular — no debe competir por atención con el juego. */
@@ -901,7 +931,7 @@ ir(IDX);
         }, 1000);
       } else {
         beat(()=>{
-          ponPose("wave", 900); mostrarIcono("👋", 1000); decirGlobo("¡Hola! 👋", 1200);
+          ponPose("wave", 900); ponEscala(1.18, 900); mostrarIcono("👋", 1000); decirGlobo("¡Hola! 👋", 1200);
         }, 1000);
       }
     });
@@ -972,7 +1002,7 @@ ir(IDX);
   function iniciarCurso(inicioMs){
     fase("curso");
     miEstado = "QUIZ_RUNNING";
-    if(setpiActorEl){ moverA(PUNTOS.HOME, "walk"); ponPose("wave", 900); setTimeout(()=>ponPose("idle"), 950); setpiGlobo.classList.remove("show"); }
+    if(setpiActorEl){ moverA(PUNTOS.HOME, "walk", .85); ponPose("wave", 900); setTimeout(()=>ponPose("idle"), 950); setpiGlobo.classList.remove("show"); }
     clearInterval(pollLobby);
     clearInterval(tickAnillo);
     tickAnillo = setInterval(()=>{
@@ -986,7 +1016,7 @@ ir(IDX);
         clearInterval(tickAnillo);
         if(miEstado !== "PODIUM" && setpiActorEl){
           miEstado = "PODIUM";
-          pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1300);
+          pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1300); ponEscala(1.4, 1600);
           mostrarIcono("🏆", 1600); decirGlobo("¡Felicitaciones a todos!", 2200);
           setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1400);
         }
