@@ -114,6 +114,23 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 .qr-tx h2{color:var(--cream); font-size:clamp(24px,2.8vw,42px); margin-bottom:1.6vh;}
 .qr-tx p{font-size:clamp(13px,1.2vw,18px); color:var(--blue-soft); line-height:1.5;}
 .qr-tx .link{font-family:'IBM Plex Mono',monospace; font-size:clamp(11px,1vw,14px); color:var(--cream); background:rgba(255,255,255,.1); padding:8px 14px; border-radius:8px; display:inline-block; margin-top:1.6vh; word-break:break-all;}
+/* ---- SETPI junto al QR: se balancea y parpadea solo, y si lo tocan se enoja un instante ---- */
+.qr-hero{position:relative; display:flex; align-items:flex-end; gap:0; margin:.6vh 0 .2vh;}
+.qr-setpi{width:min(10vw,108px); flex:none; margin-right:min(-2.2vw,-22px); z-index:2; cursor:pointer; transform-origin:bottom center; animation:qrBalanceo 3.4s ease-in-out infinite;}
+.qr-hero.bloqueado .qr-setpi{animation-duration:5s; filter:saturate(.75);}
+@keyframes qrBalanceo{0%,100%{transform:rotate(-3deg);} 50%{transform:rotate(3deg) translateY(-3px);}}
+.qr-setpi.enojado{animation:qrEnojo .5s ease-in-out !important;}
+@keyframes qrEnojo{0%,100%{transform:translateX(0) rotate(0);} 20%{transform:translateX(-7px) rotate(-6deg);} 40%{transform:translateX(7px) rotate(6deg);} 60%{transform:translateX(-5px) rotate(-4deg);} 80%{transform:translateX(5px) rotate(4deg);}}
+@keyframes mhTwinkle{0%,100%{opacity:.45; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
+.qr-globo{position:absolute; left:min(2vw,22px); top:-1.6vh; background:#fff; color:var(--navy); font-weight:800; font-size:clamp(10px,.85vw,12px); padding:5px 12px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:translateY(4px) scale(.9); transition:opacity .25s, transform .25s; z-index:3; white-space:nowrap;}
+.qr-globo.show{opacity:1; transform:translateY(0) scale(1);}
+.qr-caja{position:relative; width:min(14vw,148px); height:min(14vw,148px); border-radius:16px; box-shadow:var(--shadow); background:#fff; padding:10px; flex:none; z-index:1;}
+.qr-caja img{width:100%; height:100%; object-fit:contain; border-radius:8px; transition:filter .3s ease, opacity .3s ease;}
+.qr-candado{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(11,31,92,.9); border-radius:16px; color:#fff; text-align:center; padding:8px;}
+.qr-candado-ico{font-size:1.6rem; animation:flotarKF 2.2s ease-in-out infinite;}
+.qr-candado span:last-child{font-size:clamp(8px,.68vw,10.5px); font-weight:700; line-height:1.3;}
+.qr-hero.bloqueado .qr-caja img{filter:blur(7px); opacity:.45;}
+.qr-hero.bloqueado .qr-candado{display:flex;}
 .badge-tema{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.4vh;}
 .badge-tema span{background:rgba(255,255,255,.14); color:var(--cream); font-size:clamp(10px,.9vw,13px); font-weight:700; padding:5px 14px; border-radius:999px;}
 .nav{position:fixed; left:0; right:0; bottom:0; height:60px; display:flex; align-items:center; justify-content:center; gap:14px; background:rgba(1,39,75,.92); backdrop-filter:blur(6px); z-index:50; opacity:0; transition:opacity .3s;}
@@ -545,10 +562,17 @@ slide("cuestionario","navy",`
   <div class="split" style="align-items:stretch; gap:2.4vw">
     <div class="cont entra" style="animation-delay:.05s; justify-content:center">
       <div class="logo-lockup" style="margin-bottom:1vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
-      <h2 class="tit" style="font-size:clamp(24px,2.8vw,40px)">¿Qué tanto quedó claro?</h2>
-      <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, elige tu personaje y espera en la sala. 10 preguntas, puntos por rapidez.</p>
-      <div style="display:flex; align-items:center; gap:1vw">
-        <img src="qr_cuestionario.png" alt="Código QR del cuestionario" width="168" height="168" style="border-radius:14px; box-shadow:var(--shadow); background:#fff; padding:8px; flex:none">
+      <h2 class="tit" style="font-size:clamp(24px,2.8vw,40px)">¿Te subes al reto jurídico?</h2>
+      <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, viste a SETPI a tu manera y espera en la sala. 10 preguntas, puntos por rapidez.</p>
+      <div id="qr-hero" class="qr-hero bloqueado">
+        <div class="qr-setpi" id="qr-setpi" title="Toca a SETPI"></div>
+        <div class="qr-globo" id="qr-globo">¡Vamos!</div>
+        <div class="qr-caja">
+          <img id="qr-img" src="qr_cuestionario.png" alt="Código QR del cuestionario">
+          <div class="qr-candado"><span class="qr-candado-ico">🔒</span><span>Esperando el PIN del anfitrión…</span></div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:1vw; margin-top:.6vh">
         <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.3rem">🏆</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
       </div>
       <span class="link" style="font-size:clamp(9px,.85vw,12px)">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
@@ -654,6 +678,35 @@ ir(IDX);
   const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhPodio = document.getElementById("mh-podio"), mhBtnReiniciar = document.getElementById("mh-btn-reiniciar");
   if(!mhLogin) return; // esta diapositiva no está en esta página
 
+  /* SETPI junto al QR: parpadea solo mientras espera, y si lo tocan se enoja un instante
+     (con sabor a "no me molestes") antes de volver a la normalidad. Puramente decorativo:
+     no cambia si el QR está bloqueado o no. */
+  const qrHero = document.getElementById("qr-hero"), qrSetpi = document.getElementById("qr-setpi"), qrGlobo = document.getElementById("qr-globo");
+  let parpadeoTimer = null;
+  function pintarSetpiHero(cara){ if(qrSetpi) qrSetpi.innerHTML = avatarSVG(cara+":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 108, "cuerpo"); }
+  function iniciarParpadeo(){
+    clearInterval(parpadeoTimer);
+    parpadeoTimer = setInterval(()=>{
+      pintarSetpiHero("feliz_ojo_cerrado");
+      setTimeout(()=>pintarSetpiHero("feliz"), 220);
+    }, 3800);
+  }
+  if(qrSetpi){
+    pintarSetpiHero("feliz"); iniciarParpadeo();
+    qrSetpi.addEventListener("click", ()=>{
+      clearInterval(parpadeoTimer);
+      qrSetpi.classList.remove("enojado"); void qrSetpi.offsetWidth; qrSetpi.classList.add("enojado");
+      pintarSetpiHero("enojado");
+      if(qrGlobo){ qrGlobo.textContent = "¡Oye, ya casi empezamos!"; qrGlobo.classList.add("show"); }
+      setTimeout(()=>{
+        qrSetpi.classList.remove("enojado");
+        pintarSetpiHero("feliz");
+        iniciarParpadeo();
+        if(qrGlobo) qrGlobo.classList.remove("show");
+      }, 1500);
+    });
+  }
+
   let TOKEN = "", pollLobby = null, pollClasif = null, tickAnillo = null;
   let DURACION = 20, TRANSICION = 3, TOTAL_PREGUNTAS = 10;
   const CIRC = 2*Math.PI*44;
@@ -665,6 +718,11 @@ ir(IDX);
     mhCuenta.textContent = jugadores.length + (jugadores.length===1 ? " persona en la sala" : " personas en la sala");
   }
 
+  function caraFeliz(avatar){
+    const partes = String(avatar||"").split(":");
+    partes[0] = "muy_feliz_ojo_cerrado";
+    return partes.join(":");
+  }
   let podioPintado = false;
   async function actualizarPodio(){
     try{
@@ -672,14 +730,15 @@ ir(IDX);
       if(!r.tabla.length) return;
       const top3 = r.tabla.slice(0,3);
       const orden = [top3[1], top3[0], top3[2]];
-      const alturas = [46, 66, 34], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"];
+      const alturas = [78, 116, 58], tamanos = [54, 78, 46], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"], estrellas = ["✨✨","👑 ✨✨✨","✨✨"];
       mhPodio.innerHTML = orden.map((f,i)=>{
         if(!f) return `<div style="width:26%; opacity:.2; height:${alturas[i]}px; background:var(--line); border-radius:6px 6px 0 0"></div>`;
-        const muneco = i===1 ? avatarSVG(f.avatar, 46, "cuerpo") : avatarSVG(f.avatar, 34);
-        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%;">
-          <div style="font-size:clamp(8px,.65vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:1px 6px; margin-bottom:2px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
+        const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
+        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%; position:relative;">
+          <div style="font-size:${i===1?'1.05rem':'.8rem'}; letter-spacing:2px; animation:mhTwinkle 1.6s ease-in-out infinite; margin-bottom:2px;">${estrellas[i]}</div>
+          <div style="font-size:clamp(8px,.68vw,11px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:2px 8px; margin-bottom:3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
           <div style="margin-bottom:-4px">${muneco}</div>
-          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800; font-size:.8rem;">${nums[i]}</div>
+          <div style="width:100%; height:${alturas[i]}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; color:#fff; font-family:Barlow; font-weight:800; font-size:1rem; box-shadow:0 -2px 10px rgba(0,0,0,.12);">${nums[i]}</div>
         </div>`;
       }).join("");
       podioPintado = true;
@@ -738,6 +797,7 @@ ir(IDX);
     if(pin.length !== 4){ mhErr.textContent = "El PIN tiene 4 dígitos."; return; }
     TOKEN = pin;
     try{ sessionStorage.setItem("tj_host_token", TOKEN); }catch(e){}
+    if(qrHero) qrHero.classList.remove("bloqueado");
     mostrarLobby();
   });
   mhPin.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
@@ -763,7 +823,7 @@ ir(IDX);
 
   try{
     const saved = sessionStorage.getItem("tj_host_token");
-    if(saved){ TOKEN = saved; mostrarLobby(); } else { fase("login"); }
+    if(saved){ TOKEN = saved; if(qrHero) qrHero.classList.remove("bloqueado"); mostrarLobby(); } else { fase("login"); }
   }catch(e){ fase("login"); }
 })();
 </script>
