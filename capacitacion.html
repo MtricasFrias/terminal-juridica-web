@@ -114,21 +114,10 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 .qr-tx h2{color:var(--cream); font-size:clamp(24px,2.8vw,42px); margin-bottom:1.6vh;}
 .qr-tx p{font-size:clamp(13px,1.2vw,18px); color:var(--blue-soft); line-height:1.5;}
 .qr-tx .link{font-family:'IBM Plex Mono',monospace; font-size:clamp(11px,1vw,14px); color:var(--cream); background:rgba(255,255,255,.1); padding:8px 14px; border-radius:8px; display:inline-block; margin-top:1.6vh; word-break:break-all;}
-/* ---- SETPI junto al QR: se balancea, parpadea, lo ofrece con la mirada, se impacienta si lo
-   hacen esperar, y si lo tocan se enoja un instante — todo con las capas reales, sin dibujos nuevos. */
-.qr-hero{position:relative; display:flex; align-items:flex-end; gap:0; margin:.8vh 0 .2vh;}
-.qr-setpi{width:min(11vw,118px); flex:none; margin-right:min(-2.4vw,-24px); z-index:2; cursor:pointer; transform-origin:bottom center; animation:qrBalanceo 3.4s ease-in-out infinite;}
-.qr-hero.bloqueado .qr-setpi{animation:qrOfrece 2.6s ease-in-out infinite;}
-@keyframes qrBalanceo{0%,100%{transform:rotate(-3deg);} 50%{transform:rotate(3deg) translateY(-3px);}}
-@keyframes qrOfrece{0%,100%{transform:rotate(-2deg) translateX(0);} 30%{transform:rotate(1deg) translateX(0);} 45%{transform:rotate(5deg) translateX(6px) scale(1.04);} 60%{transform:rotate(1deg) translateX(0);}}
-.qr-setpi.enojado{animation:qrEnojo .5s ease-in-out !important;}
-@keyframes qrEnojo{0%,100%{transform:translateX(0) rotate(0);} 20%{transform:translateX(-7px) rotate(-6deg);} 40%{transform:translateX(7px) rotate(6deg);} 60%{transform:translateX(-5px) rotate(-4deg);} 80%{transform:translateX(5px) rotate(4deg);}}
-.qr-setpi.impaciente{animation:qrImpaciente .55s ease-in-out 4 !important;}
-@keyframes qrImpaciente{0%,100%{transform:translateY(0) rotate(-3deg);} 25%{transform:translateY(-7px) rotate(3deg);} 50%{transform:translateY(0) rotate(-3deg);} 75%{transform:translateY(-7px) rotate(3deg);}}
+/* ---- QR: caja sola (SETPI ya no vive aquí — ver .setpi-stage más abajo) ---- */
+.qr-hero{position:relative; margin:.8vh 0 .2vh;}
 @keyframes mhTwinkle{0%,100%{opacity:.45; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
-.qr-globo{position:absolute; left:min(1vw,14px); top:-2.4vh; background:#fff; color:var(--navy); font-weight:800; font-size:clamp(10px,.85vw,12px); padding:6px 13px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:translateY(4px) scale(.9); transition:opacity .25s, transform .25s; z-index:3; white-space:nowrap;}
-.qr-globo::after{content:""; position:absolute; left:26px; bottom:-6px; border:7px solid transparent; border-top-color:#fff;}
-.qr-globo.show{opacity:1; transform:translateY(0) scale(1);}
+@keyframes mhSube{from{opacity:0; transform:translateY(24px);} to{opacity:1; transform:translateY(0);}}
 .qr-caja{position:relative; width:min(15vw,158px); height:min(15vw,158px); border-radius:16px; box-shadow:var(--shadow); background:#fff; padding:10px; flex:none; z-index:1; transition:box-shadow .3s;}
 .qr-caja img{width:100%; height:100%; object-fit:contain; border-radius:8px; transition:filter .3s ease, opacity .3s ease;}
 .qr-candado{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(11,31,92,.9); border-radius:16px; color:#fff; text-align:center; padding:8px;}
@@ -140,6 +129,55 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 @keyframes qrListo{0%,100%{box-shadow:var(--shadow);} 50%{box-shadow:0 0 0 8px rgba(38,182,122,.22), var(--shadow);}}
 .qr-escanea{position:absolute; right:-6px; top:-14px; background:var(--green,#26B67A); color:#fff; font-size:clamp(8px,.7vw,10px); font-weight:800; padding:4px 9px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:scale(.7); transition:opacity .3s, transform .3s; z-index:3;}
 .qr-hero:not(.bloqueado) .qr-escanea{opacity:1; transform:scale(1);}
+
+/* ---- SETPI: personaje real con posición y pose independientes (sistema de estados en JS).
+   La posición (left/bottom) se anima por transición CSS = caminar/correr; la pose (clase en
+   .setpi-cuerpo) es una transformación (bote, aplastado, inclinado, etc.) del mismo compuesto
+   real de capas — nunca se dibuja nada nuevo, solo se mueve y se deforma el mismo gráfico. */
+.setpi-stage{position:absolute; inset:0; pointer-events:none; z-index:6; overflow:visible;}
+.setpi-actor{position:absolute; left:8%; bottom:4%; width:min(9vw,94px); transition:left 1s cubic-bezier(.4,0,.2,1), bottom 1s cubic-bezier(.4,0,.2,1); will-change:left,bottom; pointer-events:auto; cursor:pointer;}
+.setpi-actor.veloz{transition-duration:.55s;}
+.setpi-actor.instantaneo{transition-duration:0s;}
+.setpi-sombra{position:absolute; left:50%; bottom:-4px; width:70%; height:10px; background:radial-gradient(ellipse at center,rgba(0,0,0,.35),transparent 70%); transform:translateX(-50%); transition:width .3s, opacity .3s;}
+.setpi-cuerpo{position:relative; width:100%; aspect-ratio:640/880; transform-origin:bottom center;}
+.setpi-cuerpo img{position:absolute; inset:0; width:100%; height:100%;}
+.setpi-icono{position:absolute; left:100%; top:-6px; margin-left:2px; font-size:1.1rem; opacity:0; transform:scale(.6) translateY(4px); transition:opacity .2s, transform .2s; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));}
+.setpi-icono.show{opacity:1; transform:scale(1) translateY(0);}
+.setpi-globo{position:absolute; left:50%; bottom:100%; margin-bottom:8px; transform:translateX(-30%) translateY(4px) scale(.9); background:#fff; color:var(--navy); font-weight:800; font-size:clamp(10px,.85vw,12px); padding:6px 13px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transition:opacity .25s, transform .25s; z-index:3; white-space:nowrap; pointer-events:none;}
+.setpi-globo::after{content:""; position:absolute; left:26px; top:100%; border:7px solid transparent; border-top-color:#fff;}
+.setpi-globo.show{opacity:1; transform:translateX(-30%) translateY(0) scale(1);}
+
+/* poses: bob de reposo/caminar, aplastado de salto/aterrizaje, giro de señalar/saludar */
+@keyframes poseIdle{0%,100%{transform:translateY(0) rotate(-1deg);} 50%{transform:translateY(-3px) rotate(1deg);}}
+.pose-idle .setpi-cuerpo{animation:poseIdle 2.6s ease-in-out infinite;}
+@keyframes poseWalk{0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-6px) rotate(3deg);}}
+.pose-walk .setpi-cuerpo{animation:poseWalk .45s ease-in-out infinite;}
+.pose-walk .setpi-sombra{width:52%;}
+@keyframes poseRun{0%,100%{transform:translateY(0) rotate(-6deg) scaleX(1.05);} 50%{transform:translateY(-9px) rotate(6deg) scaleX(1.05);}}
+.pose-run .setpi-cuerpo{animation:poseRun .28s ease-in-out infinite;}
+.pose-run .setpi-sombra{width:40%; opacity:.6;}
+.pose-jump .setpi-cuerpo{animation:poseSalta .7s cubic-bezier(.3,.6,.4,1) both;}
+@keyframes poseSalta{0%{transform:translateY(0) scale(1,1);} 15%{transform:translateY(2px) scale(1.15,.82);} 55%{transform:translateY(-38px) scale(.92,1.08) rotate(6deg);} 100%{transform:translateY(0) scale(1,1);}}
+.pose-jump .setpi-sombra{animation:sombraSalta .7s ease both;}
+@keyframes sombraSalta{0%,100%{width:60%; opacity:.5;} 50%{width:30%; opacity:.22;}}
+.pose-land .setpi-cuerpo{animation:poseAterriza .35s ease both;}
+@keyframes poseAterriza{0%{transform:scale(.9,1.15) translateY(-10px);} 45%{transform:scale(1.2,.78);} 100%{transform:scale(1,1);}}
+.pose-sit .setpi-cuerpo{transform:scale(1.05,.8) translateY(6%);}
+.pose-point .setpi-cuerpo{animation:poseSenala .5s ease both;}
+@keyframes poseSenala{0%{transform:rotate(0);} 40%{transform:rotate(-9deg) scale(1.04);} 100%{transform:rotate(-4deg) scale(1.02);}}
+.pose-wave .setpi-cuerpo{animation:poseSaluda .45s ease-in-out 2;}
+@keyframes poseSaluda{0%,100%{transform:rotate(-5deg);} 50%{transform:rotate(7deg);}}
+.pose-celebrate .setpi-cuerpo{animation:poseCelebra .6s cubic-bezier(.3,.7,.3,1.4) 2;}
+@keyframes poseCelebra{0%{transform:scale(1) translateY(0) rotate(0);} 40%{transform:scale(1.08,.92) translateY(2px) rotate(-6deg);} 70%{transform:scale(.94,1.1) translateY(-26px) rotate(6deg);} 100%{transform:scale(1) translateY(0) rotate(0);}}
+.pose-impatient .setpi-cuerpo{animation:poseImpaciente .5s ease-in-out infinite;}
+@keyframes poseImpaciente{0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-4px) rotate(2deg);}}
+.pose-surprised .setpi-cuerpo{animation:poseSorpresa .4s ease both;}
+@keyframes poseSorpresa{0%{transform:scale(1);} 50%{transform:scale(1.18,.9) translateY(-6px);} 100%{transform:scale(1.05);}}
+.pose-confused .setpi-cuerpo{animation:poseConfundido .5s ease-in-out 2;}
+@keyframes poseConfundido{0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);}}
+.setpi-actor.oculto{opacity:0; pointer-events:none;}
+.setpi-actor.montando{transform-origin:bottom center; animation:montaBus 2.4s ease-in-out infinite;}
+@keyframes montaBus{0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-3px) rotate(2deg);}}
 .badge-tema{display:flex; flex-wrap:wrap; gap:.6vw; margin-top:1.4vh;}
 .badge-tema span{background:rgba(255,255,255,.14); color:var(--cream); font-size:clamp(10px,.9vw,13px); font-weight:700; padding:5px 14px; border-radius:999px;}
 .nav{position:fixed; left:0; right:0; bottom:0; height:60px; display:flex; align-items:center; justify-content:center; gap:14px; background:rgba(1,39,75,.92); backdrop-filter:blur(6px); z-index:50; opacity:0; transition:opacity .3s;}
@@ -569,13 +607,11 @@ slide("cuestionario","navy",`
   ${escenaViva()}
   <p class="eyebrow entra">Ahora te toca a ti</p>
   <div class="split" style="align-items:stretch; gap:2.4vw">
-    <div class="cont entra" style="animation-delay:.05s; justify-content:center">
+    <div class="cont entra" id="stage-cont" style="animation-delay:.05s; justify-content:center; position:relative;">
       <div class="logo-lockup" style="margin-bottom:1vh"><img src="img/setp-logo-color.png" alt="TRANSMUSICAL SETP"></div>
       <h2 class="tit" style="font-size:clamp(24px,2.8vw,40px)">¿Te subes al reto jurídico?</h2>
       <p style="font-size:clamp(12px,1.15vw,17px); color:var(--blue-soft); line-height:1.5">Escanea, viste a SETPI a tu manera y espera en la sala. 10 preguntas, puntos por rapidez.</p>
       <div id="qr-hero" class="qr-hero bloqueado">
-        <div class="qr-setpi" id="qr-setpi" title="Toca a SETPI"></div>
-        <div class="qr-globo" id="qr-globo">¡Vamos!</div>
         <div class="qr-caja">
           <span class="qr-escanea">¡Escanéame!</span>
           <img id="qr-img" src="qr_cuestionario.png" alt="Código QR del cuestionario">
@@ -586,6 +622,14 @@ slide("cuestionario","navy",`
         <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.3rem">🏆</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
       </div>
       <span class="link" style="font-size:clamp(9px,.85vw,12px)">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
+      <div class="setpi-stage" id="setpi-stage" aria-hidden="true">
+        <div class="setpi-actor" id="setpi-actor">
+          <div class="setpi-sombra"></div>
+          <div class="setpi-cuerpo" id="setpi-cuerpo"></div>
+          <div class="setpi-globo" id="setpi-globo"></div>
+          <div class="setpi-icono" id="setpi-icono"></div>
+        </div>
+      </div>
     </div>
     <div class="card entra" id="mini-host" style="animation-delay:.15s; flex:1.3; display:flex; flex-direction:column; min-height:0; background:rgba(255,255,255,.95); color:var(--ink); padding:1.4vw 1.6vw;">
       <div id="mh-login">
@@ -689,49 +733,177 @@ ir(IDX);
   const mhPreguntaNum = document.getElementById("mh-pregunta-num"), mhAnillo = document.getElementById("mh-anillo"), mhAnilloNum = document.getElementById("mh-anillo-num"), mhAnilloWrap = document.getElementById("mh-anillo-wrap"), mhJugandoAhora = document.getElementById("mh-jugando-ahora"), mhPodio = document.getElementById("mh-podio"), mhBtnReiniciar = document.getElementById("mh-btn-reiniciar");
   if(!mhLogin) return; // esta diapositiva no está en esta página
 
-  /* SETPI junto al QR: parpadea y "ofrece" el QR solo, cada tanto dice algo (y si ya se tardaron
-     mucho se impacienta de verdad), y si lo tocan se enoja un instante antes de calmarse. Todo con
-     las capas reales — nada dibujado a mano. */
-  const qrHero = document.getElementById("qr-hero"), qrSetpi = document.getElementById("qr-setpi"), qrGlobo = document.getElementById("qr-globo");
-  let parpadeoTimer = null, cicloIdleTimer = null, cicloIdx = 0;
-  const MENSAJES_IDLE = ["¡Escanéame y entra!", "¿Ya casi empezamos?", "¡La sala te está esperando!", "¡Vamos, no me dejes esperando!"];
-  function pintarSetpiHero(cara){ if(qrSetpi) qrSetpi.innerHTML = avatarSVG(cara+":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 118, "cuerpo"); }
-  function iniciarParpadeo(){
-    clearInterval(parpadeoTimer);
-    parpadeoTimer = setInterval(()=>{
-      pintarSetpiHero("feliz_ojo_cerrado");
-      setTimeout(()=>pintarSetpiHero("feliz"), 220);
-    }, 3800);
+  const qrHero = document.getElementById("qr-hero");
+
+  /* ============================================================================
+     SETPI — sistema de personaje real: posición y pose se manejan por separado.
+     POSITION (left/bottom en % del escenario) se anima por transición CSS = caminar/
+     correr entre puntos de interés. POSE es una clase en .setpi-cuerpo (una deformación
+     del MISMO compuesto de capas reales — nunca se dibuja nada nuevo). Un "corazón"
+     (heartbeat) revisa cada 1.2s el estado actual y, con cooldowns para no repetirse,
+     dispara una de varias "beats" (secuencias cortas guionizadas). Estados mínimos:
+     WAITING_FOR_PIN → WAITING_PLAYERS → QUIZ_RUNNING → PODIUM. ---------------------- */
+  const stageCont = document.getElementById("stage-cont");
+  const setpiActorEl = document.getElementById("setpi-actor");
+  const setpiCuerpo = document.getElementById("setpi-cuerpo");
+  const setpiGlobo = document.getElementById("setpi-globo");
+  const setpiIcono = document.getElementById("setpi-icono");
+  /* puntos elegidos para NUNCA solapar la caja del QR (que ocupa aprox. 0–28% de ancho y
+     24–53% de alto, medido desde abajo, dentro de este mismo contenedor) — SETPI siempre
+     se mueve a la derecha de esa zona. */
+  const PUNTOS = { HOME:{left:60,bottom:9}, QR:{left:31,bottom:30}, BUS:{left:84,bottom:9} };
+  const CAMISA_SETPI = "camisa_azul_alcaldia_setp", SOMBRERO_SETPI = "gorra_alcaldia_ibague";
+
+  let miEstado = "WAITING_FOR_PIN", enBeat = false, jugadoresPrevios = 0;
+  let ultimaAccion = Date.now(), ultimaImpaciencia = 0;
+
+  function pintarSetpi(cara){
+    if(!setpiCuerpo) return;
+    setpiCuerpo.innerHTML = `<img src="img/setpi2/camisas/${CAMISA_SETPI}.png" alt=""><img src="img/setpi2/caras/${cara}.png" alt=""><img src="img/setpi2/sombreros/${SOMBRERO_SETPI}.png" alt="">`;
+  }
+  function ponPose(pose, ms){
+    if(!setpiActorEl) return;
+    const extra = (setpiActorEl.classList.contains("veloz") ? " veloz" : "") + (setpiActorEl.classList.contains("oculto") ? " oculto" : "");
+    setpiActorEl.className = "setpi-actor pose-" + pose + extra;
+    if(ms) setTimeout(()=>{ if(setpiActorEl.classList.contains("pose-"+pose)) ponPose("idle"); }, ms);
+  }
+  function moverA(punto, modo){
+    if(!setpiActorEl) return;
+    setpiActorEl.classList.remove("veloz","instantaneo");
+    if(modo==="run") setpiActorEl.classList.add("veloz");
+    if(modo==="instant") setpiActorEl.classList.add("instantaneo");
+    setpiActorEl.style.left = punto.left + "%";
+    setpiActorEl.style.bottom = punto.bottom + "%";
   }
   function decirGlobo(msg, ms){
-    if(!qrGlobo) return;
-    qrGlobo.textContent = msg; qrGlobo.classList.add("show");
-    setTimeout(()=>qrGlobo.classList.remove("show"), ms || 2600);
+    if(!setpiGlobo) return;
+    setpiGlobo.textContent = msg; setpiGlobo.classList.add("show");
+    setTimeout(()=>setpiGlobo.classList.remove("show"), ms || 2400);
   }
-  function cicloIdle(){
-    const impaciente = cicloIdx>0 && cicloIdx%3===2;
-    decirGlobo(MENSAJES_IDLE[cicloIdx % MENSAJES_IDLE.length]);
-    cicloIdx++;
-    if(impaciente && qrSetpi){
-      qrSetpi.classList.remove("impaciente"); void qrSetpi.offsetWidth; qrSetpi.classList.add("impaciente");
-      pintarSetpiHero("confundido");
-      setTimeout(()=>{ qrSetpi.classList.remove("impaciente"); pintarSetpiHero("feliz"); }, 1300);
-    }
+  function mostrarIcono(ico, ms){
+    if(!setpiIcono) return;
+    setpiIcono.textContent = ico; setpiIcono.classList.add("show");
+    setTimeout(()=>setpiIcono.classList.remove("show"), ms || 1200);
   }
-  if(qrSetpi){
-    pintarSetpiHero("feliz"); iniciarParpadeo();
-    cicloIdleTimer = setInterval(cicloIdle, 8500);
-    setTimeout(cicloIdle, 3200);
-    qrSetpi.addEventListener("click", ()=>{
-      clearInterval(parpadeoTimer);
-      qrSetpi.classList.remove("enojado","impaciente"); void qrSetpi.offsetWidth; qrSetpi.classList.add("enojado");
-      pintarSetpiHero("enojado");
-      decirGlobo("¡Oye, ya casi empezamos!", 1500);
+  function beat(fn, duracionMs){
+    if(enBeat) return false;
+    enBeat = true; fn();
+    setTimeout(()=>{ enBeat = false; }, duracionMs);
+    return true;
+  }
+  const azar = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  /* ---- beats: pequeñas secuencias guionizadas por estado ---- */
+  function beatEsperaPin(){
+    beat(()=>{
+      moverA(PUNTOS.QR, "walk"); ponPose("walk");
+      setTimeout(()=>{ ponPose("idle"); mostrarIcono("🔒", 1400); }, 1050);
+      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 2500);
+      setTimeout(()=>{ ponPose("idle"); }, 3550);
+    }, 3700);
+  }
+  function beatImpacientePin(){
+    beat(()=>{
+      pintarSetpi("preocupado"); ponPose("impatient", 1700);
+      decirGlobo(azar(["¿Ya casi ponen el PIN?","¡Estoy listo para empezar!","Psst… ¡el candado sigue ahí!"]), 2200);
+      setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1750);
+    }, 2500);
+  }
+  function beatPinError(){
+    beat(()=>{
+      pintarSetpi("confundido"); ponPose("confused", 1100);
+      decirGlobo("Mmm… ¿ese PIN está bien?", 1900);
+      setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1150);
+    }, 1950);
+  }
+  /* CRÍTICO: a diferencia de las demás beats (decorativas, pueden saltarse si SETPI ya está
+     haciendo otra cosa), esta SIEMPRE debe correr y SIEMPRE debe llamar a cb() — cb() es lo que
+     revela el QR y la sala. Por eso reclama el estado a la fuerza en vez de usar beat(), que
+     silenciosamente no hace nada si ya había algo en curso (eso rompería el desbloqueo real). */
+  function beatDesbloqueo(cb){
+    enBeat = true;
+    pintarSetpi("sorprendido"); ponPose("surprised");
+    setTimeout(()=>{ pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1250); mostrarIcono("🎉", 1400); }, 450);
+    setTimeout(()=>{ decirGlobo("¡Vamos a jugar!", 1900); mostrarIcono("👍", 1300); }, 1250);
+    setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); enBeat = false; if(cb) cb(); }, 2050);
+  }
+  function beatInvitaQR(){
+    beat(()=>{
+      moverA(PUNTOS.QR, "walk"); ponPose("walk");
+      setTimeout(()=>{ ponPose("point", 950); }, 1050);
+      setTimeout(()=>{ mostrarIcono("👍", 1200); decirGlobo(azar(["¡Escanéame!","¡Entra a jugar!","Aquí está el código 👉"]), 2000); }, 1550);
+      setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 3250);
+      setTimeout(()=>{ ponPose("idle"); }, 4300);
+    }, 4350);
+  }
+  function beatImpacienteJugadores(){
+    beat(()=>{
+      pintarSetpi("preocupado"); ponPose("impatient", 1800);
+      decirGlobo(azar(["¿Nadie va a jugar?","¡La sala los está esperando!","Escanea el QR… ¡vamos!"]), 2200);
+      setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1850);
+    }, 2600);
+  }
+  function beatCelebraJugador(grande){
+    beat(()=>{
+      pintarSetpi("muy_feliz_ojo_cerrado"); ponPose(grande ? "celebrate" : "jump", grande ? 1300 : 700);
+      mostrarIcono(grande ? "🎉" : "✨", 1200);
+      if(grande) decirGlobo("¡Se está llenando la sala!", 1900);
+      setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, grande ? 1450 : 800);
+    }, grande ? 1600 : 950);
+  }
+  function beatBus(){
+    beat(()=>{
+      moverA(PUNTOS.BUS, "run"); ponPose("run");
       setTimeout(()=>{
-        qrSetpi.classList.remove("enojado");
-        pintarSetpiHero("feliz");
-        iniciarParpadeo();
-      }, 1500);
+        ponPose("idle");
+        const subio = Math.random() < .4;
+        if(subio){
+          ponPose("jump", 600);
+          setTimeout(()=>setpiActorEl.classList.add("oculto"), 500);
+          setTimeout(()=>{ setpiActorEl.classList.remove("oculto"); moverA(PUNTOS.HOME, "instant"); ponPose("wave", 900); mostrarIcono("👋", 1200); }, 2100);
+          setTimeout(()=>{ ponPose("idle"); }, 3100);
+        } else {
+          ponPose("wave", 900); mostrarIcono("👋", 1200);
+          setTimeout(()=>{ moverA(PUNTOS.HOME, "walk"); ponPose("walk"); }, 1300);
+          setTimeout(()=>{ ponPose("idle"); }, 2350);
+        }
+      }, 950);
+    }, 3700);
+  }
+
+  /* ---- corazón: decide (con cooldowns) si toca disparar algo, según el estado ---- */
+  function corazonSetpi(){
+    if(document.hidden || enBeat) return;
+    const ahora = Date.now(), inactivo = ahora - ultimaAccion;
+    if(miEstado === "WAITING_FOR_PIN"){
+      if(inactivo > 11000 && ahora - ultimaImpaciencia > 9000){ ultimaImpaciencia = ahora; ultimaAccion = ahora; beatImpacientePin(); }
+      else if(Math.random() < .3){ ultimaAccion = ahora; beatEsperaPin(); }
+    } else if(miEstado === "WAITING_PLAYERS"){
+      if(jugadoresPrevios === 0 && inactivo > 11000 && ahora - ultimaImpaciencia > 9000){ ultimaImpaciencia = ahora; ultimaAccion = ahora; beatImpacienteJugadores(); }
+      else {
+        const r = Math.random();
+        if(r < .28){ ultimaAccion = ahora; beatInvitaQR(); }
+        else if(r < .42){ ultimaAccion = ahora; beatBus(); }
+      }
+    }
+    /* QUIZ_RUNNING / PODIUM: sin deambular — no debe competir por atención con el juego. */
+  }
+  if(setpiActorEl){
+    pintarSetpi("feliz"); ponPose("idle");
+    setInterval(corazonSetpi, 1200);
+    setpiActorEl.addEventListener("click", ()=>{
+      if(enBeat) return;
+      if(miEstado === "WAITING_FOR_PIN"){
+        beat(()=>{
+          pintarSetpi("confundido"); ponPose("confused", 900);
+          decirGlobo("¡Falta el PIN!", 1400);
+          setTimeout(()=>pintarSetpi("feliz"), 950);
+        }, 1000);
+      } else {
+        beat(()=>{
+          ponPose("wave", 900); mostrarIcono("👋", 1000); decirGlobo("¡Hola! 👋", 1200);
+        }, 1000);
+      }
     });
   }
 
@@ -744,6 +916,11 @@ ir(IDX);
   function pintarRoster(jugadores){
     mhRoster.innerHTML = jugadores.map(j=>`<span style="display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;font-size:.72rem;font-weight:700;color:var(--navy);animation:entraKF .35s both;">${avatarSVG(j.avatar,20)}${esc(j.jugador)}</span>`).join("");
     mhCuenta.textContent = jugadores.length + (jugadores.length===1 ? " persona en la sala" : " personas en la sala");
+    if(miEstado === "WAITING_PLAYERS" && jugadores.length > jugadoresPrevios){
+      beatCelebraJugador(jugadores.length >= 4);
+      ultimaAccion = Date.now();
+    }
+    jugadoresPrevios = jugadores.length;
   }
 
   function caraFeliz(avatar){
@@ -770,10 +947,11 @@ ir(IDX);
       const orden = [top3[1], top3[0], top3[2]];
       const tamanos = [46, 66, 40], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"], estrellas = ["✨✨","👑✨✨✨","✨✨"];
       const yaEstaba = podioPintado;
+      const entrada = i => yaEstaba ? "" : `opacity:0; animation:mhSube .5s cubic-bezier(.2,.8,.2,1) ${i===1?0:(i===0?.3:.55)}s forwards;`;
       mhPodio.innerHTML = orden.map((f,i)=>{
         if(!f) return `<div style="width:26%; opacity:.2; height:60px; background:var(--line); border-radius:6px 6px 0 0; align-self:flex-end;"></div>`;
         const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
-        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%;">
+        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%; ${entrada(i)}">
           <div style="font-size:${i===1?'.95rem':'.72rem'}; letter-spacing:1px; animation:mhTwinkle 1.6s ease-in-out infinite;">${estrellas[i]}</div>
           <div style="font-size:clamp(7px,.62vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:2px 7px; margin:2px 0 3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
           <div style="margin-bottom:-4px">${muneco}</div>
@@ -793,6 +971,8 @@ ir(IDX);
      a partir del mismo "inicio", así que este panel nunca se desincroniza de lo que la gente ve. */
   function iniciarCurso(inicioMs){
     fase("curso");
+    miEstado = "QUIZ_RUNNING";
+    if(setpiActorEl){ moverA(PUNTOS.HOME, "walk"); ponPose("wave", 900); setTimeout(()=>ponPose("idle"), 950); setpiGlobo.classList.remove("show"); }
     clearInterval(pollLobby);
     clearInterval(tickAnillo);
     tickAnillo = setInterval(()=>{
@@ -804,6 +984,12 @@ ir(IDX);
         mhPreguntaNum.textContent = "🏆 ¡Cuestionario terminado!";
         mhAnilloWrap.hidden = true;
         clearInterval(tickAnillo);
+        if(miEstado !== "PODIUM" && setpiActorEl){
+          miEstado = "PODIUM";
+          pintarSetpi("muy_feliz_ojo_cerrado"); ponPose("celebrate", 1300);
+          mostrarIcono("🏆", 1600); decirGlobo("¡Felicitaciones a todos!", 2200);
+          setTimeout(()=>{ pintarSetpi("feliz"); ponPose("idle"); }, 1400);
+        }
         return;
       }
       mhPreguntaNum.textContent = "Pregunta " + (idx+1) + " de " + TOTAL_PREGUNTAS;
@@ -831,6 +1017,7 @@ ir(IDX);
     clearInterval(tickAnillo); clearInterval(pollClasif);
     mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo";
     mhAnilloWrap.hidden = false; mhJugandoAhora.textContent = ""; podioPintado = false;
+    miEstado = "WAITING_PLAYERS"; jugadoresPrevios = 0; ultimaAccion = Date.now();
     sondearLobby();
     clearInterval(pollLobby);
     pollLobby = setInterval(sondearLobby, 1400);
@@ -839,20 +1026,32 @@ ir(IDX);
   mhBtnEntrar.addEventListener("click", ()=>{
     mhErr.textContent = "";
     const pin = mhPin.value.trim();
-    if(pin.length !== 4){ mhErr.textContent = "El PIN tiene 4 dígitos."; return; }
+    if(pin.length !== 4){
+      mhErr.textContent = "El PIN tiene 4 dígitos.";
+      if(setpiActorEl) beatPinError();
+      return;
+    }
     TOKEN = pin;
     try{ sessionStorage.setItem("tj_host_token", TOKEN); }catch(e){}
-    if(qrHero) qrHero.classList.remove("bloqueado");
-    mostrarLobby();
+    /* la revelación del QR y la sala se sienten consecuencia del desbloqueo: SETPI celebra
+       primero, y solo entonces aparece todo — nunca antes (pedido explícito del usuario). */
+    if(setpiActorEl) beatDesbloqueo(()=>{ if(qrHero) qrHero.classList.remove("bloqueado"); mostrarLobby(); });
+    else { if(qrHero) qrHero.classList.remove("bloqueado"); mostrarLobby(); }
   });
   mhPin.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
 
+  function avisoPin(btn, textoNormal){
+    btn.textContent = "❌ PIN incorrecto"; btn.disabled = false;
+    if(setpiActorEl) beatPinError();
+    setTimeout(()=>{ btn.textContent = textoNormal; }, 1900);
+  }
   mhBtnIniciar.addEventListener("click", async ()=>{
     mhBtnIniciar.disabled = true; mhBtnIniciar.textContent = "Iniciando…";
+    const textoNormal = "▶ Comenzar cuando estés listo";
     try{
       const r = await api("quizIniciar", TOKEN);
-      if(!r.ok){ alert(r.error || "No se pudo iniciar."); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; return; }
-    }catch(e){ alert(e.message); mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo"; }
+      if(!r.ok){ avisoPin(mhBtnIniciar, textoNormal); return; }
+    }catch(e){ avisoPin(mhBtnIniciar, textoNormal); }
   });
 
   mhBtnReiniciar.addEventListener("click", async ()=>{
@@ -860,10 +1059,9 @@ ir(IDX);
     mhBtnReiniciar.disabled = true; mhBtnReiniciar.textContent = "Reiniciando…";
     try{
       const r = await api("quizReiniciar", TOKEN);
-      if(!r.ok){ alert(r.error || "No se pudo reiniciar."); }
-      else { podioPintado = false; mostrarLobby(); }
-    }catch(e){ alert(e.message); }
-    mhBtnReiniciar.disabled = false; mhBtnReiniciar.textContent = "↺ Reiniciar y jugar de nuevo";
+      if(!r.ok){ avisoPin(mhBtnReiniciar, "↺ Reiniciar y jugar de nuevo"); return; }
+      mhBtnReiniciar.disabled = false; podioPintado = false; mostrarLobby();
+    }catch(e){ avisoPin(mhBtnReiniciar, "↺ Reiniciar y jugar de nuevo"); }
   });
 
   try{
