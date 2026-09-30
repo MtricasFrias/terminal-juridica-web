@@ -56,7 +56,7 @@ button{font:inherit; cursor:pointer;}
 .intro input{width:100%; border:1.5px solid var(--line); border-radius:11px; padding:13px 14px; font-size:1rem; background:var(--paper); color:var(--ink); margin-bottom:16px; font-family:inherit;}
 .intro input:focus{outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(21,155,214,.18);}
 .avatar-preview{display:flex; justify-content:center; margin-bottom:14px;}
-.avatar-preview .marco{width:92px; height:92px; border-radius:50%; background:var(--cyan-soft); display:flex; align-items:center; justify-content:center; animation:floaty 3s ease-in-out infinite;}
+.avatar-preview .marco{width:118px; height:162px; border-radius:20px; background:var(--cyan-soft); display:flex; align-items:center; justify-content:center; animation:floaty 3s ease-in-out infinite; overflow:hidden;}
 .picker-tit{font-size:.78rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.04em; margin:14px 0 8px;}
 .picker-row{display:flex; gap:9px; flex-wrap:wrap;}
 .sw{width:38px; height:38px; border-radius:50%; border:3px solid transparent; padding:0; transition:transform .15s;}
@@ -65,10 +65,10 @@ button{font:inherit; cursor:pointer;}
 .acc-btn.on{border-color:var(--cyan); background:var(--cyan-soft); color:var(--navy);}
 .tabs-personaje{display:flex; gap:6px; margin-bottom:8px;}
 .tab-p{flex:1; background:var(--paper); border:2px solid var(--line); border-radius:10px; padding:7px 4px; font-size:.72rem; font-weight:700; color:var(--muted);}
-.tab-p.on{border-color:var(--royal); background:var(--blue-soft); color:var(--navy);}
+.tab-p.on{border-color:var(--royal); background:var(--cyan-soft); color:var(--navy);}
 .picker-gallery{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-height:190px; overflow-y:auto; padding:4px; background:var(--paper); border-radius:12px; border:1px solid var(--line);}
-.pg-item{border:2.5px solid transparent; border-radius:10px; overflow:hidden; background:var(--cream); line-height:0; aspect-ratio:1/1;}
-.pg-item img{width:100%; height:100%; object-fit:cover; object-position:top;}
+.pg-item{border:2.5px solid transparent; border-radius:10px; overflow:hidden; background:#fff; line-height:0; aspect-ratio:1/1;}
+.pg-item img{width:100%; height:100%; object-fit:contain;}
 .pg-item.on{border-color:var(--cyan); box-shadow:0 0 0 2px var(--cyan-soft);}
 .btn-grande{width:100%; margin-top:20px; padding:15px 18px; border:0; border-radius:14px; color:#fff; background:linear-gradient(135deg,var(--cyan),var(--royal)); font-family:"Barlow",sans-serif; font-weight:800; font-size:16.5px; letter-spacing:.02em; box-shadow:0 12px 26px rgba(21,155,214,.35); transition:transform .14s, box-shadow .14s;}
 .btn-grande:active:not(:disabled){transform:translateY(1px) scale(.99);}
@@ -110,19 +110,20 @@ button{font:inherit; cursor:pointer;}
 .feedback.no{background:var(--red-bg); color:var(--red);}
 .feedback small{display:block; font-weight:600; color:var(--muted); font-size:.76rem; margin-top:2px;}
 .esperando-tx{text-align:center; color:var(--muted); font-size:.85rem; padding:20px 0;}
-.setpi-mira{position:absolute; right:14px; bottom:10px; width:44px; height:44px; opacity:.9; pointer-events:none; animation:setpiVigila 2.6s ease-in-out infinite;}
+.setpi-mira{position:absolute; right:14px; bottom:10px; width:46px; opacity:.92; pointer-events:none; animation:setpiVigila 2.6s ease-in-out infinite; filter:drop-shadow(0 4px 8px rgba(11,31,92,.25));}
 @keyframes setpiVigila{0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-4px) rotate(3deg);}}
 
 /* podio */
 .podio-hero{text-align:center; margin-bottom:6px;}
 .podio-hero .trofeo{font-size:2.4rem; animation:floaty 2.4s ease-in-out infinite;}
-.podio-escenario{position:relative; height:230px; margin:14px 0 8px; display:flex; align-items:flex-end; justify-content:center; gap:8px;}
+.podio-escenario{position:relative; height:268px; margin:14px 0 8px; display:flex; align-items:flex-end; justify-content:center; gap:8px;}
 .pedestal{position:relative; width:30%; border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding-bottom:8px; opacity:0; transform:translateY(40px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
 @keyframes subirPodio{to{opacity:1; transform:translateY(0);}}
 .pedestal .num{font-family:"Barlow",sans-serif; font-weight:800; font-size:1.6rem; color:#fff;}
-.pedestal .nom{position:absolute; top:-30px; left:50%; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 10px; border-radius:999px; white-space:nowrap; max-width:130%; overflow:hidden; text-overflow:ellipsis; box-shadow:var(--shadow);}
-.pedestal .muneco{position:absolute; top:-80px; left:50%; transform:translateX(-50%); animation:floaty 2.6s ease-in-out infinite;}
-.pedestal .muneco svg{width:52px; height:52px;}
+.pedestal .nom{position:absolute; top:-32px; left:50%; transform:translateX(-50%); font-size:.78rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 10px; border-radius:999px; white-space:nowrap; max-width:150%; overflow:hidden; text-overflow:ellipsis; box-shadow:var(--shadow); z-index:2;}
+.pedestal .muneco{position:absolute; top:-96px; left:50%; transform:translateX(-50%); animation:floaty 2.6s ease-in-out infinite;}
+.pedestal.ped-1 .muneco{top:-118px; filter:drop-shadow(0 8px 16px rgba(240,168,0,.5));}
+.pedestal.ped-1 .nom{top:-38px; font-size:.86rem; background:var(--gold-bg); border-color:var(--gold);}
 .ped-1{height:150px; background:linear-gradient(180deg,var(--gold),#a9781f); order:2;}
 .ped-2{height:112px; background:linear-gradient(180deg,var(--royal),var(--navy)); order:1;}
 .ped-3{height:86px; background:linear-gradient(180deg,var(--cyan),var(--navy)); order:3;}
@@ -163,17 +164,17 @@ button{font:inherit; cursor:pointer;}
 
 <div id="p-intro" class="pantalla card intro">
   <h1>¿Qué tanto quedó claro?</h1>
-  <p>10 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Elige tu personaje, entra a la sala y espera: el cuestionario arranca <b>para todos a la vez</b>.</p>
+  <p>10 preguntas sobre derecho de petición, tutela y la Terminal Jurídica. Viste a SETPI a tu manera, entra a la sala y espera: el cuestionario arranca <b>para todos a la vez</b>.</p>
   <div class="avatar-preview"><div class="marco" id="avatar-marco"></div></div>
   <input id="in-nombre" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="40">
-  <div class="picker-tit">Personaje</div>
+  <div class="picker-tit">Viste a SETPI</div>
   <div class="tabs-personaje" id="tabs-personaje"></div>
   <div class="picker-gallery" id="picker-gallery"></div>
   <div class="picker-tit">Accesorio</div>
   <div class="picker-row" id="picker-acc"></div>
   <div class="picker-tit">Lleva en la mano</div>
   <div class="picker-row" id="picker-el"></div>
-  <p style="font-size:.72rem; color:var(--muted); margin:6px 0 0">Te asignamos un look al azar — cámbialo si quieres, o entra tal cual.</p>
+  <p style="font-size:.72rem; color:var(--muted); margin:6px 0 0">Te asignamos un look al azar entre cientos de combinaciones — cámbialo si quieres, o entra tal cual.</p>
   <button id="btn-empezar" class="btn-grande">Entrar a la sala →</button>
   <div class="err" id="err-intro"></div>
   <div class="temas"><span class="tema-chip">Derecho de petición</span><span class="tema-chip">Tutela</span><span class="tema-chip">Coordinación entre áreas</span><span class="tema-chip">Terminal Jurídica</span></div>
@@ -248,19 +249,31 @@ async function api(fn, ...args){
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 function mem(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
 
-/* ---------- personajes: fotos reales de SETPI recortadas de tu mascotario ---------- */
-const PERSONAJES = {
-  traje_azul:"Azul (Principal)", traje_rojo:"Rojo", traje_verde:"Verde", traje_amarillo:"Amarillo", traje_blanco:"Blanco", traje_gris:"Gris", traje_negro:"Negro", traje_naranja:"Naranja", traje_morado:"Morado",
-  tematico_conductor_bus:"Conductor de bus", tematico_pasajero:"Pasajero", tematico_semaforo:"Semáforo", tematico_ciclista:"Ciclista", tematico_obrero:"Obrero de infraestructura",
-  tematico_personal_setp:"Personal SETP", tematico_mecanico:"Mecánico", tematico_inspector:"Inspector", tematico_planificador:"Planificador", tematico_ambiental:"Ambiental",
-  tematico_cultura_tolimense:"Cultura Tolimense", tematico_superheroe:"Superhéroe SETP", tematico_explorador:"Explorador",
-  som_ninguno:"Sin sombrero", som_gorra_setp:"Gorra SETP", som_tolimense:"Sombrero tolimense", som_vueltiao:"Sombrero vueltiao", som_casco_obra:"Casco de obra", som_deportiva:"Gorra deportiva", som_conductor:"Gorra conductor",
-  som_ciclista:"Casco ciclista", som_corona:"Corona", som_explorador:"Sombrero explorador", som_ambiental:"Sombrero ambiental", som_cultural:"Sombrero cultural"
+/* ---------- personajes: SETPI armado por capas reales (cara + camisa + sombrero) ----------
+   Las 27 imágenes ya vienen normalizadas (tools/setpi_normalize.py) al MISMO lienzo de
+   640x880px con la cara, la camisa y el sombrero ya anclados en su sitio — así que combinar
+   cualquier cara + cualquier camisa + cualquier sombrero siempre da el mismo tamaño y el mismo
+   encaje (camisa abajo, cara en medio, sombrero encima), sin importar qué tan distintas eran
+   las fotos originales. */
+const CANVAS_W = 640, CANVAS_H = 880;
+const CARAS = {
+  feliz:"Feliz", muy_feliz_ojo_cerrado:"Muy feliz", feliz_ojo_cerrado:"Feliz (ojos cerrados)", emocionado:"Emocionado",
+  sorprendido:"Sorprendido", confundido:"Confundido", preocupado:"Preocupado", triste:"Triste", enojado:"Enojado"
 };
-const GRUPOS = [
-  ["color", "Colores", Object.keys(PERSONAJES).filter(k=>k.startsWith("traje_"))],
-  ["tematico", "Trajes SETP", Object.keys(PERSONAJES).filter(k=>k.startsWith("tematico_"))],
-  ["sombrero", "Sombreros", Object.keys(PERSONAJES).filter(k=>k.startsWith("som_"))]
+const CAMISAS = {
+  camisa_azul_alcaldia_setp:"Polo azul", camisa_azul_claro_alcaldia_setp:"Polo azul claro", camisa_blanca_alcaldia_setp:"Polo blanco",
+  camisa_verde_alcaldia_setp:"Polo verde", camisa_amarilla_alcaldia_setp:"Polo amarillo", camisa_negro_amarillo_alcaldia_setp:"Polo negro y amarillo",
+  camisa_tolima_alcaldia_setp:"Polo Tolima", ruana_tolima:"Ruana Tolima", ruana_verde:"Ruana verde"
+};
+const SOMBREROS = {
+  gorra_alcaldia_ibague:"Gorra Alcaldía", casco_amarillo_setp:"Casco amarillo SETP", casco_blanco_setpp:"Casco blanco SETP",
+  casco_blanco_iglesia:"Casco blanco", casco_cicla:"Casco ciclista", sombrero_volteado_tolimense:"Sombrero tolimense",
+  sombrero_volteado_tolimense_mujer:"Sombrero tolimense (ala)", sombrero_capitan_verde:"Gorra capitán", sombrero_musico:"Sombrero músico"
+};
+const EJES = [
+  ["cara", "Cara", CARAS, "caras"],
+  ["camisa", "Camisa", CAMISAS, "camisas"],
+  ["sombrero", "Sombrero", SOMBREROS, "sombreros"]
 ];
 const ACCESORIOS = ["ninguno","gafas","corbata","mascarilla","bufanda","audifonos","panuelo","moño"];
 const NOMBRES_ACC = {ninguno:"Ninguno", gafas:"Gafas oscuras", corbata:"Corbata", mascarilla:"Mascarilla", bufanda:"Bufanda", audifonos:"Audífonos", panuelo:"Pañuelo", "moño":"Moño"};
@@ -268,39 +281,50 @@ const ICONO_ACC = {gafas:"🕶️", corbata:"👔", mascarilla:"😷", bufanda:"
 const ELEMENTOS = ["ninguno","mochila","tablet","mapa","llave","radio","cono","semaforo","bandera","megafono","planta","balon","patineta","capa","libro","binoculares","camara"];
 const NOMBRES_EL = {ninguno:"Ninguno", mochila:"Mochila", tablet:"Tablet", mapa:"Mapa", llave:"Llave inglesa", radio:"Radio", cono:"Cono", semaforo:"Semáforo portátil", bandera:"Bandera", megafono:"Megáfono", planta:"Planta", balon:"Balón", patineta:"Patineta", capa:"Capa", libro:"Libro", binoculares:"Binoculares", camara:"Cámara"};
 const ICONO_EL = {mochila:"🎒", tablet:"📱", mapa:"🗺️", llave:"🔧", radio:"📻", cono:"🚧", semaforo:"🚦", bandera:"🚩", megafono:"📢", planta:"🌱", balon:"⚽", patineta:"🛹", capa:"🦸", libro:"📖", binoculares:"🔭", camara:"📷"};
-/* spec = "personaje:accesorio:elemento". El personaje es una foto real (img/setpi/<clave>.png);
-   accesorio y elemento se muestran como insignias pequeñas encima, en vez de intentar dibujarlos
-   sobre la foto (evita que se vean mal pegados). */
-function avatarSVG(spec, sz){
+/* spec = "cara:camisa:sombrero:accesorio:elemento" — 9×9×9 = 729 combinaciones de SETPI,
+   más accesorio/elemento como insignias encima. modo "cuerpo" = SETPI completo (respeta el
+   alto real del lienzo); por defecto (retrato) recorta y hace zoom a la cara para los avatares
+   circulares chiquitos (lista de espera, ranking, podio). */
+function avatarSVG(spec, sz, modo){
   sz = sz || 40;
-  const partes = String(spec||"traje_azul:ninguno:ninguno").split(":");
-  const personaje = PERSONAJES[partes[0]] !== undefined ? partes[0] : "traje_azul";
-  const acc = ACCESORIOS.includes(partes[1]) ? partes[1] : "ninguno";
-  const el = ELEMENTOS.includes(partes[2]) ? partes[2] : "ninguno";
+  const partes = String(spec||"").split(":");
+  const cara = CARAS[partes[0]] !== undefined ? partes[0] : "feliz";
+  const camisa = CAMISAS[partes[1]] !== undefined ? partes[1] : "camisa_azul_alcaldia_setp";
+  const sombrero = SOMBREROS[partes[2]] !== undefined ? partes[2] : "gorra_alcaldia_ibague";
+  const acc = ACCESORIOS.includes(partes[3]) ? partes[3] : "ninguno";
+  const el = ELEMENTOS.includes(partes[4]) ? partes[4] : "ninguno";
+  const capas = `<img src="img/setpi2/camisas/${camisa}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/caras/${cara}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;"><img src="img/setpi2/sombreros/${sombrero}.png" alt="" style="position:absolute; inset:0; width:100%; height:100%;">`;
   const fs = Math.max(11, Math.round(sz*.4));
-  const accIco = ICONO_ACC[acc] ? `<span style="position:absolute; right:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))">${ICONO_ACC[acc]}</span>` : "";
-  const elIco = ICONO_EL[el] ? `<span style="position:absolute; left:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))">${ICONO_EL[el]}</span>` : "";
-  return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none;"><img src="img/setpi/${personaje}.png" width="${sz}" height="${sz}" style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:50%; display:block; background:#fff;" alt="${esc(PERSONAJES[personaje])}">${accIco}${elIco}</span>`;
+  const accIco = ICONO_ACC[acc] ? `<span style="position:absolute; right:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45)); z-index:2;">${ICONO_ACC[acc]}</span>` : "";
+  const elIco = ICONO_EL[el] ? `<span style="position:absolute; left:-3px; bottom:-3px; font-size:${fs}px; line-height:1; filter:drop-shadow(0 1px 1px rgba(0,0,0,.45)); z-index:2;">${ICONO_EL[el]}</span>` : "";
+  if(modo === "cuerpo"){
+    const h = Math.round(sz * CANVAS_H / CANVAS_W);
+    return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}${accIco}${elIco}</span>`;
+  }
+  /* retrato: recorta un cuadro centrado en la cara (1/6 de ancho a la izq., 5/12 de alto arriba) */
+  return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#EAF1FB;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span>${accIco}${elIco}</span>`;
 }
 function busWatermark(color, cls){
   return `<svg class="${cls}" viewBox="0 0 200 90" aria-hidden="true"><rect x="6" y="12" width="176" height="54" rx="14" fill="${color}"/><rect x="6" y="42" width="176" height="8" fill="#D62828"/>${[26,62,98,134].map(x=>`<rect x="${x}" y="22" width="24" height="18" rx="3" fill="#fff"/>`).join("")}<circle cx="188" cy="58" r="5" fill="#F0A800"/>${[46,146].map(x=>`<circle cx="${x}" cy="70" r="13" fill="#0D1730"/><circle cx="${x}" cy="70" r="5.5" fill="#8A93A8"/>`).join("")}</svg>`;
 }
 
-/* look inicial al azar (distinto cada vez que alguien entra, para que no todos se vean iguales
-   si nadie toca el selector — se sortea entre los 34 personajes reales). */
-const CLAVES_PERSONAJE = Object.keys(PERSONAJES);
-let MI_PERSONAJE = CLAVES_PERSONAJE[Math.floor(Math.random()*CLAVES_PERSONAJE.length)], MI_ACC = "ninguno", MI_EL = "ninguno";
-let TAB_ACTIVA = GRUPOS.find(g=>g[2].includes(MI_PERSONAJE))[0];
+/* look inicial al azar por cada eje (distinto cada vez que alguien entra, para que no todos se
+   vean iguales si nadie toca el selector — 9×9×9 = 729 combinaciones posibles de SETPI). */
+function alAzar(obj){ const ks = Object.keys(obj); return ks[Math.floor(Math.random()*ks.length)]; }
+let MI_EJE = { cara: alAzar(CARAS), camisa: alAzar(CAMISAS), sombrero: alAzar(SOMBREROS) };
+let MI_ACC = "ninguno", MI_EL = "ninguno";
+let TAB_ACTIVA = "cara";
 const avatarMarco = document.getElementById("avatar-marco"), tabsPersonaje = document.getElementById("tabs-personaje"), pickerGallery = document.getElementById("picker-gallery"), pickerAcc = document.getElementById("picker-acc"), pickerEl = document.getElementById("picker-el");
-function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(MI_PERSONAJE+":"+MI_ACC+":"+MI_EL, 60); }
+function specActual(){ return [MI_EJE.cara, MI_EJE.camisa, MI_EJE.sombrero, MI_ACC, MI_EL].join(":"); }
+function pintarAvatarPreview(){ avatarMarco.innerHTML = avatarSVG(specActual(), 92, "cuerpo"); }
 function pintarTabs(){
-  tabsPersonaje.innerHTML = GRUPOS.map(g=>`<button type="button" class="tab-p${g[0]===TAB_ACTIVA?" on":""}" data-t="${g[0]}">${g[1]}</button>`).join("");
+  tabsPersonaje.innerHTML = EJES.map(g=>`<button type="button" class="tab-p${g[0]===TAB_ACTIVA?" on":""}" data-t="${g[0]}">${g[1]}</button>`).join("");
   tabsPersonaje.querySelectorAll(".tab-p").forEach(b=>b.addEventListener("click", ()=>{ TAB_ACTIVA = b.dataset.t; pintarTabs(); pintarGaleria(); }));
 }
 function pintarGaleria(){
-  const grupo = GRUPOS.find(g=>g[0]===TAB_ACTIVA);
-  pickerGallery.innerHTML = grupo[2].map(k=>`<button type="button" class="pg-item${k===MI_PERSONAJE?" on":""}" data-k="${k}" title="${esc(PERSONAJES[k])}"><img src="img/setpi/${k}.png" alt="${esc(PERSONAJES[k])}" loading="lazy"></button>`).join("");
-  pickerGallery.querySelectorAll(".pg-item").forEach(b=>b.addEventListener("click", ()=>{ MI_PERSONAJE = b.dataset.k; pintarGaleria(); pintarAvatarPreview(); }));
+  const [ejeId,, opciones, carpeta] = EJES.find(g=>g[0]===TAB_ACTIVA);
+  pickerGallery.innerHTML = Object.keys(opciones).map(k=>`<button type="button" class="pg-item${k===MI_EJE[ejeId]?" on":""}" data-k="${k}" title="${esc(opciones[k])}"><img src="img/setpi2/thumbs/${carpeta}/${k}.png" alt="${esc(opciones[k])}" loading="lazy"></button>`).join("");
+  pickerGallery.querySelectorAll(".pg-item").forEach(b=>b.addEventListener("click", ()=>{ MI_EJE[ejeId] = b.dataset.k; pintarGaleria(); pintarAvatarPreview(); }));
 }
 pintarTabs(); pintarGaleria();
 ACCESORIOS.forEach(k=>{
@@ -329,7 +353,7 @@ function confeti(cont){
 document.getElementById("marca-agua").innerHTML = busWatermark("#00A830","ma-bus1") + busWatermark("#1D4ED8","ma-bus2");
 
 /* ---------- estado y pantallas ---------- */
-let PREGUNTAS = [], DURACION = 20, TRANSICION = 3, TOTAL = 10, NOMBRE = "", MI_AVATAR = "royal:ninguno:ninguno";
+let PREGUNTAS = [], DURACION = 20, TRANSICION = 3, TOTAL = 10, NOMBRE = "", MI_AVATAR = "";
 let PUNTAJE = 0, INICIO = 0, IDX_MOSTRADO = -1, RESPONDIDA = {}, TICK = null;
 
 const pIntro = document.getElementById("p-intro"), pLobby = document.getElementById("p-lobby"), pPregunta = document.getElementById("p-pregunta"), pPodio = document.getElementById("p-podio"), pHost = document.getElementById("p-host");
@@ -347,7 +371,7 @@ async function empezar(){
   const nom = inNombre.value.trim();
   if(nom.length < 2){ errIntro.textContent = "Escribe tu nombre (mínimo 2 letras)."; return; }
   btnEmpezar.disabled = true; btnEmpezar.textContent = "Entrando…"; errIntro.textContent = "";
-  MI_AVATAR = MI_PERSONAJE+":"+MI_ACC+":"+MI_EL;
+  MI_AVATAR = specActual();
   try{
     const r = await api("quizUnirse", nom, MI_AVATAR);
     NOMBRE = nom; mem("quiz_nombre", nom); mem("quiz_avatar", MI_AVATAR);
@@ -410,7 +434,7 @@ const elSetpi = document.getElementById("setpi-mira");
 function mostrarPregunta(idx){
   const q = PREGUNTAS[idx];
   elFeedback.innerHTML = ""; elEsperando.hidden = true;
-  if(elSetpi) elSetpi.innerHTML = avatarSVG("tematico_inspector:ninguno:ninguno", 44);
+  if(elSetpi) elSetpi.innerHTML = avatarSVG("feliz:camisa_azul_alcaldia_setp:gorra_alcaldia_ibague:ninguno:ninguno", 46, "cuerpo");
   ORDEN = barajaEstable(q.opciones.length, NOMBRE + ":" + q.id);
   elContador.textContent = "Pregunta " + (idx+1) + " de " + TOTAL;
   elTema.textContent = q.tema;
@@ -450,7 +474,8 @@ function pintarEscenario(tabla){
   const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"];
   elEscenario.innerHTML = orden.map((f,i)=>{
     if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><span class="num">${num[i]}</span></div>`;
-    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="nom">${esc(f.jugador)}</span><span class="muneco">${avatarSVG(f.avatar,52)}</span><span class="num">${num[i]}°</span></div>`;
+    const muneco = i===1 ? avatarSVG(f.avatar, 74, "cuerpo") : avatarSVG(f.avatar, 54);
+    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><span class="num">${num[i]}°</span></div>`;
   }).join("");
 }
 async function actualizarClasificacion(){
@@ -511,8 +536,10 @@ document.getElementById("host-btn-reiniciar").addEventListener("click", async ()
 
 const guardado = mem("quiz_nombre"); if(guardado) inNombre.value = guardado;
 const avGuardado = mem("quiz_avatar");
-if(avGuardado){ const [p,a,e] = avGuardado.split(":"); if(PERSONAJES[p]!==undefined) MI_PERSONAJE=p; if(ACCESORIOS.includes(a)) MI_ACC=a; if(ELEMENTOS.includes(e)) MI_EL=e;
-  TAB_ACTIVA = GRUPOS.find(g=>g[2].includes(MI_PERSONAJE))[0];
+if(avGuardado){
+  const [c,cm,s,a,e] = avGuardado.split(":");
+  if(CARAS[c]!==undefined) MI_EJE.cara=c; if(CAMISAS[cm]!==undefined) MI_EJE.camisa=cm; if(SOMBREROS[s]!==undefined) MI_EJE.sombrero=s;
+  if(ACCESORIOS.includes(a)) MI_ACC=a; if(ELEMENTOS.includes(e)) MI_EL=e;
   pintarTabs(); pintarGaleria();
   [...pickerAcc.children].forEach((el,i)=>el.classList.toggle("on", ACCESORIOS[i]===MI_ACC));
   [...pickerEl.children].forEach((el,i)=>el.classList.toggle("on", ELEMENTOS[i]===MI_EL));
