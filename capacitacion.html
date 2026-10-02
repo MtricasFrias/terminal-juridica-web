@@ -162,8 +162,10 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
   <button id="btn-next" aria-label="Siguiente">→</button>
   <button id="btn-full" aria-label="Pantalla completa" title="Pantalla completa" style="margin-left:10px">⛶</button>
 </div>
+<script src="setpi/engine.js"></script>
+<script src="setpi/fx.js"></script>
+<script src="setpi/bus.js"></script>
 <script src="setpi/clips.js"></script>
-<script src="setpi/actor.js"></script>
 <script src="setpi/director.js"></script>
 <script>
 /* ===================== ilustraciones SVG reutilizables ===================== */
@@ -684,7 +686,7 @@ ir(IDX);
 
   const qrHero = document.getElementById("qr-hero");
 
-  /* SETPI: sistema de personaje en setpi/ (clips.js, actor.js, director.js). Aquí solo se le AVISA lo que pasa:
+  /* SETPI: sistema de personaje en setpi/ (engine.js, fx.js, bus.js, clips.js, director.js + frames reales en setpi/f). Aquí solo se le AVISA lo que pasa:
      PIN erróneo/desbloqueo, cambio de nº de jugadores y fase (sala → quiz → podio). No modifica nada de la página. */
   const SetpiDir = (window.Setpi && Setpi.init) ? Setpi.init({
     slide: document.getElementById("cuestionario"), stage: document.getElementById("setpi-stage"),
