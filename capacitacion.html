@@ -754,11 +754,13 @@ ir(IDX);
     const yaEstaba = podioPintado;
     const entrada = i => yaEstaba ? "" : `opacity:0; animation:mhSube .5s cubic-bezier(.2,.8,.2,1) ${i===1?0:(i===0?.3:.55)}s forwards;`;
     const pintar = k=>{
-      const alturas = [Hp * .2, Hp * .28, Hp * .14].map(v=>Math.round(v*k)), nomH = Math.max(28, Math.min(56, Hp * .11)) * k;
+      const vw = document.documentElement.clientWidth, numPx = Math.max(18, Math.min(42, vw * .021)), ptsPx = Math.max(11, Math.min(22, vw * .0105));
+      const minB = Math.round((numPx * 1.05 + ptsPx * 1.35 + 20) * k);        // lo que ocupan el número y los puntos
+      const alturas = [Math.max(Hp * .2 * k, minB * 1.12), Math.max(Hp * .28 * k, minB * 1.5), Math.max(Hp * .14 * k, minB)].map(Math.round), nomH = Math.max(28, Math.min(56, Hp * .11)) * k;
       const base = Math.max(34, Math.min(cw * .95, (Hp - alturas[1] - nomH - 8) * 640 / 740)) * k, tamanos = [base * .86, base, base * .78].map(Math.round);
       mhPodio.style.setProperty("--ps", k.toFixed(3));
       mhPodio.innerHTML = orden.map((f,i)=>{
-        if(!f) return `<div style="width:30%; opacity:.2; height:${alturas[i]}px; background:var(--line); border:3px solid var(--navy); border-bottom:0; border-radius:8px 8px 0 0; align-self:flex-end;"></div>`;
+        if(!f) return `<div class="mh-ped" style="opacity:.45"><div class="mh-bloque" style="height:${alturas[i]}px; background:#E8EDF5"><span class="mh-num">${nums[i]}</span></div></div>`;
         const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "podio");
         return `<div class="mh-ped${i===1?" p1":""}" style="${entrada(i)}">
           <div class="mh-nom">${esc(f.jugador)}</div>
