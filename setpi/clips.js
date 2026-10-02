@@ -17,7 +17,7 @@
     /* ---- saludar ---- */
     /* un SOLO saludo, con una sola mano, lento: sube, se mantiene con un balanceo suave y baja. (side -1 = mano izquierda, 1 = derecha;
        los saludos se reparten en el tiempo y alternan de lado entre uno y otro, nunca dentro del mismo) */
-    waveF: (side, hold) => { const f = side < 0 ? 'wave_f2' : 'wave_f3'; return [T('wave_f1', .26, { fade: .1 }), T(f, .24, { fade: .1 }), T(f, hold || 1.8, { sway: { a: 1.4, p: 1.3 } }), T('wave_f4', .24, { fade: .1 }), T('idle_a', .08, { fade: .1 })]; },
+    waveF: (side, hold) => { const f = side < 0 ? 'wave_f2' : 'wave_f3'; return [T('wave_f1', .26, { fade: .1 }), T(f, .24, { fade: .1 }), T(f, Math.min(hold || 1.8, 1.1), { sway: { a: 2.6, p: .8 } }), T('wave_f4', .24, { fade: .1 }), T('idle_a', .08, { fade: .1 })]; },
     /* saludo de 3/4: la misma mano mueve la muñeca despacio (dos dibujos reales, ~.4 s cada uno) */
     waveR: n => [T('wave34_1', .24, { fade: .08 })].concat(rep([T('wave34_2', .4), T('wave34_3', .4)], n || 2), [T('wave34_2', .3), T('wave34_1', .22), T('turn_34', .08, { fade: .08 })]),
 

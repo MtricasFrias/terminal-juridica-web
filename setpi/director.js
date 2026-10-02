@@ -98,21 +98,21 @@
       if (a.stance === 'F') { a.face(dx >= 0 ? 1 : -1); await a.play(C.turnFR()); }
       else if (Math.abs(dx) > 6 && a.facing !== (dx >= 0 ? 1 : -1) && !o.diag) { await a.play(C.turnRF()); a.face(dx >= 0 ? 1 : -1); await a.play(C.turnFR()); }
       setState('WALKING');
-      await a.moveTo(x, y, { speed: a.S * (o.speed || 1.5), gait: 'run' });
+      await a.moveTo(x, y, { speed: a.S * (o.speed || 1.8), gait: 'run' });
       a.rest('R');
     }
     /* un tramo hacia (x,y): casi vertical hacia abajo = de frente caminando hacia la cámara; en cualquier otro caso corre en diagonal */
     async function leg(x, y, o) {
       o = o || {}; const dx = x - a.x, dy = y - a.y;
-      if (dy < -.25 * a.S && Math.abs(dx) < -.3 * dy && !o.run && S.Frames.has('back_1')) { await backLeg(x, y); return; }
+      if (dy < -.25 * a.S && Math.abs(dx) < -.3 * dy && !o.run && S.Frames.has('back_6')) { await backLeg(x, y); return; }
       if (dy > 0 && Math.abs(dx) < .3 * dy && dy > .25 * a.S && !o.run) {
-        await front(); setState('WALKING'); await a.moveTo(x, y, { gait: 'front', speed: a.S * .8, ramp: a.S * .25 }); a.rest('F');
+        await front(); setState('WALKING'); await a.moveTo(x, y, { gait: 'front', speed: a.S * 1, ramp: a.S * .25 }); a.rest('F');
       } else await runLeg(x, y, { diag: Math.abs(dy) > 8, speed: o.speed });
     }
     /* hacia arriba (alejándose de la cámara): camina de ESPALDAS; al llegar gira de caricatura y queda de frente */
     async function backLeg(x, y) {
       setState('WALKING'); await front(); await a.spin('back_1');
-      await a.moveTo(x, y, { gait: 'back', speed: a.S * .8, ramp: a.S * .25 });
+      await a.moveTo(x, y, { gait: 'back', speed: a.S * 1, ramp: a.S * .25 });
       await a.spin('idle_a'); a.rest('F');
     }
     /* planifica el camino libre de obstáculos: recto, o con un punto intermedio (evita correr en vertical hacia arriba: no hay frames de espaldas) */
@@ -167,7 +167,7 @@
        y como mucho 3 en 6 min. De frente con una mano (alterna de lado), de frente con la muñeca, o girando a 3/4 con la muñeca. */
     let waveQ = [], waveLast = '';
     const nextWave = () => {
-      if (!waveQ.length) { waveQ = ['fl', 'fr', 'w', 'r'].filter(v => v !== 'w' || S.Frames.has('wavew_1')); for (let i = waveQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [waveQ[i], waveQ[j]] = [waveQ[j], waveQ[i]]; } if (waveQ[waveQ.length - 1] === waveLast) waveQ.unshift(waveQ.pop()); }
+      if (!waveQ.length) { waveQ = ['w', 'r', 'w', 'r', Math.random() < .5 ? 'fl' : 'fr'].filter(v => v !== 'w' || S.Frames.has('wavew_1')); for (let i = waveQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [waveQ[i], waveQ[j]] = [waveQ[j], waveQ[i]]; } if (waveQ[waveQ.length - 1] === waveLast) waveQ.unshift(waveQ.pop()); }
       return waveLast = waveQ.pop();
     };
     const waveOK = () => { D.waveLog = (D.waveLog || []).filter(t => D.t - t < 360); return D.t - (D.lastWave || -99) >= 40 && D.waveLog.length < 3; };

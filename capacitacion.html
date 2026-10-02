@@ -33,6 +33,7 @@ button{font-family:inherit; cursor:pointer;}
 #deck{position:relative; width:100vw; height:100vh; overflow:hidden;}
 .slide{position:absolute; inset:0; display:flex; flex-direction:column; padding:6.5vh 6.5vw 10.5vh; opacity:0; pointer-events:none; transition:opacity .5s ease; background:var(--cream); color:var(--ink);}
 .slide.activa{opacity:1; pointer-events:auto; z-index:1;}
+.slide:not(.activa) *{animation-play-state:paused!important;}      /* las diapositivas que no se ven no gastan animación (había ~35 corriendo escondidas) */
 .slide.navy{background:linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%); color:var(--cream);}
 .slide.cream2{background:linear-gradient(160deg, var(--cream) 0%, #ECE6D8 100%);}
 
@@ -151,13 +152,13 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
   .qr-box img{width:min(56vw,260px); height:min(56vw,260px);}
 }
 .mh-ped{display:flex; flex-direction:column; align-items:center; width:30%;}
-.mh-nom{font-size:clamp(14px,1.55vw,32px); font-weight:800; line-height:1.08; text-align:center; color:var(--navy); background:#fff; border:3px solid var(--navy); border-radius:18px; padding:.12em .55em; margin:2px 0 4px; max-width:100%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break:break-word; box-shadow:3px 3px 0 rgba(11,31,92,.25);}
-.mh-ped.p1 .mh-nom{font-size:clamp(16px,1.85vw,38px); background:#FFE9A8;}
+.mh-nom{font-size:calc(clamp(12px,1.12vw,24px) * var(--ps,1)); font-weight:800; line-height:1.1; text-align:center; color:var(--navy); background:#fff; border:2px solid var(--navy); border-radius:14px; padding:.1em .5em; margin:2px 0 3px; max-width:100%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; word-break:break-word; box-shadow:2px 2px 0 rgba(11,31,92,.22);}
+.mh-ped.p1 .mh-nom{font-size:calc(clamp(13px,1.3vw,28px) * var(--ps,1)); background:#FFE9A8;}
 .mh-bloque{position:relative; width:100%; border:4px solid var(--navy); border-bottom:0; border-radius:8px 8px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--navy); font-family:Barlow,sans-serif; box-shadow:4px 0 0 rgba(11,31,92,.3); overflow:hidden;}
 .mh-bloque::before{content:""; position:absolute; left:0; right:0; top:0; height:24%; background:rgba(255,255,255,.42);}
 .mh-bloque span{position:relative;}
-.mh-num{font-weight:900; font-size:clamp(20px,2.6vw,52px); line-height:1; text-shadow:0 1.5px 0 rgba(255,255,255,.5);}
-.mh-pts-ticker{font-size:clamp(12px,1.35vw,28px); font-weight:800; margin-top:2px;}
+.mh-num{font-weight:900; font-size:calc(clamp(18px,2.1vw,42px) * var(--ps,1)); line-height:1; text-shadow:0 1.5px 0 rgba(255,255,255,.5);}
+.mh-pts-ticker{font-size:calc(clamp(11px,1.05vw,22px) * var(--ps,1)); font-weight:800; margin-top:2px;}
 .mh-ped{min-width:0;}
 .p-oro{background:#F6B91D;} .p-plata{background:#C9D1DC;} .p-bronce{background:#D58A4A;}
 </style>
@@ -676,6 +677,7 @@ ir(IDX);
   const CANVAS_W = 640, CANVAS_H = 880;
   const CARAS_OK = ["confundido","emocionado","enojado","feliz","feliz_ojo_cerrado","muy_feliz_ojo_cerrado","preocupado","sorprendido","triste"];
   const CAMISAS_OK = ["camisa_amarilla_alcaldia_setp","camisa_azul_alcaldia_setp","camisa_azul_claro_alcaldia_setp","camisa_blanca_alcaldia_setp","camisa_negro_amarillo_alcaldia_setp","camisa_tolima_alcaldia_setp","camisa_verde_alcaldia_setp","ruana_tolima","ruana_verde"];
+  const SOMBRERO_TOP = {"casco_amarillo_setp":128,"casco_blanco_iglesia":135,"casco_blanco_setpp":136,"casco_cicla":129,"gorra_alcaldia_ibague":150,"sombrero_capitan_verde":180,"sombrero_musico":40,"sombrero_volteado_tolimense":179,"sombrero_volteado_tolimense_mujer":188};   // primera fila con color de cada sombrero (de 880)
   const SOMBREROS_OK = ["casco_amarillo_setp","casco_blanco_iglesia","casco_blanco_setpp","casco_cicla","gorra_alcaldia_ibague","sombrero_capitan_verde","sombrero_musico","sombrero_volteado_tolimense","sombrero_volteado_tolimense_mujer"];
   /* mismo sistema de capas (cara+camisa+sombrero) que en cuestionario.html: spec = "cara:camisa:sombrero" */
   function avatarSVG(spec, sz, modo){
@@ -688,6 +690,10 @@ ir(IDX);
     if(modo === "cuerpo"){
       const h = Math.round(sz * CANVAS_H / CANVAS_W);
       return `<span style="position:relative; display:inline-block; width:${sz}px; height:${h}px; flex:none;">${capas}</span>`;
+    }
+    if(modo === "podio"){          // como "cuerpo" pero recortado arriba (según el sombrero) y abajo: sin el hueco vacío sobre la cabeza
+      const k = sz / CANVAS_W, t = Math.max(0, (SOMBRERO_TOP[sombrero] || 130) - 8), H = 812 - t;
+      return `<span style="position:relative; display:inline-block; width:${sz}px; height:${Math.round(H * k)}px; overflow:hidden; flex:none;"><span style="position:absolute; left:0; top:${-Math.round(t * k)}px; width:${sz}px; height:${Math.round(CANVAS_H * k)}px;">${capas}</span></span>`;
     }
     return `<span style="position:relative; display:inline-block; width:${sz}px; height:${sz}px; flex:none; border-radius:50%; overflow:hidden; background:#fff;"><span style="position:absolute; width:${sz*4/3}px; height:${sz*11/6}px; left:${-sz/6}px; top:${-sz*5/12}px;">${capas}</span></span>`;
   }
@@ -738,45 +744,60 @@ ir(IDX);
       if(t<1) requestAnimationFrame(tick);
     })(t0);
   }
-  let podioPintado = false, podioSig = "";
-  async function actualizarPodio(){
-    if(!slideActiva()) return;
-    {
-      const r = await api("quizClasificacion");
-      mhJugandoAhora.innerHTML = Ico("jugadores") + " " + r.jugadores + (r.jugadores===1 ? " persona jugando ahora" : " personas jugando ahora");
-      if(!r.tabla.length) return;
-      const top3 = r.tabla.slice(0,3);
-      if(SetpiDir) SetpiDir.leaderboard(top3.map(f=>({ nombre:f.jugador, puntos:f.puntos })), r.jugadores);
-      const sig = JSON.stringify(top3.map(f=>[f.jugador, f.puntos, f.avatar])) + mhPodio.clientHeight + "x" + mhPodio.clientWidth;
-      if(sig === podioSig) return;                 // sin cambios: no se repinta (evita parpadeo)
-      podioSig = sig;
-      const orden = [top3[1], top3[0], top3[2]];
-      const clases = ["p-plata","p-oro","p-bronce"], nums = ["2°","1°","3°"];
-      /* tamaños según el espacio real del panel: SETPI y su nombre ocupan todo lo que se pueda (se leen desde lejos en el proyector) */
-      const Hp = mhPodio.clientHeight || 320, Wp = mhPodio.clientWidth || 560, cw = Wp * .28;
-      const alturas = [Hp * .2, Hp * .28, Hp * .14].map(Math.round), nomH = Math.max(34, Math.min(80, Hp * .15));
-      const base = Math.max(40, Math.min(cw * .95, (Hp - alturas[1] - nomH - 8) * 640 / 880)), tamanos = [base * .86, base, base * .78].map(Math.round);
-      const yaEstaba = podioPintado;
-      const entrada = i => yaEstaba ? "" : `opacity:0; animation:mhSube .5s cubic-bezier(.2,.8,.2,1) ${i===1?0:(i===0?.3:.55)}s forwards;`;
+  let podioPintado = false, podioSig = "", ultimoTop3 = null;
+  /* Dibuja el podio con el factor de tamaño `k` y lo ajusta MIDIENDO: si SETPI + nombre + bloque no caben en el alto real del panel
+     (depende de la pantalla y de la tipografía), se reduce hasta que quepan, así nunca tapa el contador ni la cuenta de jugadores. */
+  function dibujarPodio(top3){
+    const orden = [top3[1], top3[0], top3[2]];
+    const clases = ["p-plata","p-oro","p-bronce"], nums = ["2°","1°","3°"];
+    const Hp = mhPodio.clientHeight || 320, Wp = mhPodio.clientWidth || 560, cw = Wp * .28;
+    const yaEstaba = podioPintado;
+    const entrada = i => yaEstaba ? "" : `opacity:0; animation:mhSube .5s cubic-bezier(.2,.8,.2,1) ${i===1?0:(i===0?.3:.55)}s forwards;`;
+    const pintar = k=>{
+      const alturas = [Hp * .2, Hp * .28, Hp * .14].map(v=>Math.round(v*k)), nomH = Math.max(28, Math.min(56, Hp * .11)) * k;
+      const base = Math.max(34, Math.min(cw * .95, (Hp - alturas[1] - nomH - 8) * 640 / 740)) * k, tamanos = [base * .86, base, base * .78].map(Math.round);
+      mhPodio.style.setProperty("--ps", k.toFixed(3));
       mhPodio.innerHTML = orden.map((f,i)=>{
         if(!f) return `<div style="width:30%; opacity:.2; height:${alturas[i]}px; background:var(--line); border:3px solid var(--navy); border-bottom:0; border-radius:8px 8px 0 0; align-self:flex-end;"></div>`;
-        const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
+        const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "podio");
         return `<div class="mh-ped${i===1?" p1":""}" style="${entrada(i)}">
           <div class="mh-nom">${esc(f.jugador)}</div>
-          <div style="margin-bottom:-6px">${muneco}</div>
+          <div style="margin-bottom:-4px; line-height:0">${muneco}</div>
           <div class="mh-bloque ${clases[i]}" style="height:${alturas[i]}px"><span class="mh-num">${nums[i]}</span><span class="mh-pts-ticker" data-pts="${f.puntos}">0 pts</span></div>
         </div>`;
       }).join("");
-      if(!yaEstaba) mhPodio.querySelectorAll(".mh-pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 300+i*180));
-      else mhPodio.querySelectorAll(".mh-pts-ticker").forEach(el=>{ el.textContent = el.dataset.pts + " pts"; });
-      podioPintado = true;
+    };
+    let k = 1; pintar(k);
+    for(let i=0; i<4; i++){
+      const alto = Math.max(0, ...[...mhPodio.children].map(c=>c.offsetHeight));
+      if(alto <= Hp * .985 || k < .45) break;
+      k = Math.max(.4, k * Hp * .97 / alto); pintar(k);
     }
+    if(!yaEstaba) mhPodio.querySelectorAll(".mh-pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 300+i*180));
+    else mhPodio.querySelectorAll(".mh-pts-ticker").forEach(el=>{ el.textContent = el.dataset.pts + " pts"; });
+    podioPintado = true;
+  }
+  function limpiarPodio(){ mhPodio.innerHTML = ""; podioSig = ""; podioPintado = false; ultimoTop3 = null; }
+  if("ResizeObserver" in window) new ResizeObserver(()=>{ if(ultimoTop3 && mhPodio.clientHeight) dibujarPodio(ultimoTop3); }).observe(mhPodio);
+  async function actualizarPodio(){
+    if(!slideActiva()) return;
+    const r = await api("quizClasificacion");
+    const txt = Ico("jugadores") + " " + r.jugadores + (r.jugadores===1 ? " persona jugando ahora" : " personas jugando ahora");
+    if(mhJugandoAhora.dataset.t !== txt){ mhJugandoAhora.dataset.t = txt; mhJugandoAhora.innerHTML = txt; }
+    if(!r.tabla.length){ if(ultimoTop3) limpiarPodio(); return; }          // sin resultados (sesión nueva): no queda el podio de la anterior
+    const top3 = r.tabla.slice(0,3);
+    if(SetpiDir) SetpiDir.leaderboard(top3.map(f=>({ nombre:f.jugador, puntos:f.puntos })), r.jugadores);
+    const sig = JSON.stringify(top3.map(f=>[f.jugador, f.puntos, f.avatar]));
+    if(sig === podioSig) return;                 // sin cambios: no se repinta (evita parpadeo)
+    podioSig = sig; ultimoTop3 = top3;
+    dibujarPodio(top3);
   }
 
   /* mismo reloj compartido que usan los celulares: todos calculan la MISMA pregunta actual
      a partir del mismo "inicio", así que este panel nunca se desincroniza de lo que la gente ve. */
   function iniciarCurso(inicioMs){
     fase("curso");
+    limpiarPodio(); mhJugandoAhora.textContent = ""; mhJugandoAhora.dataset.t = ""; mhAnilloWrap.hidden = false;
     setpiFase("quiz");
     if(pollLobby) pollLobby.stop();
     clearInterval(tickAnillo);
@@ -813,7 +834,7 @@ ir(IDX);
 
   function mostrarLobby(){
     fase("lobby");
-    ROSTER.clear(); podioSig = "";
+    ROSTER.clear(); limpiarPodio();
     clearInterval(tickAnillo); if(pollClasif) pollClasif.stop();
     mhBtnIniciar.disabled = false; mhBtnIniciar.innerHTML = Ico("play") + " Comenzar cuando estés listo";
     mhAnilloWrap.hidden = false; mhJugandoAhora.textContent = ""; podioPintado = false;
@@ -853,14 +874,15 @@ ir(IDX);
     }catch(e){ avisoPin(mhBtnIniciar, textoNormal); }
   });
 
+  const TXT_REINICIAR = "↺ Reiniciar y jugar de nuevo";
   mhBtnReiniciar.addEventListener("click", async ()=>{
     if(!confirm("¿Borrar los resultados y volver a la sala de espera para jugar de nuevo?")) return;
     mhBtnReiniciar.disabled = true; mhBtnReiniciar.textContent = "Reiniciando…";
     try{
       const r = await api("quizReiniciar", TOKEN);
-      if(!r.ok){ avisoPin(mhBtnReiniciar, "↺ Reiniciar y jugar de nuevo"); return; }
-      mhBtnReiniciar.disabled = false; podioPintado = false; mostrarLobby();
-    }catch(e){ avisoPin(mhBtnReiniciar, "↺ Reiniciar y jugar de nuevo"); }
+      if(!r.ok){ avisoPin(mhBtnReiniciar, TXT_REINICIAR); return; }
+      mhBtnReiniciar.disabled = false; mhBtnReiniciar.textContent = TXT_REINICIAR; podioPintado = false; mostrarLobby();
+    }catch(e){ avisoPin(mhBtnReiniciar, TXT_REINICIAR); }
   });
 
   try{

@@ -37,7 +37,7 @@
       if (Math.random() < .55) { const s = P.spot(); await P.goTo(s.x, s.y); await P.front(); await a.play(C.search(-d)); fin(); }
     }, ['search']);
     def('wander', 'move', 8, c => c.ph === 'quiz' ? .5 : c.ph === 'podium' ? 1.2 : 2.6, async () => {
-      const s = P.spot(); await P.goTo(s.x, s.y, { speed: rnd(1.15, 1.7) });
+      const s = P.spot(); await P.goTo(s.x, s.y, { speed: rnd(1.5, 2.1) });
       if (a.stance === 'R' && D.energy > .55 && Math.random() < .25) await P.jump('R', .24);
       if (a.stance === 'R' && Math.random() < .4) { await hold(rnd(.4, 1)); }                     // a veces se queda un momento de perfil antes de volverse
       await P.front();

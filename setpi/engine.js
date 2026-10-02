@@ -18,8 +18,9 @@
       const self = this;
       return fetch(base + 'frames.json').then(r => r.json()).then(j => {
         self.meta = j.frames; self.ref = j.ref;
-        const names = Object.keys(j.frames), order = CORE.concat(names.filter(n => CORE.indexOf(n) < 0));
-        const mk = n => new Promise(res => { const i = new Image(); i.onload = () => { self.ok[n] = true; res(); }; i.onerror = () => res(); i.decoding = 'async'; i.src = base + 'f/' + n + '.webp'; self.img[n] = i; });
+        const early = /^(walkf|back|turn|wave|wavew|wave34|like|around|lookuser|surp|point|jump|no|clap|cele|watch|search|selfie|stretch|dance|bench|sit|yawn|nod|sleep|wake|think|lupa|tablet|peek|spy|bus|bwin|bexit)/;
+        const names = Object.keys(j.frames).sort((p, q) => (early.test(q) ? 1 : 0) - (early.test(p) ? 1 : 0)), order = CORE.concat(names.filter(n => CORE.indexOf(n) < 0));
+        const mk = n => new Promise(res => { const i = new Image(); i.onload = () => { self.ok[n] = true; if (i.decode) i.decode().catch(() => { }); res(); }; i.onerror = () => res(); i.decoding = 'async'; i.src = base + 'f/' + n + '.webp'; self.img[n] = i; });
         const core = Promise.all(CORE.map(mk));
         core.then(() => { order.slice(CORE.length).forEach(mk); });
         return core;
@@ -153,6 +154,7 @@
           this._frame(a.i + 1);
         }
       }
+      if (a && !this.pose.sway && !this.walk && (a.frames[a.i].t || 0) >= .4) { const p = this.pose; this.mod.sy = (p.sy || 1) * (1 + .0045 * Math.sin(this.t * 2.6)); this.mod.rot = (p.rot || 0) + .6 * Math.sin(this.t * 1.9 + 1); this.dirty = true; }   // una pose sostenida no se queda congelada
       if (this.pose.sway) { const w = this.pose.sway; this.mod.rot = (this.pose.rot || 0) + w.a * Math.sin(this.t * 6.2832 / w.p); this.dirty = true; }   // balanceo suave y continuo mientras dura el frame
       this._walk(dt);
       if (this.autoIdle && !this.anim && !this.walk) this._idle(dt);
@@ -190,8 +192,9 @@
       if (w.gait === 'run') { if (Math.abs(dx) > 1.5) this.facing = dx > 0 ? 1 : -1; }
       // ciclo atado a la distancia recorrida: una zancada (6 frames) = stride px
       const names = w.gait === 'run' ? ['run_1', 'run_2', 'run_3', 'run_4', 'run_5', 'run_6'] : w.gait === 'back' ? ['back_1', 'back_2', 'back_3', 'back_4', 'back_5', 'back_6'] : ['walkf_1', 'walkf_2', 'walkf_3', 'walkf_4', 'walkf_5', 'walkf_6'];
-      const stride = this.S * (w.gait === 'run' ? 1.05 : .62);
-      w.ct += st / stride * 6; w.ci = Math.floor(w.ct) % 6;
+      /* cadencia: antes la carrera salia a ~6-9 dibujos por segundo (se veía a saltos). Zancada más corta + mínimo de ritmo (aunque arranque o frene) */
+      const stride = Math.min(this.S * (w.gait === 'run' ? .8 : .5), (w.speed || 1) / 1.7);
+      w.ct += Math.max(st / stride * 6, dt * 7.5); w.ci = Math.floor(w.ct) % 6;
       const f = names[w.ci]; if (this.pose.f !== f) this._setPose({ f });
       this.stance = w.gait === 'run' ? 'R' : 'F';
       this.dirty = true;
@@ -215,7 +218,7 @@
       if (!S.Frames.meta || !this.cvW) return;
       const ctx = this.ctx; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.cv.width, this.cv.height);
       const flip = this.facing;
-      let f = this.pose.f; if (!S.Frames.has(f)) f = 'idle_a';
+      let f = this.pose.f; if (!S.Frames.has(f)) f = this._good || 'idle_a'; else this._good = f;
       if (this.prev && this.xfDur) {
         const p = clamp(this.xf / this.xfDur, 0, 1);
         this._blit(ctx, this.prev.f in S.Frames.meta ? this.prev.f : 'idle_a', this.prev.mod, this.prev.flip, 1);
