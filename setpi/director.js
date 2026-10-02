@@ -236,9 +236,11 @@
       for (let i = 0; i < 9 && y < l.yL && hr(xn) < (RIDE.l3 + .06) * s; i++) { y = Math.min(l.yL, y + 14); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; }
       if (hr(xn) < (RIDE.l3 + .03) * s) return null;
       const k = s / 100;
-      if (xn - .45 * s < xMinAt(y) || !valid(clamp(xn - RIDE.wait * s, l.xMin, l.xMaxAt(y)), y)) return null;
+      /* dónde espera SETPI antes de que llegue el bus: lo más atrás posible; en pantallas angostas se pega más a la puerta */
+      let wait = null; for (const w of [RIDE.wait, .45, .3, .15]) { const wx = xn - w * s; if (wx >= xMinAt(y) && valid(wx, y)) { wait = w; break; } }
+      if (wait == null) return null;
       const ws = Math.min(.9, ((wantW ? hrW() : -1e9) + .36 * s - 6) / (.69 * s));       // escala con la que SETPI cabe en la ventanilla sin tocar el texto de arriba
-      return { y, s, k, xn, win: wantW && ws >= .64, ws };
+      return { y, s, k, xn, wait, win: wantW && ws >= .64, ws };
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
     /* ================= bucle principal: reacciones > comportamiento autónomo ================= */
@@ -309,6 +311,7 @@
       const f = ts => {
         if (my !== chain) return; wall = performance.now();
         if (!isActive()) { last = 0; setTimeout(() => { if (my === chain) requestAnimationFrame(f); }, 400); return; }
+        if (last && !a.anim && !a.walk && !a.tw.length && ts - last < 30) { requestAnimationFrame(f); return; }      // en reposo bastan ~30 cuadros por segundo
         const dt = Math.min(.05, (ts - (last || ts)) / 1000); last = ts; D.step(dt); requestAnimationFrame(f);
       };
       requestAnimationFrame(f);

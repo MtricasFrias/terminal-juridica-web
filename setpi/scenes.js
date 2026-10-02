@@ -176,13 +176,13 @@
       await hold(.3); await P.front();
     });
     /* viaje en bus: espera en la parada, llega el bus (detrás del panel), sube por la puerta y se despide por la ventanilla; vuelve en otro bus y baja por la puerta */
-    def('ride', 'bus', 140, c => (c.ph === 'pin' || c.ph === 'lobby') && c.idle > 20 && D.energy > .18 && D.t - D.lastJoin > 30 && (c.ph === 'pin' ? c.idle > 25 : c.idle > 15) && P.rideGeo() ? (c.ph === 'lobby' && c.n === 0 ? 3 : 1.5) + (D.busTarget ? 1 : 0) : 0, async () => {
+    def('ride', 'bus', 100, c => (c.ph === 'pin' || c.ph === 'lobby') && c.idle > 8 && D.energy > .12 && D.t - D.lastJoin > 12 && P.rideGeo() ? ((c.ph === 'lobby' && c.n === 0 ? 3 : 1.8) + (D.busTarget ? 1 : 0)) * (D.rides ? (D.t - D.lastRideT > 150 ? 2.5 : 1) : 4) : 0, async () => {
       const g = P.rideGeo(), bus = P.bus, RIDE = P.RIDE, VBW = P.VBW; if (!g) return; const l = L();
       const apply0 = bus.apply; let inWin = false;
-      P.setState('RIDING'); D.riding = true;
+      P.setState('RIDING'); D.riding = true; D.rides = (D.rides || 0) + 1; D.lastRideT = D.t;      // la primera vez pesa x4: que se vea pronto
       try {
         if (D.busTarget && Math.random() < .5) await SC.busWave.run();
-        await P.goTo(g.xn - RIDE.wait * g.s, g.y); P.setState('RIDING');
+        await P.goTo(g.xn - g.wait * g.s, g.y); P.setState('RIDING');
         await P.toR(1); await hold(.35); a.fx('alert');
         bus.clipX = l.pr.left; bus.place(l.pr.left + 26, g.y, g.k); bus.show(true, false);
         const arrive = a.tween('x', g.xn, 1.9, 'out', bus);
@@ -436,7 +436,7 @@
         await P.front();
       }
       if (have('confetti')) { fire(C.confetti()); a.fx('confetti'); await hold(.8); a.fx('confetti', { n: 20 }); await hold(2); }
-      await P.front(); a.fx('question');
+      await P.front();
       if (have('clear')) { fire(C.clear.q(3.2)); await P.say('¿Quedó todo claro?', 3.2); await a.play(C.clear.wave(1.1)); await a.play(C.clear.ok(1.2)); } else { fire(C.lookUser()); await P.say('¿Quedó todo claro?', 3.4); }
       if (have('bow')) { await a.play(C.bow()); } fin();
     }

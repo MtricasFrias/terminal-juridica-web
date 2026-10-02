@@ -176,7 +176,7 @@
         else if (this.pose.f !== 'turn_34') this._idleFrame();
       }
       // respiración casi imperceptible (solo escala vertical sobre los pies)
-      const br = 1 + 0.006 * Math.sin(this.t * 2.1); if (Math.abs(br - this.mod.sy) > .0004) { this.mod.sy = br; this.dirty = true; }
+      const br = 1 + 0.006 * Math.sin(this.t * 2.1); if (Math.abs(br - this.mod.sy) > .0015) { this.mod.sy = br; this.dirty = true; }
     }
     _walk(dt) {
       const w = this.walk; if (!w) return;
@@ -222,14 +222,15 @@
         this._blit(ctx, f, this.mod, flip, p);
       } else this._blit(ctx, f, this.mod, flip, 1);
       const L0 = this.x - this.cvW / 2, il = this.clipL > -1e8 ? Math.max(0, this.clipL - L0) : 0, ir = this.clipR < 1e8 ? Math.max(0, L0 + this.cvW - this.clipR) : 0;   // lo que cae detrás del panel / tarjeta no se transparenta
-      this.cv.style.clipPath = il || ir ? 'inset(0 ' + ir.toFixed(1) + 'px 0 ' + il.toFixed(1) + 'px)' : '';
-      this.root.style.transform = 'translate3d(' + this.x.toFixed(1) + 'px,' + (this.y - this.lift).toFixed(1) + 'px,0)';
+      const V = this._v || (this._v = {}), sv = (k, el, prop, val) => { if (V[k] !== val) { V[k] = val; el.style[prop] = val; } };    // solo se escribe en el DOM lo que cambió
+      sv('cl', this.cv, 'clipPath', il || ir ? 'inset(0 ' + ir.toFixed(1) + 'px 0 ' + il.toFixed(1) + 'px)' : '');
+      sv('rt', this.root, 'transform', 'translate3d(' + this.x.toFixed(1) + 'px,' + (this.y - this.lift).toFixed(1) + 'px,0)');
       const sw = this.S * .62 * (1 - clamp(this.lift / (this.S * .9), 0, .55)), shh = this.S * .11;
-      this.sh.style.display = this.noShadow ? 'none' : '';
-      this.sh.style.width = sw.toFixed(1) + 'px'; this.sh.style.height = shh.toFixed(1) + 'px';
-      this.sh.style.transform = 'translate3d(' + (this.x - sw / 2).toFixed(1) + 'px,' + (this.y - shh * .55).toFixed(1) + 'px,0)';
-      this.sh.style.opacity = (1 - clamp(this.lift / (this.S * 1.1), 0, .6)).toFixed(2);
-      this.sh.style.clipPath = this.clipR < 1e8 && this.x + sw / 2 > this.clipR ? 'inset(0 ' + Math.max(0, this.x + sw / 2 - this.clipR).toFixed(1) + 'px 0 0)' : '';
+      sv('sd', this.sh, 'display', this.noShadow ? 'none' : '');
+      sv('sw', this.sh, 'width', sw.toFixed(1) + 'px'); sv('sh', this.sh, 'height', shh.toFixed(1) + 'px');
+      sv('st', this.sh, 'transform', 'translate3d(' + (this.x - sw / 2).toFixed(1) + 'px,' + (this.y - shh * .55).toFixed(1) + 'px,0)');
+      sv('so', this.sh, 'opacity', (1 - clamp(this.lift / (this.S * 1.1), 0, .6)).toFixed(2));
+      sv('sc', this.sh, 'clipPath', this.clipR < 1e8 && this.x + sw / 2 > this.clipR ? 'inset(0 ' + Math.max(0, this.x + sw / 2 - this.clipR).toFixed(1) + 'px 0 0)' : '');
     }
   }
   S.Actor = Actor;

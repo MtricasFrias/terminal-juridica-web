@@ -82,7 +82,7 @@ button{font:inherit; cursor:pointer;}
 .premio-banner{display:flex; align-items:center; gap:10px; background:#FFF1C2; border:2px solid var(--navy); border-radius:14px; padding:11px 14px; font-weight:800; font-size:.85rem; color:#7a5a0a; margin-bottom:16px;}
 .premio-banner .ico{display:inline-flex; align-items:center; flex:none; animation:floaty 2.2s ease-in-out infinite;}
 .roster{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px; min-height:44px;}
-.chip-persona{display:flex; align-items:center; gap:7px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:5px 13px 5px 5px; font-size:.85rem; font-weight:700; color:var(--navy); animation:pop .4s cubic-bezier(.2,.8,.2,1) both;}
+.chip-persona{display:flex; align-items:center; gap:7px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:5px 13px 5px 5px; font-size:.85rem; font-weight:700; color:var(--navy);}
 .chip-persona svg{width:26px; height:26px; border-radius:50%;}
 .contador-sala{font-size:.78rem; color:var(--muted); margin-top:4px;}
 .tu-chip{outline:2px solid var(--cyan); outline-offset:1px;}
@@ -136,8 +136,8 @@ button{font:inherit; cursor:pointer;}
 /* avisos de resultados tardíos: la red/el servidor puede tardar unos segundos bajo carga (varias
    personas respondiendo casi al mismo tiempo), así que un resultado que llega cuando ya se ve la
    siguiente pregunta se muestra aparte, rotulado con su número, en vez de pisar el feedback actual. */
-.toast-contenedor{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; width:min(92vw,400px);}
-.toast-tardio{background:var(--card); border-radius:12px; box-shadow:var(--shadow-lg); padding:9px 16px; display:flex; align-items:center; gap:8px; font-size:.8rem; font-weight:700; opacity:0; transform:translateY(-14px); transition:opacity .3s ease, transform .3s ease; border-left:5px solid var(--muted); width:100%;}
+.toast-contenedor{position:fixed; bottom:max(64px,calc(env(safe-area-inset-bottom) + 56px)); left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column-reverse; gap:8px; align-items:center; pointer-events:none; width:min(92vw,400px);}
+.toast-tardio{background:var(--card); border-radius:12px; box-shadow:var(--shadow-lg); padding:9px 16px; display:flex; align-items:center; gap:8px; font-size:.8rem; font-weight:700; opacity:0; transform:translateY(14px); transition:opacity .3s ease, transform .3s ease; border-left:5px solid var(--muted); width:100%;}
 .toast-tardio.mostrar{opacity:1; transform:translateY(0);}
 .toast-tardio.ok{border-color:var(--green); color:var(--green);}
 .toast-tardio.no{border-color:var(--red); color:var(--red);}
@@ -301,6 +301,7 @@ button{font:inherit; cursor:pointer;}
 
 </div>
 <script src="setpi/ico.js"></script>
+<script src="setpi/net.js"></script>
 <button class="host-badge" id="btn-modo-host" title="Modo anfitrión" data-ico="llave" data-s="22"></button>
 <script>
 /* iconos: sin emojis, imágenes vectoriales (setpi/ico.js) */
@@ -405,10 +406,13 @@ function mostrarSolo(p){ [pIntro,pLobby,pPregunta,pPodio,pHost].forEach(x=>x.hid
 
 /* ---------- sala de espera ---------- */
 const elRoster = document.getElementById("lobby-roster"), elCuentaSala = document.getElementById("lobby-cuenta");
-let POLL_LOBBY = null, POLL_LATIDO = null;
+let POLL_LOBBY = null, POLL_LATIDO = null;   // objetos Poller
+const stopP = p => { if(p) p.stop(); };
+const htmlEl = html => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+const ROSTER = Roster(elRoster, { key: j=>j.jugador, sig: j=>j.avatar, make: j=>htmlEl(`<span class="chip-persona${j.jugador===NOMBRE?' tu-chip':''}">${avatarSVG(j.avatar,26)}${esc(j.jugador)}${j.jugador===NOMBRE?" (tú)":""}</span>`) });
 function pintarRoster(jugadores){
-  elRoster.innerHTML = jugadores.map(j=>`<span class="chip-persona${j.jugador===NOMBRE?' tu-chip':''}">${avatarSVG(j.avatar,26)}${esc(j.jugador)}${j.jugador===NOMBRE?" (tú)":""}</span>`).join("");
-  elCuentaSala.textContent = jugadores.length + (jugadores.length===1 ? " persona esperando" : " personas esperando");
+  const lista = ROSTER.update(jugadores);          // solo se pinta quien llega: nadie parpadea en cada sondeo
+  elCuentaSala.textContent = lista.length + (lista.length===1 ? " persona esperando" : " personas esperando");
 }
 async function empezar(){
   const nom = inNombre.value.trim();
@@ -424,25 +428,27 @@ async function empezar(){
     document.getElementById("lobby-yo-nombre").textContent = NOMBRE;
     pintarRoster(r.jugadores);
     if(r.estado === "en_curso"){ await cargarYArrancar(parseInt(r.inicio,10)); return; }
-    clearInterval(POLL_LOBBY); POLL_LOBBY = setInterval(sondearLobby, 1500);
-    clearInterval(POLL_LATIDO); POLL_LATIDO = setInterval(()=>api("quizUnirse", NOMBRE, MI_AVATAR).catch(()=>{}), 6000);
+    stopP(POLL_LOBBY); POLL_LOBBY = Poller(sondearLobby, 2200).start();
+    stopP(POLL_LATIDO); POLL_LATIDO = Poller(()=>api("quizUnirse", NOMBRE, MI_AVATAR), 5500).start();
   }catch(e){
     errIntro.textContent = e.message; btnEmpezar.disabled = false; btnEmpezar.textContent = "Entrar a la sala →";
   }
 }
 async function sondearLobby(){
-  try{
-    const r = await api("quizEstadoSesion");
-    pintarRoster(r.jugadores);
-    if(r.estado === "en_curso"){ clearInterval(POLL_LOBBY); clearInterval(POLL_LATIDO); await cargarYArrancar(parseInt(r.inicio,10)); }
-  }catch(e){ /* se reintenta solo */ }
+  const r = await api("quizEstadoSesion");
+  pintarRoster(r.jugadores);
+  if(r.estado === "en_curso"){
+    stopP(POLL_LOBBY); stopP(POLL_LATIDO);
+    try{ await cargarYArrancar(parseInt(r.inicio,10)); }
+    catch(e){ POLL_LOBBY.start(); POLL_LATIDO.start(); throw e; }      // si no bajaron las preguntas, sigue intentando (antes quedaba colgado)
+  }
 }
 async function cargarYArrancar(inicioMs){
-  const r = await api("quizPreguntas");
+  const r = await retry(()=>api("quizPreguntas"), 4, 600);
   PREGUNTAS = r.preguntas; DURACION = r.duracion; TOTAL = PREGUNTAS.length; PUNTAJE = 0; IDX_MOSTRADO = -1; RESPONDIDA = {};
   INICIO = inicioMs || Date.now();
   mostrarSolo(pPregunta);
-  clearInterval(POLL_LATIDO); POLL_LATIDO = setInterval(()=>api("quizUnirse", NOMBRE, MI_AVATAR).catch(()=>{}), 8000);
+  stopP(POLL_LATIDO); POLL_LATIDO = Poller(()=>api("quizUnirse", NOMBRE, MI_AVATAR), 8000).start();
   clearInterval(TICK); TICK = setInterval(tickReloj, 200);
   tickReloj();
 }
@@ -484,6 +490,7 @@ function reaccionSetpi(correcta){
   void elSetpi.offsetWidth;
   elSetpi.classList.add(correcta ? "reacciona-ok" : "reacciona-no");
 }
+/* aviso pequeño (ABAJO, nunca sobre el encabezado) cuando la respuesta llega con otra pregunta ya en pantalla */
 function mostrarToast(idxPregunta, correcta, puntos){
   if(!elToasts) return;
   const t = document.createElement("div");
@@ -493,22 +500,23 @@ function mostrarToast(idxPregunta, correcta, puntos){
   requestAnimationFrame(()=>t.classList.add("mostrar"));
   setTimeout(()=>{ t.classList.remove("mostrar"); setTimeout(()=>t.remove(), 350); }, 3400);
 }
-/* la reacción grande: nadie se la puede perder — tapa toda la pantalla un instante y se
-   desvanece sola, para que acertar o fallar se sienta de verdad (como pidió el equipo: "que no
-   pasen desapercibidas"). */
+/* la reacción grande: nadie se la puede perder — SETPI tapa toda la pantalla un instante y se
+   desvanece solo, para que acertar o fallar se sienta de verdad (como pidió el equipo: "que no
+   pasen desapercibidas"). Sale SIEMPRE que llega la respuesta (también si llega tarde, rotulada con su pregunta). */
 const elReaccionFull = document.getElementById("reaccion-full"), elReaccionSetpi = document.getElementById("reaccion-setpi"),
       elReaccionSello = document.getElementById("reaccion-sello"), elReaccionTexto = document.getElementById("reaccion-texto");
 let reaccionFullTimer = null;
 const FRASES_OK = ["¡Buen trabajo!", "¡Eso es!", "¡Excelente!", "¡La sacaste!"];
 const FRASES_NO = ["Esa no era…", "¡A la siguiente!", "Casi… ¡sigue así!"];
-function mostrarReaccionFull(correcta, puntos){
+function mostrarReaccionFull(correcta, puntos, nPregunta){
   if(!elReaccionFull) return;
   clearTimeout(reaccionFullTimer);
   elReaccionFull.className = "reaccion-full " + (correcta ? "ok" : "no");
-  elReaccionSetpi.innerHTML = avatarSVG((correcta ? "muy_feliz_ojo_cerrado" : "enojado") + ":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 230, "cuerpo");
+  const mio = String(MI_AVATAR||"").split(":");      // el SETPI de pantalla completa es el TUYO (tu camisa y tu sombrero), solo cambia la cara
+  elReaccionSetpi.innerHTML = avatarSVG((correcta ? "muy_feliz_ojo_cerrado" : "enojado") + ":" + (CAMISAS[mio[1]] !== undefined ? mio[1] : "camisa_azul_alcaldia_setp") + ":" + (SOMBREROS[mio[2]] !== undefined ? mio[2] : "gorra_alcaldia_ibague"), 230, "cuerpo");
   elReaccionSello.innerHTML = correcta ? '<img src="setpi/f/like_glove.webp" alt="" style="width:min(30vw,118px); display:block">' : Ico("equis", {s:74});
   const frase = correcta ? FRASES_OK[Math.floor(Math.random()*FRASES_OK.length)] : FRASES_NO[Math.floor(Math.random()*FRASES_NO.length)];
-  elReaccionTexto.textContent = correcta ? `${frase} +${puntos} pts` : frase;
+  elReaccionTexto.textContent = (nPregunta ? "Pregunta " + nPregunta + " · " : "") + (correcta ? `${frase} +${puntos} pts` : frase);
   requestAnimationFrame(()=>elReaccionFull.classList.add("mostrar"));
   reaccionFullTimer = setTimeout(()=>elReaccionFull.classList.remove("mostrar"), correcta ? 1750 : 1500);
 }
@@ -537,15 +545,24 @@ async function responder(idx, opcionIdx, tiempoMs){
   elEsperando.textContent = "Enviando tu respuesta…";
   elEsperando.hidden = false;
   const q = PREGUNTAS[idx];
-  let r;
-  try{ r = await api("quizResponder", NOMBRE, q.id, opcionIdx, tiempoMs); }
-  catch(e){ r = {correcta:false, puntos:0}; }
+  let r = null;
+  /* se reintenta si falla la red (el servidor ya ignora repetidas); antes un fallo se contaba como respuesta mala */
+  try{ r = await retry(()=>api("quizResponder", NOMBRE, q.id, opcionIdx, tiempoMs), 4, 700); }
+  catch(e){ r = null; }
+  if(!r){
+    if(idx === IDX_MOSTRADO && opcionIdx >= 0){          // no se pudo enviar: que lo intente de nuevo mientras haya tiempo
+      RESPONDIDA[idx] = false; elOpciones.querySelectorAll(".opcion").forEach(b=>b.disabled = false);
+      elFeedback.innerHTML = `<div class="feedback no">${Ico("alerta")} No se pudo enviar. Revisa tu conexión y toca otra vez</div>`; elEsperando.hidden = true;
+    }
+    return;
+  }
   PUNTAJE += r.puntos || 0;
-  if(idx === IDX_MOSTRADO){
+  const actual = idx === IDX_MOSTRADO;
+  if(r.correcta) confeti(actual ? 18 : 10);
+  mostrarReaccionFull(r.correcta, r.puntos, actual ? 0 : idx+1);
+  if(actual){
     if(opcionIdx >= 0){ const b = elOpciones.querySelector('.opcion[data-orig="'+opcionIdx+'"]'); if(b) b.classList.add(r.correcta ? "correcta" : "incorrecta"); }
-    if(r.correcta) confeti(18);
     reaccionSetpi(r.correcta);
-    mostrarReaccionFull(r.correcta, r.puntos);
     elFeedback.innerHTML = r.correcta
       ? `<div class="feedback ok">${Ico("listo")} ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${PUNTAJE}</small></div>`
       : `<div class="feedback no">${opcionIdx<0 ? Ico("reloj") + " Se acabó el tiempo" : Ico("equis") + " No era esa"}<small>Total hasta ahora: ${PUNTAJE}</small></div>`;
@@ -563,8 +580,8 @@ let POLL_PODIO = null, PODIO_PINTADO = false;
 function mostrarPodio(){
   mostrarSolo(pPodio);
   elMiFila.textContent = "Tu puntaje: " + PUNTAJE + " pts";
-  actualizarClasificacion(); confeti(28);
-  clearInterval(POLL_PODIO); POLL_PODIO = setInterval(actualizarClasificacion, 3500);
+  confeti(28);
+  actualizarClasificacion().catch(()=>{}); stopP(POLL_PODIO); POLL_PODIO = Poller(actualizarClasificacion, 4000).start();
 }
 function caraFeliz(avatar){
   const partes = String(avatar||"").split(":");
@@ -590,20 +607,22 @@ function pintarEscenario(tabla){
   }).join("");
   elEscenario.querySelectorAll(".pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 500+i*200));
 }
+let TABLA_SIG = "";
 async function actualizarClasificacion(){
-  try{
-    const r = await api("quizClasificacion");
-    elCuenta.textContent = r.jugadores + (r.jugadores===1 ? " persona" : " personas");
-    if(!PODIO_PINTADO && r.tabla.length){ pintarEscenario(r.tabla.slice(0,3)); PODIO_PINTADO = true; }
-    if(!r.tabla.length){ elTabla.innerHTML = '<div class="vacio">Todavía no hay resultados.</div>'; return; }
-    elTabla.innerHTML = r.tabla.map((f,i)=>{
-      const top = i===0?"top1":i===1?"top2":i===2?"top3":"";
-      const yo = f.jugador===NOMBRE ? "yo" : "";
-      return `<div class="fila ${top} ${yo}">${avatarSVG(f.avatar,28)}<span class="pos">${i+1}</span><span class="nom">${esc(f.jugador)}</span><span class="pts mono">${f.puntos}</span></div>`;
-    }).join("");
-  }catch(e){ /* silencioso: se reintenta en el próximo ciclo */ }
+  const r = await api("quizClasificacion");
+  elCuenta.textContent = r.jugadores + (r.jugadores===1 ? " persona" : " personas");
+  if(!PODIO_PINTADO && r.tabla.length){ pintarEscenario(r.tabla.slice(0,3)); PODIO_PINTADO = true; }
+  const sig = JSON.stringify(r.tabla);
+  if(sig === TABLA_SIG) return;                    // sin cambios: no se repinta (evita parpadeo de los avatares)
+  TABLA_SIG = sig;
+  if(!r.tabla.length){ elTabla.innerHTML = '<div class="vacio">Todavía no hay resultados.</div>'; return; }
+  elTabla.innerHTML = r.tabla.map((f,i)=>{
+    const top = i===0?"top1":i===1?"top2":i===2?"top3":"";
+    const yo = f.jugador===NOMBRE ? "yo" : "";
+    return `<div class="fila ${top} ${yo}">${avatarSVG(f.avatar,28)}<span class="pos">${i+1}</span><span class="nom">${esc(f.jugador)}</span><span class="pts mono">${f.puntos}</span></div>`;
+  }).join("");
 }
-window.addEventListener("beforeunload", ()=>{ clearInterval(POLL_PODIO); clearInterval(POLL_LOBBY); clearInterval(POLL_LATIDO); clearInterval(TICK); });
+window.addEventListener("beforeunload", ()=>{ stopP(POLL_PODIO); stopP(POLL_LOBBY); stopP(POLL_LATIDO); stopP(POLL_HOST); clearInterval(TICK); });
 
 /* ---------- modo anfitrión ---------- */
 const btnModoHost = document.getElementById("btn-modo-host");
@@ -611,7 +630,7 @@ const hostLogin = document.getElementById("host-login"), hostPanel = document.ge
 const hostPin = document.getElementById("host-pin"), hostErr = document.getElementById("host-err");
 const hostLista = document.getElementById("host-lista"), hostCuenta = document.getElementById("host-cuenta"), hostEstadoPill = document.getElementById("host-estado-pill"), hostErr2 = document.getElementById("host-err2");
 let HOST_PIN = "", POLL_HOST = null;
-function abrirHost(){ clearInterval(POLL_LOBBY); clearInterval(POLL_PODIO); clearInterval(POLL_LATIDO); clearInterval(TICK); mostrarSolo(pHost); hostPin.focus(); }
+function abrirHost(){ stopP(POLL_LOBBY); stopP(POLL_PODIO); stopP(POLL_LATIDO); clearInterval(TICK); mostrarSolo(pHost); hostPin.focus(); }
 btnModoHost.addEventListener("click", abrirHost);
 if(new URLSearchParams(location.search).get("host")==="1") abrirHost();
 
@@ -621,18 +640,17 @@ function desbloquearHost(){
   if(pin.length !== 4){ hostErr.textContent = "El PIN tiene 4 dígitos."; return; }
   HOST_PIN = pin;
   hostLogin.hidden = true; hostPanel.hidden = false;
-  sondearHost(); clearInterval(POLL_HOST); POLL_HOST = setInterval(sondearHost, 1500);
+  stopP(POLL_HOST); POLL_HOST = Poller(sondearHost, 2200).start(true);
 }
 document.getElementById("host-btn-entrar").addEventListener("click", desbloquearHost);
 hostPin.addEventListener("keydown", e=>{ if(e.key==="Enter") desbloquearHost(); });
+const HOST_ROSTER = Roster(hostLista, { key: j=>j.jugador, sig: j=>j.avatar, make: j=>htmlEl(`<div class="host-fila">${avatarSVG(j.avatar,22)}<span>${esc(j.jugador)}</span></div>`) });
 async function sondearHost(){
-  try{
-    const r = await api("quizEstadoSesion");
-    hostEstadoPill.textContent = r.estado === "en_curso" ? "en curso" : "sala de espera";
-    hostEstadoPill.className = "estado-pill " + (r.estado === "en_curso" ? "curso" : "lobby");
-    hostCuenta.textContent = r.jugadores.length + (r.jugadores.length===1 ? " persona conectada" : " personas conectadas");
-    hostLista.innerHTML = r.jugadores.length ? r.jugadores.map(j=>`<div class="host-fila">${avatarSVG(j.avatar,22)}<span>${esc(j.jugador)}</span></div>`).join("") : '<div class="vacio">Nadie ha entrado todavía.</div>';
-  }catch(e){ /* reintenta solo */ }
+  const r = await api("quizEstadoSesion");
+  const lista = HOST_ROSTER.update(r.jugadores);
+  hostEstadoPill.textContent = r.estado === "en_curso" ? "en curso" : "sala de espera";
+  hostEstadoPill.className = "estado-pill " + (r.estado === "en_curso" ? "curso" : "lobby");
+  hostCuenta.textContent = lista.length + (lista.length===1 ? " persona conectada" : " personas conectadas");
 }
 document.getElementById("host-btn-iniciar").addEventListener("click", async ()=>{
   hostErr2.textContent = "";
