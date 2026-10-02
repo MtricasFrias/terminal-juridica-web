@@ -155,7 +155,16 @@
       await a.play(J.land);
       a.rest(view === 'R' ? 'R' : 'F');
     }
-    async function wave(n) { setState('GREETING'); await room(); if (a.stance === 'R') await a.play(C.waveR(n)); else await a.play(C.waveF(n)); a.rest(a.stance); }
+    /* saludar: nunca dos saludos seguidos (mín. 14 s entre uno y otro, salvo la llegada y la despedida); de frente con una mano
+       (alterna de lado cada vez) o girando a 3/4 para saludar moviendo la muñeca */
+    async function wave(n, o) {
+      if (!(o && o.force) && D.t - (D.lastWave || -99) < 14) return;
+      D.lastWave = D.t; setState('GREETING'); await room();
+      if (a.stance === 'R') await a.play(C.waveR(2 + (n > 2 ? 1 : 0)));
+      else if (Math.random() < .35) { await toR(Math.random() < .5 ? 1 : -1); await a.wait(.15); await a.play(C.waveR(3)); a.rest('R'); await front(); }
+      else { D.waveSide = -(D.waveSide || 1); await a.play(C.waveF(D.waveSide, 1.5 + .4 * (n || 1))); }
+      a.rest(a.stance);
+    }
     async function thumbs() { setState('THUMBS_UP'); await room(); await front(); a.fx('like'); await a.play(C.likeF()); a.rest('F'); }
     async function clap(n) { setState('CELEBRATING'); await front(); await a.play(C.clap(n)); a.rest('F'); }
     async function surprised(fx) { setState('SURPRISED'); await room(); await front(); if (fx !== false) a.fx('alert'); await a.play(C.surprised()); a.rest('F'); }
@@ -275,7 +284,7 @@
           await a.tween('x', -(VBW * g.k) - 80, 2.9, 'in3', bus); bus.show(false);    // el bus se va hacia la izquierda, por detrás del contenido
           await a.wait(rnd(13, 22));                                                    // paseo
           D.away = false; D.active = D.t; const sp = spot({ lane: 'L', minDist: 0 });
-          await enter(sp.x, sp.y, 1.9); await front(); await wave(2);                   // vuelve corriendo por detrás del panel
+          await enter(sp.x, sp.y, 1.9); await front(); await wave(2, { force: true });   // vuelve corriendo por detrás del panel
         } finally { D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; }
       },
       /* un bus pasa por detrás: lo mira y lo saluda */
@@ -308,7 +317,7 @@
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
     /* ---- elección: cada comportamiento declara SUS condiciones ---- */
-    const COOL = { lookAround: 16, wander: 9, greet: 26, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 90, peekQR: 110, nap: 140, busWave: 18, ride: 240 };
+    const COOL = { lookAround: 16, wander: 9, greet: 45, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 90, peekQR: 110, nap: 140, busWave: 18, ride: 240 };
     function weights() {
       const l = L(), ph = D.phase, n = D.players, idle = idleFor(), W = {}, hostBusy = D.t - D.hostT < 7;
       const qrOpen = ph === 'lobby';
@@ -416,7 +425,7 @@
       if (D.phase === p) return; D.phase = p; markActive(); D.attentive = false;
       if (p === 'quiz') {
         D.interrupt(async () => {
-          const l = L(); setState('EXITING'); await emerge(); await front(); await wave(2);
+          const l = L(); setState('EXITING'); await emerge(); await front(); await wave(2, { force: true });
           await runLeg(l.hideX(), a.y, { speed: 1.8 }); doneAway();                         // se despide y se va por detrás del panel
         }, 3);
       } else if (!a.visible) {
@@ -477,7 +486,7 @@
     D.intro = function () {
       if (!D.ready) return; layout(); const l = L(); a.cancel(); a.show(false);
       D.interrupt(async () => {
-        setState('REACTING'); const s = spot({ lane: 'L', minDist: 0 }); await enter(s.x, s.y, 1.7); await front(); await wave(2);
+        setState('REACTING'); const s = spot({ lane: 'L', minDist: 0 }); await enter(s.x, s.y, 1.7); await front(); await wave(2, { force: true });
       }, 1);
     };
     function boot() {

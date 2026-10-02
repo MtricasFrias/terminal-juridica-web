@@ -148,6 +148,7 @@
           this._frame(a.i + 1);
         }
       }
+      if (this.pose.sway) { const w = this.pose.sway; this.mod.rot = (this.pose.rot || 0) + w.a * Math.sin(this.t * 6.2832 / w.p); this.dirty = true; }   // balanceo suave y continuo mientras dura el frame
       this._walk(dt);
       if (this.autoIdle && !this.anim && !this.walk) this._idle(dt);
       if (this.xfDur && this.prev) { this.xf += dt; this.dirty = true; if (this.xf >= this.xfDur) { this.prev = null; this.xfDur = 0; } }
