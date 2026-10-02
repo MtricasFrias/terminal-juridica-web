@@ -308,7 +308,7 @@
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
     /* ---- elección: cada comportamiento declara SUS condiciones ---- */
-    const COOL = { lookAround: 16, wander: 9, greet: 26, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 90, peekQR: 110, nap: 140, busWave: 18, ride: 150 };
+    const COOL = { lookAround: 16, wander: 9, greet: 26, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 90, peekQR: 110, nap: 140, busWave: 18, ride: 240 };
     function weights() {
       const l = L(), ph = D.phase, n = D.players, idle = idleFor(), W = {}, hostBusy = D.t - D.hostT < 7;
       const qrOpen = ph === 'lobby';
@@ -325,7 +325,7 @@
       if (ph !== 'podium' && valid(clamp(l.qr.right + 3 + .55 * l.SU, l.xMin, l.xMaxAt(l.yU)), l.yU)) W.peekQR = 1.2;
       if ((ph === 'pin' && idle > 45) || (qrOpen && n === 0 && idle > 38) || (D.energy < .25 && idle > 25)) W.nap = 5 + Math.min(6, (idle - 30) / 6);
       if (D.busTarget && ph !== 'podium') W.busWave = 5.5;
-      if (ph !== 'podium' && idle > 20 && D.energy > .3 && D.t - D.lastJoin > 40 && (ph === 'pin' ? idle > 30 : true) && rideGeo()) W.ride = (qrOpen && n === 0 ? 3 : 1.3) + (D.busTarget ? 1.5 : 0);
+      if (ph !== 'podium' && idle > 20 && D.energy > .3 && D.t - D.lastJoin > 40 && (ph === 'pin' ? idle > 45 : true) && rideGeo()) W.ride = (qrOpen && n === 0 ? 1.7 : .6) + (D.busTarget ? .9 : 0);
       return W;
     }
     function choose() {
