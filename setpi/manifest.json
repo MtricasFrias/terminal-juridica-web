@@ -1,0 +1,26 @@
+{
+ "w": 360,
+ "h": 520,
+ "ax": 180,
+ "ay": 508,
+ "frames": {
+  "walk_1": "walk_1.webp",
+  "walk_2": "walk_2.webp",
+  "walk_3": "walk_3.webp",
+  "walk_4": "walk_4.webp",
+  "walk_5": "walk_5.webp",
+  "walk_6": "walk_6.webp",
+  "look_3": "look_3.webp",
+  "stand": "stand.webp",
+  "look": "look.webp",
+  "alert": "alert.webp"
+ },
+ "pivot": [
+  251,
+  330
+ ],
+ "glove": [
+  278,
+  390
+ ]
+}

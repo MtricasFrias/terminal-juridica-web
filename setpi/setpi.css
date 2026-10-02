@@ -1,0 +1,18 @@
+/* SETPI — escenario y actor. El escenario cubre toda la diapositiva; SETPI va por encima del fondo y de la columna
+   izquierda pero POR DEBAJO del panel de la sala (por eso puede esconderse detrás de él). */
+.setpi-stage{position:absolute; inset:0; pointer-events:none; z-index:2; overflow:visible;}
+.sp{position:absolute; left:0; top:0; visibility:hidden; pointer-events:auto; cursor:pointer; will-change:transform; user-select:none; -webkit-tap-highlight-color:transparent;}
+.sp-flip,.sp-body{position:absolute; left:0; top:0;}
+.sp-f,.sp-arm{position:absolute; left:0; top:0; width:100%; height:100%; display:none; pointer-events:none; user-select:none; -webkit-user-drag:none;}
+.sp-f.on,.sp-arm.on{display:block;}
+.sp-eyes{position:absolute; left:0; top:0; width:100%; height:100%; display:none; pointer-events:none;}
+.sp-eyes.on{display:block;}
+/* efectos temporales (no son parte del personaje) */
+.sp-fx{position:absolute; z-index:3; pointer-events:none; transform:translate(-50%,-50%);}
+.sp-fx.z{font-family:Barlow,sans-serif; font-weight:800; color:#fff; text-shadow:0 2px 5px rgba(0,0,0,.45); opacity:0; animation:spZ 2.4s ease-out forwards;}
+@keyframes spZ{0%{opacity:0; transform:translate(-50%,-50%) scale(.6);} 20%{opacity:.95;} 100%{opacity:0; transform:translate(8px,-46px) scale(1.25) rotate(8deg);}}
+.sp-fx.alert{animation:spAlert .9s ease-out forwards;}
+@keyframes spAlert{0%{opacity:0; transform:translate(-50%,-50%) scale(.4);} 25%{opacity:1; transform:translate(-50%,-50%) scale(1.1);} 100%{opacity:0; transform:translate(-50%,-72%) scale(1);}}
+.sp-fx.spark{width:7px; height:7px; border-radius:2px; animation:spSpark 1s ease-out forwards;}
+@keyframes spSpark{0%{opacity:1; transform:translate(-50%,-50%) scale(.5);} 100%{opacity:0; transform:translate(-50%,-150%) scale(1.3) rotate(160deg);}}
+@media (prefers-reduced-motion:reduce){.sp-fx{display:none;}}
