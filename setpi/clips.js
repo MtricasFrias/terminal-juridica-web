@@ -51,4 +51,40 @@
     peekQR: v => v === 2 ? [T('peek_1', .3, { fade: .05, face: -1 }), T('spy_2', .85, { face: 1 }), T('peek_1', .3, { face: -1 }), T('peek_2', .5), T('peek_3', .5)] : [T('peek_1', .3, { fade: .05, face: -1 }), T('peek_2', .9), T('peek_1', .25), T('peek_3', .55)],
     peek: v => v === 2 ? [T('peek_1', .3, { fade: .05 }), T('spy_1', .8), T('peek_1', .3), T('peek_2', .5), T('peek_3', .5)] : [T('peek_1', .3, { fade: .05 }), T('peek_2', .9), T('peek_1', .25), T('peek_3', .55)]
   };
+  /* ---- V.2: más repertorio (cada clip empieza y termina en la pose neutra de frente) ---- */
+  const N = 'idle_a', END = () => T(N, .06, { fade: .08 });
+  Object.assign(C, {
+    hold: (f, t, o) => [T(f, t, Object.assign({ fade: .08 }, o))],
+    /* saludo de frente con la muñeca (3 dibujos reales) */
+    waveW: n => [T('wavew_1', .24, { fade: .08 })].concat(rep([T('wavew_2', .34), T('wavew_3', .34)], n || 2), [T('wavew_2', .26), T('wavew_1', .2), END()]),
+    glance: side => [T('around_2', .14, { fade: .06 }), T(side < 0 ? 'around_1' : 'around_3', .8), T('around_2', .2), END()],
+    /* sala de espera */
+    watch: n => { const r = [T('watch_1', .5, { fade: .08 }), T('watch_2', .95)]; for (let i = 1; i < (n || 1); i++) r.push(T('watch_1', .6), T('watch_2', .85)); return r.concat([T('watch_3', 1.15, { fade: .08 }), T('watch_1', .4), END()]); },
+    selfie: () => [T('selfie_1', .5, { fade: .08 }), T('selfie_2', .6, { fade: .05 }), T('selfie_3', 1.1, { fade: .06 }), T('selfie_1', .4, { fade: .06 }), END()],
+    dance: loops => { const o = []; for (let i = 0; i < (loops || 2); i++) for (let k = 1; k <= 6; k++) o.push(T('dance_' + k, .24, { fade: k === 1 && i === 0 ? .08 : .04, dy: k % 2 ? 0 : -.012 })); return o.concat([T('dance_1', .22, { fade: .04 }), END()]); },
+    stretch: () => [T('stretch_1', .8, { fade: .08 }), T('stretch_1', .5), T('stretch_2', .95, { fade: .08 }), T('stretch_1', .45, { fade: .08 }), T('stretch_3', .85, { fade: .08 }), END()],
+    search: side => [T('search_1', .4, { fade: .08, face: side }), T('search_2', 1.0, { face: side }), T('search_1', .45, { face: side }), T('search_2', .7, { face: -side }), END()],
+    bench: n => { const r = [T('bench_1', .5, { fade: .16 })]; for (let i = 0; i < (n || 3); i++) r.push(T('bench_2', .5), T('bench_1', .45), T('bench_3', .5), T('bench_1', .45)); return r.concat([T('bench_1', .35), END()]); },
+    /* analizar / revisar */
+    think: () => [T('think_1', .85, { fade: .08 }), T('think_2', 1.05), T('think_3', .95), T('think_2', .75), T('think_1', .6), END()],
+    lupa: () => [T('lupa_1', .75, { fade: .08 }), T('lupa_2', 1.25), T('lupa_1', .5), T('lupa_2', .95), T('lupa_3', 1.15, { fade: .06 }), END()],
+    tablet: () => [T('tablet_1', .75, { fade: .08 }), T('tablet_2', 1.3), T('tablet_1', .5), T('tablet_2', .85), T('tablet_3', 1.05, { fade: .06 }), END()],
+    shrug: () => [T('shrug_1', .95, { fade: .08 }), T('shrug_2', .35), T('shrug_1', .85), END()],
+    armsx: n => [T('armsx_1', .4, { fade: .08 })].concat(rep([T('armsx_2', .38), T('armsx_1', .38)], n || 3), [END()]),
+    cheer: () => [T('cheer_1', .45, { fade: .08 }), T('cheer_2', .4), T('cheer_1', .35), T('cheer_2', .4), T('cheer_1', .35), END()],
+    uy: () => [T('uy_1', .3, { fade: .06 }), T('uy_2', .5), T('uy_1', .22), T('uy_2', .5), T('uy_1', .3), END()],
+    /* presentar / anunciar */
+    present: () => [T('present_1', .35, { fade: .08 }), T('present_2', .85), T('present_3', .9), T('present_2', .6), T('present_1', .4), END()],
+    talk: () => [T('talk_1', .55, { fade: .08 }), T('talk_2', .6), T('talk_1', .45), T('talk_3', .8), END()],
+    mega: () => [T('mega_1', .4, { fade: .08 }), T('mega_2', .6), T('mega_3', .7), T('mega_2', .5), T('mega_1', .3), END()],
+    medal: (n, secs) => [T('medal_' + n, .3, { fade: .1 }), T('medal_' + n, secs || 1.8, { sway: { a: 1.1, p: 1.7 } })],
+    applaud: n => [T('applaud_1', .12, { fade: .06 })].concat(rep([T('applaud_2', .11), T('applaud_3', .12)], n || 4), [T('applaud_1', .12), END()]),
+    leap: { crouch: [T('leap_1', .2, { fade: .04 })], air: [T('leap_2', .1, { fade: .03 })], land: [T('leap_3', .18, { fade: .03 }), END()] },
+    trophy: () => [T('trophy_1', .5, { fade: .1 }), T('trophy_2', .45, { fade: .06 }), T('trophy_3', 1.25, { fade: .06, sway: { a: 1.4, p: 1.4 } }), T('trophy_4', .55, { fade: .06 }), END()],
+    confetti: () => [T('confetti_1', .3, { fade: .08 }), T('confetti_2', .6, { fade: .05 }), T('confetti_3', .6, { fade: .05 }), T('confetti_2', .45, { fade: .05 }), END()],
+    bow: () => [T('bow_1', .45, { fade: .08 }), T('bow_2', .85, { fade: .06 }), T('bow_3', .75, { fade: .06 }), END()],
+    clear: { q: t => [T('clear_1', t || 2, { fade: .08 })], wave: t => [T('clear_2', .3, { fade: .08 }), T('clear_2', t || 1.2, { sway: { a: 1.2, p: 1.2 } })], ok: t => [T('clear_3', t || 1.4, { fade: .08 })] },
+    /* viaje en bus: saludando por la ventanilla y bajando por la puerta */
+    bwin: (n, sc) => { sc = sc || .9; return [T('bwin_1', .3, { fade: .1, sx: sc, sy: sc })].concat(rep([T('bwin_2', .34, { sx: sc, sy: sc }), T('bwin_3', .34, { sx: sc, sy: sc })], n || 3)); }
+  });
 })(window);

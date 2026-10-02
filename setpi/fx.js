@@ -3,7 +3,7 @@
   'use strict';
   const S = g.Setpi = g.Setpi || {};
   function mk(a, cls, x, y, life, html) {
-    if (a.fxN > 28) return null; const e = document.createElement('div'); e.className = 'sp-fx ' + cls;
+    if (a.fxN > 64) return null; const e = document.createElement('div'); e.className = 'sp-fx ' + cls;
     e.style.left = x + 'px'; e.style.top = y + 'px'; if (html) e.innerHTML = html; a.layerFx.appendChild(e); a.fxN++;
     setTimeout(() => { e.remove(); a.fxN--; }, life); return e;
   }
@@ -38,6 +38,20 @@
       if (e) e.style.setProperty('--w', w + 'px');
     } else if (kind === 'question') {
       const w = Math.round(s * .3); const e = mk(a, 'q', h.x + a.facing * h.r * 1.05, h.y - h.r * 1.5, 2800, '<span>?</span>'); if (e) { e.style.setProperty('--w', w + 'px'); e.style.fontSize = Math.round(w * .78) + 'px'; }
+    } else if (kind === 'confetti') {
+      const cols = ['#F6B91D', '#159BD6', '#1FA35C', '#D6432C', '#D6488E', '#ffffff'], n = o.n || 28;
+      for (let i = 0; i < n; i++) {
+        const sx = (Math.random() - .5) * s * 1.5, e = mk(a, 'conf', h.x + sx * .35, h.y - h.r * .2, 2300); if (!e) continue;
+        const w = Math.round(s * (.026 + Math.random() * .02)); e.style.width = w + 'px'; e.style.height = Math.round(w * 1.7) + 'px'; e.style.background = cols[i % cols.length];
+        e.style.setProperty('--dx', Math.round(sx) + 'px'); e.style.setProperty('--up', Math.round(-s * (.18 + Math.random() * .3)) + 'px'); e.style.setProperty('--fall', Math.round(s * (.55 + Math.random() * .55)) + 'px');
+        e.style.setProperty('--rot', Math.round(240 + Math.random() * 420) + 'deg'); e.style.animationDelay = (Math.random() * .35) + 's';
+      }
+    } else if (kind === 'note') {
+      const w = Math.round(s * .15), e = mk(a, 'note', h.x + a.facing * (h.r * (1.1 + Math.random() * .9)), h.y - h.r * (.2 + Math.random() * .7), 1700,
+        '<svg viewBox="0 0 24 32" width="' + w + '"><path d="M9 5v17.5a5 5 0 1 0 3.2 4.7V10l8.800-2.400V4z" fill="' + (Math.random() < .5 ? '#2A62B8' : '#D6488E') + '" stroke="#0B1F5C" stroke-width="2" stroke-linejoin="round"/></svg>');
+      if (e) e.style.setProperty('--dx', Math.round(a.facing * s * (.05 + Math.random() * .12)) + 'px');
+    } else if (kind === 'flash') {
+      const w = Math.round(s * .42), e = mk(a, 'flash', h.x - a.facing * h.r * 1.35, h.y - h.r * .55, 420); if (e) e.style.width = w + 'px';
     } else if (kind === 'dust') {
       const n = o.n || 3;
       for (let i = 0; i < n; i++) {

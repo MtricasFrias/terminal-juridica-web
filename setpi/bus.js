@@ -23,7 +23,8 @@
     '<rect x="40" y="24" width="66" height="120" rx="6" fill="url(#spbi)"/>' +
     '<rect x="40" y="130" width="66" height="14" fill="#2c3a4d"/>' +
     '<rect x="47" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="95" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="40" y="142" width="66" height="4" fill="#F2B01E"/>' +
-    [0, 1, 2, 3, 4].map(i => '<rect x="' + (116 + i * 43) + '" y="28" width="36" height="46" rx="5" fill="' + GLASS + '"/>').join('') +
+    '<rect x="116" y="28" width="56" height="64" rx="6" fill="' + GLASS + '"/>' +                     /* ventanilla grande tras la puerta (SETPI se asoma aquí) */
+    [0, 1, 2, 3].map(i => '<rect x="' + (180 + i * 38) + '" y="28" width="32" height="64" rx="5" fill="' + GLASS + '"/>').join('') +
     wheel(142) + wheel(262) +
     '<path d="M121 140 a21 21 0 0 1 42 0 Z" fill="' + BODY2 + '" opacity=".0"/>' +
     '<rect x="-2" y="108" width="8" height="14" rx="3" fill="#FFE282"/>' +

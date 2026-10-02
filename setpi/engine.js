@@ -117,6 +117,11 @@
       });
     }
     get moving() { return !!this.walk; }
+    /* de espaldas a de frente: giro de caricatura (se achata a lo ancho, cambia de dibujo y se estira) */
+    async spin(frame, f2) {
+      await this.tween('sx', .04, .11, 'in', this.mod); this._setPose({ f: frame || 'idle_a' }); this.mod.sx = .04; this.stance = 'F'; this.facing = 1;
+      await this.tween('sx', 1, .15, 'out', this.mod);
+    }
     /* ---------- efectos ---------- */
     headPos() {
       const f = S.Frames.meta && S.Frames.meta[this.pose.f]; const s = this.S;
@@ -184,7 +189,7 @@
       if (dist > 0) { this.x += dx / dist * st; this.y += dy / dist * st; }
       if (w.gait === 'run') { if (Math.abs(dx) > 1.5) this.facing = dx > 0 ? 1 : -1; }
       // ciclo atado a la distancia recorrida: una zancada (6 frames) = stride px
-      const names = w.gait === 'run' ? ['run_1', 'run_2', 'run_3', 'run_4', 'run_5', 'run_6'] : ['walkf_1', 'walkf_2', 'walkf_3', 'walkf_4', 'walkf_5', 'walkf_6'];
+      const names = w.gait === 'run' ? ['run_1', 'run_2', 'run_3', 'run_4', 'run_5', 'run_6'] : w.gait === 'back' ? ['back_1', 'back_2', 'back_3', 'back_4', 'back_5', 'back_6'] : ['walkf_1', 'walkf_2', 'walkf_3', 'walkf_4', 'walkf_5', 'walkf_6'];
       const stride = this.S * (w.gait === 'run' ? 1.05 : .62);
       w.ct += st / stride * 6; w.ci = Math.floor(w.ct) % 6;
       const f = names[w.ci]; if (this.pose.f !== f) this._setPose({ f });
@@ -220,6 +225,7 @@
       this.cv.style.clipPath = il || ir ? 'inset(0 ' + ir.toFixed(1) + 'px 0 ' + il.toFixed(1) + 'px)' : '';
       this.root.style.transform = 'translate3d(' + this.x.toFixed(1) + 'px,' + (this.y - this.lift).toFixed(1) + 'px,0)';
       const sw = this.S * .62 * (1 - clamp(this.lift / (this.S * .9), 0, .55)), shh = this.S * .11;
+      this.sh.style.display = this.noShadow ? 'none' : '';
       this.sh.style.width = sw.toFixed(1) + 'px'; this.sh.style.height = shh.toFixed(1) + 'px';
       this.sh.style.transform = 'translate3d(' + (this.x - sw / 2).toFixed(1) + 'px,' + (this.y - shh * .55).toFixed(1) + 'px,0)';
       this.sh.style.opacity = (1 - clamp(this.lift / (this.S * 1.1), 0, .6)).toFixed(2);

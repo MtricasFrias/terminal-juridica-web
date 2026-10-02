@@ -175,6 +175,7 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
 <script src="setpi/fx.js"></script>
 <script src="setpi/bus.js"></script>
 <script src="setpi/clips.js"></script>
+<script src="setpi/scenes.js"></script>
 <script src="setpi/director.js"></script>
 <script>
 /* ===================== ilustraciones SVG reutilizables ===================== */
@@ -696,7 +697,7 @@ ir(IDX);
 
   const qrHero = document.getElementById("qr-hero");
 
-  /* SETPI: sistema de personaje en setpi/ (engine.js, fx.js, bus.js, clips.js, director.js + frames reales en setpi/f). Aquí solo se le AVISA lo que pasa:
+  /* SETPI: sistema de personaje en setpi/ (engine.js, fx.js, bus.js, clips.js, scenes.js, director.js + frames reales en setpi/f). Aquí solo se le AVISA lo que pasa:
      PIN erróneo/desbloqueo, cambio de nº de jugadores y fase (sala → quiz → podio). No modifica nada de la página. */
   const SetpiDir = (window.Setpi && Setpi.init) ? Setpi.init({
     slide: document.getElementById("cuestionario"), stage: document.getElementById("setpi-stage"),
@@ -714,7 +715,7 @@ ir(IDX);
   function pintarRoster(jugadores){
     mhRoster.innerHTML = jugadores.map(j=>`<span style="display:flex;align-items:center;gap:5px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 4px;font-size:.72rem;font-weight:700;color:var(--navy);animation:entraKF .35s both;">${avatarSVG(j.avatar,20)}${esc(j.jugador)}</span>`).join("");
     mhCuenta.textContent = jugadores.length + (jugadores.length===1 ? " persona en la sala" : " personas en la sala");
-    if(SetpiDir) SetpiDir.onPlayers(jugadores.length);
+    if(SetpiDir) SetpiDir.onPlayers(jugadores.length, jugadores.map(j=>j.jugador));
   }
 
   function caraFeliz(avatar){

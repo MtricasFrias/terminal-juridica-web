@@ -104,15 +104,22 @@
     /* un tramo hacia (x,y): casi vertical hacia abajo = de frente caminando hacia la cámara; en cualquier otro caso corre en diagonal */
     async function leg(x, y, o) {
       o = o || {}; const dx = x - a.x, dy = y - a.y;
+      if (dy < -.25 * a.S && Math.abs(dx) < -.3 * dy && !o.run && S.Frames.has('back_1')) { await backLeg(x, y); return; }
       if (dy > 0 && Math.abs(dx) < .3 * dy && dy > .25 * a.S && !o.run) {
         await front(); setState('WALKING'); await a.moveTo(x, y, { gait: 'front', speed: a.S * .8, ramp: a.S * .25 }); a.rest('F');
       } else await runLeg(x, y, { diag: Math.abs(dy) > 8, speed: o.speed });
+    }
+    /* hacia arriba (alejándose de la cámara): camina de ESPALDAS; al llegar gira de caricatura y queda de frente */
+    async function backLeg(x, y) {
+      setState('WALKING'); await front(); await a.spin('back_1');
+      await a.moveTo(x, y, { gait: 'back', speed: a.S * .8, ramp: a.S * .25 });
+      await a.spin('idle_a'); a.rest('F');
     }
     /* planifica el camino libre de obstáculos: recto, o con un punto intermedio (evita correr en vertical hacia arriba: no hay frames de espaldas) */
     function plan(x, y) {
       if (clear(a.x, a.y, x, y)) return [{ x, y }];
       const l = L(); let best = null;
-      const cost = (x1, y1, x2, y2) => { const d = Math.hypot(x2 - x1, y2 - y1), up = y2 < y1 - 8, steep = Math.abs(x2 - x1) < .55 * Math.abs(y2 - y1); return d + (up && steep ? 600 : 0); };
+      const cost = (x1, y1, x2, y2) => { const d = Math.hypot(x2 - x1, y2 - y1), up = y2 < y1 - 8, steep = Math.abs(x2 - x1) < .55 * Math.abs(y2 - y1); return d + (up && steep ? 40 : 0); };
       [a.y, y, l.yU, l.yL, (a.y + y) / 2].forEach(wy => {
         const x0 = xMinAt(wy), x1 = l.xMaxAt(wy); if (x1 - x0 < 4) return;
         for (let i = 0; i <= 16; i++) {
@@ -148,7 +155,7 @@
     /* salto con anticipación / aire / caída / amortiguación */
     async function jump(view, h) {
       h = (h || .32) * a.S; await space(h * 1.1); await room(); h = Math.min(h, headroom(a.x, a.y)); if (h < .08 * a.S) return; setState('JUMPING');
-      const J = view === 'R' ? C.jumpR : C.jumpF;
+      const J = view === 'R' ? C.jumpR : view === 'L' && C.leap ? C.leap : C.jumpF;
       await a.play(J.crouch);
       if (view === 'R') { fire(J.up); await a.tween('lift', h, .22, 'out'); fire(J.peak); await a.wait(.04); await a.tween('lift', 0, .26, 'in'); }
       else { fire(J.air); await a.tween('lift', h, .24, 'out'); await a.wait(.04); await a.tween('lift', 0, .28, 'in'); }
@@ -156,15 +163,27 @@
       await a.play(J.land);
       a.rest(view === 'R' ? 'R' : 'F');
     }
-    /* saludar: nunca dos saludos seguidos (mín. 14 s entre uno y otro, salvo la llegada y la despedida); de frente con una mano
-       (alterna de lado cada vez) o girando a 3/4 para saludar moviendo la muñeca */
+    /* saludar: las variantes salen de una bolsa (no se repite una hasta agotarlas) y hay presupuesto: sin forzar, mín. 40 s entre saludos
+       y como mucho 3 en 6 min. De frente con una mano (alterna de lado), de frente con la muñeca, o girando a 3/4 con la muñeca. */
+    let waveQ = [], waveLast = '';
+    const nextWave = () => {
+      if (!waveQ.length) { waveQ = ['fl', 'fr', 'w', 'r'].filter(v => v !== 'w' || S.Frames.has('wavew_1')); for (let i = waveQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [waveQ[i], waveQ[j]] = [waveQ[j], waveQ[i]]; } if (waveQ[waveQ.length - 1] === waveLast) waveQ.unshift(waveQ.pop()); }
+      return waveLast = waveQ.pop();
+    };
+    const waveOK = () => { D.waveLog = (D.waveLog || []).filter(t => D.t - t < 360); return D.t - (D.lastWave || -99) >= 40 && D.waveLog.length < 3; };
+    D.waveOK = waveOK;
     async function wave(n, o) {
-      if (!(o && o.force) && D.t - (D.lastWave || -99) < 14) return;
-      D.lastWave = D.t; setState('GREETING'); await room();
-      if (a.stance === 'R') await a.play(C.waveR(2 + (n > 2 ? 1 : 0)));
-      else if (Math.random() < .35) { await toR(Math.random() < .5 ? 1 : -1); await a.wait(.15); await a.play(C.waveR(3)); a.rest('R'); await front(); }
-      else { D.waveSide = -(D.waveSide || 1); await a.play(C.waveF(D.waveSide, 1.5 + .4 * (n || 1))); }
-      a.rest(a.stance);
+      o = o || {}; if (!o.force && !waveOK()) return false;
+      D.lastWave = D.t; (D.waveLog = D.waveLog || []).push(D.t); setState('GREETING'); await room(.55);
+      const v = nextWave();
+      if (v === 'r') { if (a.stance !== 'R') await toR(Math.random() < .5 ? 1 : -1); await a.wait(.12); await a.play(C.waveR(2 + (n > 2 ? 1 : 0))); a.rest('R'); await front(); }
+      else {
+        await front();
+        if (v === 'w') await a.play(C.waveW(2 + (n > 2 ? 1 : 0)));
+        else { D.waveSide = -(D.waveSide || 1); await a.play(C.waveF(v === 'fl' ? -1 : 1, 1.5 + .4 * (n || 1))); }
+        a.rest('F');
+      }
+      return true;
     }
     async function thumbs() { setState('THUMBS_UP'); await room(); await front(); a.fx('like'); await a.play(C.likeF()); a.rest('F'); }
     async function clap(n) { setState('CELEBRATING'); await front(); await a.play(C.clap(n)); a.rest('F'); }
@@ -196,126 +215,6 @@
     }
     async function sayNow(text) { await space(a.S * .5); return S.say(a, text, bubbleBox()); }
 
-    /* ================= comportamientos autónomos ================= */
-    const BEH = {
-      /* mirar alrededor (de frente) */
-      lookAround: async () => { setState('LOOKING'); await front(); await a.play(C.around()); a.rest('F'); },
-      /* pasea sin más: va a otro punto y vuelve de frente al público */
-      wander: async () => { const s = spot(); await goTo(s.x, s.y); if (a.stance === 'R' && D.energy > .55 && Math.random() < .28) await jump('R', .24); await front(); },
-      /* saluda al público */
-      greet: async () => { if (Math.random() < .5) { const s = spot(); await goTo(s.x, s.y); } await front(); await wave(2 + (Math.random() < .4 ? 1 : 0)); },
-      /* me gusta */
-      thumbs: async () => { if (Math.random() < .5) { const s = spot(); await goTo(s.x, s.y); } await thumbs(); },
-      /* aplaude */
-      clap: async () => { await clap(3); },
-      /* saltito de alegría */
-      play: async () => { await front(); await jump('F', .3); if (Math.random() < .5) { await a.wait(.25); await jump('F', .24); } },
-      /* QR: mira → camina → se detiene → mira → señala → vuelve a señalar → reacción positiva → se aleja */
-      inviteQR: async () => {
-        const l = L(), q = nearQR();
-        setState('QR_INTERACTION');
-        await toR(l.qrc[0] > a.x ? 1 : -1); await a.wait(.55);                           // mira hacia el QR
-        await goTo(q.x, q.y); setState('QR_INTERACTION');
-        await toR(-1); await a.wait(.4);                                                 // se detiene de cara al QR
-        await point(2);                                                                  // señala (rebote)
-        await front(); await a.play(C.lookUser()); a.rest('F');                          // mira al usuario
-        await toR(-1); await point(1);                                                   // vuelve a señalar
-        const rr = Math.random(); if (rr < .4) await thumbs(); else if (rr < .75) await clap(2); else { await toR(-1); await jump('R', .26); }   // reacción positiva pequeña
-        await a.wait(.3); const s = spot({ minDist: 1 }); await goTo(s.x, s.y);          // se aleja
-      },
-      /* antes del PIN: se acerca al candado, niega con la cabeza y señala el campo del PIN */
-      lookLock: async () => {
-        const l = L(), q = nearQR(); setState('LOOKING');
-        await goTo(q.x, q.y); await toR(-1); await a.wait(.6);                           // mira el candado
-        await front(); await shake(2);                                                    // "aún no"
-        await toR(1); await a.wait(.35); setState('QR_INTERACTION'); await point(2);     // señala hacia el panel
-        await front(); await a.play(C.lookUser()); a.rest('F');
-      },
-      /* esconderse detrás del panel de la sala y asomarse (capas reales: el panel va por delante) */
-      peekaboo: async () => {
-        const l = L(); if (!l.canHide) return BEH.lookAround();
-        const y = l.oneLane ? l.yU : (Math.random() < .5 ? l.yL : rnd(l.yU, l.yL)); setState('HIDING');
-        await goTo(l.xMaxAt(y) - .08 * a.S, y); await toR(1); await a.wait(.35);
-        const hideX = l.hideX(); await runLeg(hideX, y, { speed: .95 });                  // entra detrás del panel
-        await a.wait(rnd(.9, 1.6));
-        const n = Math.random() < .5 ? 1 : 2;
-        for (let i = 0; i < n; i++) {
-          setState('PEEKING'); a.face(1); a.stance = 'R'; a.autoIdle = false; a.setS(l.sAt(y));
-          const edge = l.pr.left + 4, half = a.S * .72, v = i === 0 ? 1 : 2;
-          a.place(edge + half, y); fire(C.peek(v)); await a.tween('x', edge, .42, 'out');      // asoma deslizándose por el borde del panel
-          await a.wait(v === 1 ? 1.05 : 1.35); await a.tween('x', edge + half, .38, 'in');   // se mete
-          await a.wait(rnd(.7, 1.3));
-        }
-        a.place(hideX, y); a.face(-1); a.stance = 'R';
-        await runLeg(l.xMaxAt(y) - .1 * a.S, y, { speed: 1.1 });                          // sale corriendo por debajo del panel
-        await toR(-1); await front(); await wave(1);
-      },
-      /* esconderse detrás del QR (la tarjeta va por debajo de SETPI: se recorta en su borde) y asomarse */
-      peekQR: async () => {
-        const l = L(), y = l.yU, edge = l.qr.right + 3; setState('HIDING');
-        try {
-          await goTo(edge + .55 * l.SU, y); await toR(-1); await a.wait(.3);
-          a.clipL = edge; await runLeg(edge - .6 * a.S, y, { speed: .95 });          // se mete detrás de la tarjeta del QR
-          await a.wait(rnd(.9, 1.5));
-          const n = Math.random() < .5 ? 1 : 2, half = a.S * .72;
-          for (let i = 0; i < n; i++) {
-            setState('PEEKING'); a.face(-1); a.stance = 'R'; a.autoIdle = false; a.clipL = edge;
-            a.place(edge - half, y); fire(C.peekQR(i === 0 ? 1 : 2)); await a.tween('x', edge, .42, 'out');
-            await a.wait(i === 0 ? 1.05 : 1.35); await a.tween('x', edge - half, .38, 'in'); await a.wait(rnd(.7, 1.2));
-          }
-          a.place(edge - .6 * a.S, y); a.face(1); a.stance = 'R'; a.rest('R');
-          await runLeg(edge + .62 * a.S, y, { speed: 1.1 });                           // sale corriendo hacia la derecha
-        } finally { a.clipL = -1e9; }
-        await toR(1); await front(); await wave(1);
-      },
-      /* dormir esperando: se sienta → bosteza → cabecea → duerme (Z temporales) → despierta */
-      nap: async () => {
-        setState('SLEEPING');
-        if (Math.random() < .6) { const s = spot({ lane: 'L' }); await goTo(s.x, s.y); }
-        await front(); await a.wait(.5);
-        await a.play(C.sit()); await a.play(C.yawn()); await a.play(C.nod());
-        a.loop(C.sleepLoop()); const n = Math.floor(rnd(3, 6));
-        for (let i = 0; i < n; i++) { a.fx('zzz'); await a.wait(rnd(2.4, 3.2)); }
-        await wakeUp(true);
-      },
-      /* viaje en bus: espera en la parada, llega el bus (detrás del panel), sube por la puerta y se va; vuelve corriendo */
-      ride: async () => {
-        const g = rideGeo(); if (!g) return; const l = L();
-        setState('RIDING'); D.riding = true;
-        try {
-          if (D.busTarget && Math.random() < .5) await BEH.busWave();                 // primero saluda al bus que pasa por el fondo
-          await goTo(g.xn - RIDE.wait * g.s, g.y); setState('RIDING');
-          await toR(1); await a.wait(.35); a.fx('alert');                             // mira hacia donde llegan los buses
-          bus.clipX = l.pr.left; bus.place(l.pr.left + 26, g.y, g.k); bus.show(true, false);
-          const arrive = a.tween('x', g.xn, 1.9, 'out', bus);                          // el bus llega frenando
-          fire(C.waveR(1)); await arrive; a.fx('dust', { n: 2 }); bus.front = true;
-          await a.tween('dy', 3 * g.k, .12, 'out', bus); await a.tween('dy', 0, .22, 'io', bus);   // cabeceo al frenar
-          await a.wait(.15); await jump('R', .2); await runLeg(g.xn + RIDE.f1 * g.s, g.y, { speed: 1.2 });          // salta de alegría y corre a la puerta
-          // sube: frame a frame, con el desplazamiento y la altura del escalón
-          a.autoIdle = false; a.stance = 'R'; a.face(1); a.place(g.xn + RIDE.f1 * g.s, g.y);
-          await a.play([{ f: 'bus_1', t: .3, fade: .05 }]);
-          fire([{ f: 'bus_2', t: .34, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.f2 * g.s, .3, 'io'), a.tween('lift', RIDE.l2 * g.s, .3, 'out')]);
-          fire([{ f: 'bus_3', t: .34, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.f3 * g.s, .3, 'io'), a.tween('lift', RIDE.l3 * g.s, .3, 'io')]);
-          fire([{ f: 'bus_4', t: .6, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.f4 * g.s, .5, 'io'), a.tween('lift', RIDE.l4 * g.s, .5, 'io'), a.tween('a', 0, .45, 'in', a.mod), a.tween('br', .35, .45, 'lin', a.mod)]);
-          a.show(false); a.cancel(); a.lift = 0; D.away = true; setState('AWAY'); bus.front = false; bus.apply();
-          await a.wait(.5);
-          await a.tween('x', -(VBW * g.k) - 80, 2.9, 'in3', bus); bus.show(false);    // el bus se va hacia la izquierda, por detrás del contenido
-          await a.wait(rnd(13, 22));                                                    // paseo
-          D.away = false; D.active = D.t; const sp = spot({ lane: 'L', minDist: 0 });
-          await enter(sp.x, sp.y, 1.9); await front(); await wave(2, { force: true });   // vuelve corriendo por detrás del panel
-        } finally { D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; }
-      },
-      /* analizando una pregunta: "?" sobre la cabeza y mira alrededor pensando */
-      think: async () => { setState('THINKING'); await front(); a.fx('question'); await a.play(C.around()); a.rest('F'); await a.wait(rnd(.4, 1)); if (Math.random() < .45) { a.fx('question'); await a.play(C.lookUser()); a.rest('F'); } },
-      /* mira el podio (el panel está a su derecha) */
-      watchPodium: async () => { setState('WATCHING'); await toR(1); await a.wait(rnd(1.6, 2.6)); await front(); },
-      /* un bus pasa por detrás: lo mira y lo saluda */
-      busWave: async () => {
-        const b = D.busTarget; if (!b) return; setState('GREETING');
-        await toR(b.dir); await a.wait(.25); await a.play(C.waveR(1 + (Math.random() < .5 ? 1 : 0))); a.rest('R');
-        await a.wait(.3); await front();
-      }
-    };
     const asleep = () => /^(sleep|nod|yawn|sit|wake)/.test(a.pose.f);
     async function wakeUp(natural) {
       setState('SURPRISED'); a.cancel();
@@ -325,56 +224,27 @@
     async function wakeIfAsleep() { if (asleep()) { a.fx('alert'); await a.play(C.wake()); a.rest('R'); a.face(1); } }
 
     /* ---- geometría del viaje: la parada está en el carril alto, pegada al borde del panel (la puerta cabe entera a la vista) ---- */
-    const RIDE = { wait: .62, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12 };   // fracciones de S respecto a la trompa del bus
+    const RIDE = { wait: .62, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12, e1: .8, e2: .86, e3: 1.02, el1: .12, el2: .06 };   // e*/el*: bajada por la puerta (x y altura del escalón)   // fracciones de S respecto a la trompa del bus
     const VBW = 356;
     function rideGeo() {
       const l = L(); if (!bus || !l.side || l.oneLane) return null;
       let y = l.yU, s = l.SU, xn = l.pr.left - 8 - 1.06 * s;
+      const hr = x => Math.min(headroom(x, y), headroom(x + .5 * s, y), headroom(x + s, y));
+      /* la ventanilla (SETPI asomado, más alto que de pie) pasa de largo bajo el texto: se mide el aire a todo lo largo del recorrido */
+      const wantW = S.Frames.has('bwin_1'), hrW = () => { let h = 1e9; for (let x = xMinAt(y); x <= xn + 1.44 * s; x += .25 * s) h = Math.min(h, headroom(x, y)); return h; };
       /* el escalón sube a SETPI: si arriba no hay aire hasta el texto, la parada baja un poco (más cerca de la cámara = más espacio) */
-      const hr = x => Math.min(headroom(x, y), headroom(x + .5 * s, y), headroom(x + s, y)), need = (RIDE.l3 + .06) * s;
-      if (hr(xn) < need) { y = Math.min(l.yL, y + (need - hr(xn)) * 1.5); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; if (hr(xn) < (RIDE.l3 + .03) * s) return null; }
+      for (let i = 0; i < 9 && y < l.yL && hr(xn) < (RIDE.l3 + .06) * s; i++) { y = Math.min(l.yL, y + 14); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; }
+      if (hr(xn) < (RIDE.l3 + .03) * s) return null;
       const k = s / 100;
       if (xn - .45 * s < xMinAt(y) || !valid(clamp(xn - RIDE.wait * s, l.xMin, l.xMaxAt(y)), y)) return null;
-      return { y, s, k, xn };
+      const ws = Math.min(.9, ((wantW ? hrW() : -1e9) + .36 * s - 6) / (.69 * s));       // escala con la que SETPI cabe en la ventanilla sin tocar el texto de arriba
+      return { y, s, k, xn, win: wantW && ws >= .64, ws };
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
-    /* ---- elección: cada comportamiento declara SUS condiciones ---- */
-    const COOL = { think: 7, watchPodium: 6, lookAround: 16, wander: 9, greet: 45, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 45, peekQR: 60, nap: 140, busWave: 18, ride: 110 };
-    function weights() {
-      const l = L(), ph = D.phase, n = D.players, idle = idleFor(), W = {}, hostBusy = D.t - D.hostT < 7;
-      const qrOpen = ph === 'lobby';
-      if (ph === 'quiz') { const q = D.quiz; return q.inTrans ? { watchPodium: 4, wander: .6, thumbs: .5 } : { think: 5, lookAround: 1.2, wander: .6, thumbs: .4 }; }
-      if (hostBusy) return { lookAround: .6 };                                  // el anfitrión escribe el PIN: SETPI no estorba
-      W.lookAround = ph === 'podium' ? 1 : 2.2;
-      W.wander = ph === 'podium' ? 1.2 : 2.6;
-      W.greet = ph === 'pin' ? 1.5 : ph === 'lobby' ? (n > 0 ? 2.4 : 1.6) : 3;
-      if (ph !== 'pin') W.thumbs = ph === 'podium' ? 3 : (n >= 2 ? 2 + (D.t - D.lastJoin < 25 ? 2 : 0) : .8);
-      if (ph === 'podium' || (qrOpen && n >= 3)) W.clap = ph === 'podium' ? 3 : 1.4;
-      if (D.energy > .5 && ph !== 'podium') W.play = .9 + (D.energy - .5) * 3;
-      if (ph === 'pin') W.lookLock = idle > 10 ? 3.4 : 1.2;                          // mira el candado, señala el PIN
-      if (qrOpen) W.inviteQR = (n === 0 ? 4.2 : n <= 2 ? 2.4 : .5) * (idle > 14 ? 1.5 : 1);   // invita a escanear cuando falta gente
-      if (l.canHide && ph !== 'podium') W.peekaboo = n <= 3 ? 2.6 : 1.2;
-      if (ph !== 'podium' && valid(clamp(l.qr.right + 3 + .55 * l.SU, l.xMin, l.xMaxAt(l.yU)), l.yU)) W.peekQR = 1.9;
-      if ((ph === 'pin' && idle > 45) || (qrOpen && n === 0 && idle > 38) || (D.energy < .25 && idle > 25)) W.nap = 5 + Math.min(6, (idle - 30) / 6);
-      if (D.busTarget && ph !== 'podium') W.busWave = 5.5;
-      if (ph !== 'podium' && idle > 20 && D.energy > .3 && D.t - D.lastJoin > 30 && (ph === 'pin' ? idle > 25 : idle > 15) && rideGeo()) W.ride = (qrOpen && n === 0 ? 3 : 1.5) + (D.busTarget ? 1 : 0);
-      return W;
-    }
-    function choose() {
-      const W = weights(); let tot = 0; const c = [];
-      for (const k in W) {
-        if (!W[k] || !BEH[k] || D.t - (D.last[k] || -999) < COOL[k] || k === D.lastRun) continue;
-        let w = W[k]; const recent = D.hist.slice(-3).filter(h => h === k).length; if (recent) w *= .35;
-        tot += w; c.push([k, w]);
-      }
-      if (!c.length) return 'wander';
-      let r = Math.random() * tot; for (const [k, v] of c) { if ((r -= v) <= 0) return k; } return c[0][0];
-    }
-
     /* ================= bucle principal: reacciones > comportamiento autónomo ================= */
     D.reaction = null;
     D.interrupt = (fn, prio, needs) => { prio = prio || 1; if (prio < D.prio && D.running) return false; D.reaction = fn; D.reactPrio = prio; D.reactNeeds = !!needs; a.cancel(); return true; };
-    D.run = name => D.interrupt(async () => { D.last[name] = D.t; D.lastRun = name; await BEH[name](); }, 0);
+    D.run = name => D.interrupt(async () => { D.note(name); await D.SC[name].run(); }, 0);
     async function main() {
       for (;;) {
         try {
@@ -387,10 +257,10 @@
           if (!a.visible) { await a.wait(.5); continue; }
           if (D.attentive) { await a.wait(.4); continue; }
           // reposo: respira y parpadea; la duración depende de la energía (cansado = más quieto)
-          await settle(); await idle(rnd(2.6, 7.5) * (1.35 - D.energy * .6)); layout();
-          const k = choose(); D.lastRun = k; D.last[k] = D.t; D.hist.push(k); if (D.hist.length > 8) D.hist.shift();
-          await BEH[k](); await settle();
-          D.energy = clamp(D.energy - .04, .05, 1);
+          await settle(); await D.rest(); layout();
+          const k = D.pick(); D.note(k);
+          await D.SC[k].run(); await settle();
+          D.energy = clamp(D.energy - .025, .05, 1);
         } catch (e) { if (e !== CANCEL) { console.error('[SETPI]', e); await a.wait(1).catch(() => { }); } }
       }
     }
@@ -405,36 +275,6 @@
       const l = L(); a.cancel(); a.stance = 'R'; a.face(-1); a.setS(l.sAt(ty)); a.place(l.hideX(), ty); a.show(true); a.rest('R');
       await runLeg(tx, ty, { speed: speed || 1.7 });
     }
-    async function reactJoin(prev, n) {
-      markActive(); D.energy = clamp(D.energy + .25, 0, 1); await emerge(); setState('REACTING');
-      const big = (prev === 0 || n - prev >= 3) && D.t - D.lastBigJoin > 8;
-      await surprised();
-      if (big) {
-        D.lastBigJoin = D.t; await a.wait(.12); await jump('F', .34); a.fx('spark');
-        await celebrate(prev === 0 ? 2 : 1); await front(); await wave(2);
-      } else {
-        await a.wait(.08);
-        if (n >= 4) { await clap(3); await thumbs(); }
-        else if (Math.random() < .5) { await thumbs(); } else { await clap(2); }
-      }
-    }
-    D.onPlayers = function (n) {
-      const prev = D.players; D.players = n;
-      if (n > prev && D.phase === 'lobby' && (a.visible || D.away) && D.t - D.lastJoin > 3.5) { D.lastJoin = D.t; D.interrupt(() => reactJoin(prev, n), 2, true); }
-      else if (n > prev) D.lastJoin = D.t;
-    };
-    D.pinError = function () {
-      if ((!a.visible && !D.away) || D.phase !== 'pin') return; markActive();
-      D.interrupt(async () => { setState('REACTING'); await emerge(); await surprised(); await shake(2); }, 2, true);
-    };
-    /* SIEMPRE llama cb: el reveal real del QR/sala nunca depende de la animación */
-    D.unlock = function (cb) {
-      let done = false; const fin = () => { if (done) return; done = true; if (cb) cb(); };
-      setTimeout(fin, 2300);
-      if (!a.visible && !D.away) { fin(); return; }
-      markActive(); D.energy = 1; D.attentive = false;
-      D.interrupt(async () => { setState('CELEBRATING'); await emerge(); await surprised(); fin(); await a.wait(.05); await jump('F', .36); await celebrate(2); await thumbs(); }, 3, true);
-    };
     /* el anfitrión enfoca / escribe en el campo del PIN: SETPI se vuelve hacia el panel y mira con atención */
     D.hostFocus = function (on) {
       D.hostT = D.t; if (D.phase !== 'pin' || (!a.visible && !D.away)) return;
@@ -444,54 +284,6 @@
       } else if (!on && D.attentive) { D.attentive = false; D.hostT = D.t - 3; }
     };
     D.hostTyping = function () { D.hostT = D.t; markActive(); };
-    /* ---- la prueba: SETPI se queda, piensa con "?" en cada pregunta, mira el podio y celebra a quien va ganando ---- */
-    D.top = []; D.quiz = { idx: -1, inTrans: false, total: 10 }; D.lastLeaderT = -99;
-    D.leaderboard = function (top, nJug) {
-      const prev = D.top[0] && D.top[0].nombre; D.top = top || []; D.nJug = nJug || D.top.length;
-      if (D.phase === 'quiz' && prev && D.top[0] && D.top[0].nombre !== prev && a.visible && D.t - D.lastLeaderT > 6) { D.lastLeaderT = D.t; const nm = D.top[0].nombre; D.interrupt(() => reactLeader(nm), 2, true); }
-    };
-    /* el panel avisa cada 0,2 s en qué pregunta va y si está en la pausa entre preguntas */
-    D.quizTick = function (info) {
-      const q = D.quiz, was = q.inTrans; q.total = info.total || q.total;
-      if (info.idx !== q.idx) { q.idx = info.idx; q.inTrans = !!info.inTrans; if (D.phase === 'quiz' && a.visible && !q.inTrans && D.prio < 2) D.interrupt(() => BEH.think(), 1, true); return; }
-      q.inTrans = !!info.inTrans;
-      if (D.phase === 'quiz' && q.inTrans && !was && a.visible && D.prio < 2 && D.t - D.lastLeaderT > 5) D.interrupt(() => BEH.watchPodium(), 1, true);
-    };
-    async function reactLeader(nombre) {
-      setState('REACTING'); markActive(); await emerge(); await toR(1); await a.wait(.15); await point(1); await front();
-      await sayNow('¡' + nombre + ' va primero!'); await clap(3); await a.wait(1.1); S.sayClear(a); if (Math.random() < .5) await thumbs();
-    }
-    async function quizStart() {
-      setState('REACTING'); await emerge(); await front(); await jump('F', .3); await sayNow('¡Que empiece la prueba!'); await a.wait(1.9); S.sayClear(a);
-    }
-    /* al terminar: dice en texto quién ganó el 1.º, 2.º y 3.º y luego pregunta si quedó todo claro */
-    async function announceWinners() {
-      setState('CELEBRATING'); markActive(); await emerge();
-      for (let i = 0; i < 40 && !D.top.length && D.phase === 'podium'; i++) await a.wait(.1);          // espera el último dato del podio
-      const T = D.top.filter(Boolean).slice(0, 3);
-      await front(); await jump('F', .3);
-      if (T.length) {
-        await say('¡Terminó la prueba! Los ganadores son…', 2.3);
-        const lin = ['¡Primer lugar: ', 'Segundo lugar: ', 'Tercer lugar: '];
-        for (let i = 0; i < T.length; i++) {
-          await say(lin[i] + T[i].nombre + (i === 0 ? '!' : ''), clamp(1.6 + T[i].nombre.length * .06, 2.2, 3.4));
-          if (i === 0) { await jump('F', .3); await celebrate(1); } else if (i === 1) await clap(2); else await thumbs();
-        }
-      }
-      await front(); fire(C.lookUser()); await say('¿Quedó todo claro?', 3.4);
-    }
-    D.setPhase = function (p) {
-      if (D.phase === p) return; D.phase = p; markActive(); D.attentive = false;
-      if (p === 'quiz') D.interrupt(quizStart, 3, true);
-      else if (p === 'podium') D.interrupt(announceWinners, 3, true);
-      else D.interrupt(async () => { await front(); await wave(2, { force: true }); }, 3, true);          // vuelve a la sala / al PIN
-    };
-    stage.addEventListener('click', e => {
-      if (!e.target.classList || !e.target.classList.contains('sp-cv')) return;
-      if (D.state === 'EXITING' || D.state === 'RIDING' || D.prio >= 3) return;
-      markActive(); D.energy = clamp(D.energy + .12, 0, 1);
-      D.interrupt(async () => { setState('REACTING'); await surprised(); await a.wait(.05); const r = Math.random(); if (r < .4) await wave(2); else if (r < .75) await thumbs(); else await jump('F', .28); }, 2);
-    });
     if (cfg.pin) { const p = cfg.pin(); if (p) { p.addEventListener('focus', () => D.hostFocus(true)); p.addEventListener('blur', () => D.hostFocus(false)); p.addEventListener('input', () => D.hostTyping()); } }
 
     /* ================= buses de fondo (solo se observan) ================= */
@@ -511,7 +303,7 @@
     let last = 0, chain = 0, wall = 0, sense = 0;
     const reduced = g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isActive = () => !document.hidden && slide.classList.contains('activa');
-    D.step = dt => { D.t += dt; D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
+    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
     function kick() {
       const my = ++chain; last = 0;
       const f = ts => {
@@ -546,6 +338,8 @@
       setTimeout(layout, 1500);                                       // tras las animaciones de entrada de la diapositiva
       if (slide.classList.contains('activa')) setTimeout(() => { if (D.state === 'IDLE' && !D.reaction) D.intro(); }, 400);
     }
+    const P = { a, D, L, C, CANCEL, rnd, clamp, WID, bus, setState, fire, front, toR, runLeg, leg, backLeg, goTo, room, space, headroom, hits, box, valid, clear, xMinAt, spot, nearQR, idle, hop, jump, wave, thumbs, clap, surprised, shake, celebrate, point, say, sayNow, bubbleBox, rideGeo, RIDE, VBW, enter, emerge, wakeUp, wakeIfAsleep, asleep, markActive, settle, layout };
+    D.P = P; if (S.Scenes) S.Scenes(D, P);
     S.Frames.load(S.base).then(boot);
     return D;
   };
