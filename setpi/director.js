@@ -54,6 +54,7 @@
       l.hideX = () => (side ? pr.left : sr.width) + .62 * l.sAt(l.yL);        // detrás del panel / fuera de pantalla
       l.canHide = side && (l.xMaxAt(l.yL) - xMinAt(l.yL)) >= 0;
       if (cfg.pin) { const p = rel(cfg.pin().getBoundingClientRect(), sr); l.pinc = [p.left + p.w / 2, p.top + p.h / 2]; }
+      a.clipR = side ? pr.left : 1e9;                                 // el panel va por delante: SETPI no se transparenta detrás de él
       a.setCap(Math.max(SU, SL, 120));
       a.scaleAt = y => l.sAt(y);
       const ny = onY != null ? clamp(l.yU + onY * (l.yL - l.yU), l.yU, l.yL) : (a.y || l.yL);

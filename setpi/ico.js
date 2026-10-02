@@ -30,7 +30,7 @@
   };
   g.Ico = function (name, o) {
     const s = o && o.s ? o.s + 'px' : '1.15em';
-    return '<svg class="ico" viewBox="0 0 48 48" width="' + (o && o.s ? o.s : '') + '" height="' + (o && o.s ? o.s : '') + '" style="width:' + s + ';height:' + s + '" aria-hidden="true" focusable="false">' + (I[name] || '') + '</svg>';
+    return '<svg class="ico" viewBox="0 0 48 48"' + (o && o.s ? ' width="' + o.s + '" height="' + o.s + '"' : '') + ' style="width:' + s + ';height:' + s + '" aria-hidden="true" focusable="false">' + (I[name] || '') + '</svg>';
   };
   const css = document.createElement('style'); css.textContent = '.ico{display:inline-block; vertical-align:-.22em; flex:none; overflow:visible;}'; document.head.appendChild(css);
 })(window);

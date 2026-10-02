@@ -45,7 +45,7 @@
       this.mod = { dx: 0, dy: 0, rot: 0, sx: 1, sy: 1, a: 1, br: 1 };
       this.dpr = Math.min(2, g.devicePixelRatio || 1);
       this.scaleAt = null;         // y -> S (profundidad); lo pone el director
-      this.pathHook = null; this.clipL = -1e9;       // recorte: solo se ve lo que queda a la derecha de clipL (esconderse tras el QR)
+      this.pathHook = null; this.clipL = -1e9; this.clipR = 1e9;       // recorte: solo se ve lo que queda a la derecha de clipL (esconderse tras el QR)
     }
     /* ---------- tamaño / posición ---------- */
     setCap(Scap) {                // lienzo para el tamaño máximo; el dibujo usa S <= Scap
@@ -216,12 +216,14 @@
         this._blit(ctx, this.prev.f in S.Frames.meta ? this.prev.f : 'idle_a', this.prev.mod, this.prev.flip, 1);
         this._blit(ctx, f, this.mod, flip, p);
       } else this._blit(ctx, f, this.mod, flip, 1);
-      this.cv.style.clipPath = this.clipL > -1e8 ? 'inset(0 0 0 ' + Math.max(0, this.clipL - (this.x - this.cvW / 2)).toFixed(1) + 'px)' : '';
+      const L0 = this.x - this.cvW / 2, il = this.clipL > -1e8 ? Math.max(0, this.clipL - L0) : 0, ir = this.clipR < 1e8 ? Math.max(0, L0 + this.cvW - this.clipR) : 0;   // lo que cae detrás del panel / tarjeta no se transparenta
+      this.cv.style.clipPath = il || ir ? 'inset(0 ' + ir.toFixed(1) + 'px 0 ' + il.toFixed(1) + 'px)' : '';
       this.root.style.transform = 'translate3d(' + this.x.toFixed(1) + 'px,' + (this.y - this.lift).toFixed(1) + 'px,0)';
       const sw = this.S * .62 * (1 - clamp(this.lift / (this.S * .9), 0, .55)), shh = this.S * .11;
       this.sh.style.width = sw.toFixed(1) + 'px'; this.sh.style.height = shh.toFixed(1) + 'px';
       this.sh.style.transform = 'translate3d(' + (this.x - sw / 2).toFixed(1) + 'px,' + (this.y - shh * .55).toFixed(1) + 'px,0)';
       this.sh.style.opacity = (1 - clamp(this.lift / (this.S * 1.1), 0, .6)).toFixed(2);
+      this.sh.style.clipPath = this.clipR < 1e8 && this.x + sw / 2 > this.clipR ? 'inset(0 ' + Math.max(0, this.x + sw / 2 - this.clipR).toFixed(1) + 'px 0 0)' : '';
     }
   }
   S.Actor = Actor;
