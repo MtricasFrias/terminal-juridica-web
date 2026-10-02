@@ -7,6 +7,18 @@
     e.style.left = x + 'px'; e.style.top = y + 'px'; if (html) e.innerHTML = html; a.layerFx.appendChild(e); a.fxN++;
     setTimeout(() => { e.remove(); a.fxN--; }, life); return e;
   }
+  /* globo de texto de SETPI (sin emojis): sobre su cabeza, dentro de los límites libres que da el director */
+  S.sayClear = function (a) { if (a.sayEl) { const e = a.sayEl; a.sayEl = null; e.classList.add('out'); setTimeout(() => e.remove(), 260); } };
+  S.say = function (a, text, o) {
+    o = o || {}; S.sayClear(a);
+    const e = document.createElement('div'); e.className = 'sp-say'; e.textContent = text; a.layerFx.appendChild(e); a.sayEl = e;
+    let fs = Math.round(a.S * (o.size || .115)); e.style.fontSize = fs + 'px'; e.style.maxWidth = Math.round(Math.min(o.maxW || a.S * 2.7, (o.maxX - o.minX) || 9999)) + 'px';
+    const h = a.headPos(), gap = Math.round(a.S * .07);
+    for (let i = 0; i < 7; i++) { e.style.fontSize = fs + 'px'; if (e.offsetHeight + gap + h.r * .9 <= (h.y - h.r - (o.minY == null ? 0 : o.minY))) break; fs = Math.round(fs * .88); }
+    const w = e.offsetWidth, x = Math.max((o.minX || 0) + w / 2, Math.min(h.x, (o.maxX == null ? 1e9 : o.maxX) - w / 2));
+    e.style.left = x.toFixed(1) + 'px'; e.style.top = (h.y - h.r * 1.12 - gap).toFixed(1) + 'px'; e.style.setProperty('--tx', (h.x - x).toFixed(1) + 'px');
+    return e;
+  };
   S.fx = function (a, kind, o) {
     o = o || {}; const h = a.headPos(), s = a.S;
     if (kind === 'zzz') {
@@ -24,6 +36,8 @@
     } else if (kind === 'like') {
       const w = Math.round(s * (o.size || .5)); const e = mk(a, 'like', h.x + a.facing * h.r * 1.5, h.y - h.r * .6, 1600, '<img src="' + (S.base || 'setpi/') + 'f/like_glove.webp" style="width:100%;display:block" alt="">');
       if (e) e.style.setProperty('--w', w + 'px');
+    } else if (kind === 'question') {
+      const w = Math.round(s * .3); const e = mk(a, 'q', h.x + a.facing * h.r * 1.05, h.y - h.r * 1.5, 2800, '<span>?</span>'); if (e) { e.style.setProperty('--w', w + 'px'); e.style.fontSize = Math.round(w * .78) + 'px'; }
     } else if (kind === 'dust') {
       const n = o.n || 3;
       for (let i = 0; i < n; i++) {

@@ -79,8 +79,8 @@ button{font:inherit; cursor:pointer;}
 .lobby-cabeza{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
 .pulso{display:inline-flex; align-items:center; gap:8px; font-size:.82rem; font-weight:700; color:var(--royal);}
 .punto{width:9px; height:9px; border-radius:50%; background:var(--royal); animation:pulso 1.3s ease-in-out infinite;}
-.premio-banner{display:flex; align-items:center; gap:10px; background:linear-gradient(90deg,var(--gold-bg),var(--cyan-soft)); border:1px dashed var(--gold); border-radius:14px; padding:11px 14px; font-weight:800; font-size:.85rem; color:#7a5a0a; margin-bottom:16px;}
-.premio-banner .ico{font-size:1.4rem; animation:floaty 2.2s ease-in-out infinite;}
+.premio-banner{display:flex; align-items:center; gap:10px; background:#FFF1C2; border:2px solid var(--navy); border-radius:14px; padding:11px 14px; font-weight:800; font-size:.85rem; color:#7a5a0a; margin-bottom:16px;}
+.premio-banner .ico{display:inline-flex; align-items:center; flex:none; animation:floaty 2.2s ease-in-out infinite;}
 .roster{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px; min-height:44px;}
 .chip-persona{display:flex; align-items:center; gap:7px; background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:5px 13px 5px 5px; font-size:.85rem; font-weight:700; color:var(--navy); animation:pop .4s cubic-bezier(.2,.8,.2,1) both;}
 .chip-persona svg{width:26px; height:26px; border-radius:50%;}
@@ -151,19 +151,18 @@ button{font:inherit; cursor:pointer;}
 .podio-escenario{display:flex; align-items:flex-end; justify-content:center; gap:10px; margin:18px 0 10px;}
 .pedestal{width:31%; display:flex; flex-direction:column; align-items:center; opacity:0; transform:translateY(30px); animation:subirPodio .55s cubic-bezier(.2,.8,.2,1) forwards;}
 @keyframes subirPodio{to{opacity:1; transform:translateY(0);}}
-.pedestal .estrellas{font-size:.95rem; letter-spacing:2px; animation:mhTwinkle 1.6s ease-in-out infinite; filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));}
-.pedestal.ped-1 .estrellas{font-size:1.2rem;}
 @keyframes mhTwinkle{0%,100%{opacity:.45; transform:scale(.85);} 50%{opacity:1; transform:scale(1.1);}}
-.pedestal .nom{font-size:.74rem; font-weight:800; color:var(--navy); background:var(--card); border:1px solid var(--line); padding:3px 9px; border-radius:999px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; box-shadow:var(--shadow); margin:3px 0 4px;}
-.pedestal.ped-1 .nom{font-size:.82rem; background:var(--gold-bg); border-color:var(--gold);}
+.pedestal .nom{font-size:.74rem; font-weight:800; color:var(--navy); background:var(--card); border:2px solid var(--navy); padding:3px 9px; border-radius:999px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; box-shadow:var(--shadow); margin:3px 0 4px;}
+.pedestal.ped-1 .nom{font-size:.82rem; background:#FFE9A8;}
 .pedestal .muneco{animation:floaty 2.6s ease-in-out infinite; margin-bottom:-6px; position:relative; z-index:1;}
-.pedestal.ped-1 .muneco{filter:drop-shadow(0 8px 16px rgba(240,168,0,.5));}
-.pedestal .bloque{width:100%; border-radius:10px 10px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 -3px 12px rgba(0,0,0,.12);}
-.pedestal .num{font-family:"Barlow",sans-serif; font-weight:800; font-size:1.4rem; color:#fff;}
-.pedestal .pts-ticker{font-size:.7rem; font-weight:700; color:rgba(255,255,255,.88); margin-top:1px;}
-.ped-1 .bloque{height:128px; background:linear-gradient(180deg,var(--gold),#a9781f);}
-.ped-2 .bloque{height:94px; background:linear-gradient(180deg,var(--royal),var(--navy));}
-.ped-3 .bloque{height:72px; background:linear-gradient(180deg,var(--cyan),var(--navy));}
+.pedestal.ped-1 .muneco{filter:none;}
+.pedestal .bloque{position:relative; width:100%; border:3px solid var(--navy); border-bottom:0; border-radius:12px 12px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:5px 0 0 rgba(11,31,92,.28); overflow:hidden;}
+.pedestal .bloque::before{content:""; position:absolute; left:0; right:0; top:0; height:22%; background:rgba(255,255,255,.42);}
+.pedestal .num{position:relative; font-family:"Barlow",sans-serif; font-weight:900; font-size:1.5rem; line-height:1; color:var(--navy); text-shadow:0 2px 0 rgba(255,255,255,.5);}
+.pedestal .pts-ticker{position:relative; font-size:.72rem; font-weight:800; color:var(--navy); margin-top:2px;}
+.ped-1 .bloque{height:128px; background:#F6B91D;}
+.ped-2 .bloque{height:94px; background:#C9D1DC;}
+.ped-3 .bloque{height:72px; background:#D58A4A;}
 .confeti{position:fixed; top:-10px; width:9px; height:14px; border-radius:2px; z-index:5; animation:caer linear forwards;}
 .tabla-tit{display:flex; justify-content:space-between; align-items:baseline; margin:18px 0 10px;}
 .tabla-tit h3{font-size:1rem; color:var(--navy);}
@@ -249,7 +248,7 @@ button{font:inherit; cursor:pointer;}
     <div class="lobby-yo-setpi" id="lobby-yo-setpi"></div>
     <div class="lobby-yo-tx">Listo para el reto, <span id="lobby-yo-nombre"></span> — descansa mientras llega el resto.</div>
   </div>
-  <div class="premio-banner"><span class="ico">🏆</span><span>Los 3 primeros puestos de la clasificación final se llevan premio — ¡a jugársela!</span></div>
+  <div class="premio-banner"><span class="ico" data-ico="trofeo" data-s="30"></span><span>Los 3 primeros puestos de la clasificación final se llevan premio — ¡a jugársela!</span></div>
   <div id="lobby-roster" class="roster"></div>
   <div class="contador-sala" id="lobby-cuenta"></div>
 </div>
@@ -271,10 +270,10 @@ button{font:inherit; cursor:pointer;}
 </div>
 
 <div id="p-podio" class="pantalla card" hidden>
-  <div class="podio-hero"><div class="trofeo">🏆</div><h1 style="font-size:1.4rem">¡Cuestionario terminado!</h1></div>
+  <div class="podio-hero"><div class="trofeo" data-ico="trofeo" data-s="56"></div><h1 style="font-size:1.4rem">¡Cuestionario terminado!</h1></div>
   <div style="display:flex; align-items:center; justify-content:center; gap:10px; background:var(--paper); border-radius:12px; padding:12px; margin:14px 0; font-weight:800; color:var(--navy)" class="mono" id="mi-puntaje-fila"></div>
   <div class="podio-escenario" id="podio-escenario"></div>
-  <div class="premio-banner" style="margin-top:4px"><span class="ico">🎁</span><span>Premio para el 1°, 2° y 3° puesto.</span></div>
+  <div class="premio-banner" style="margin-top:4px"><span class="ico" data-ico="regalo" data-s="30"></span><span>Premio para el 1°, 2° y 3° puesto.</span></div>
   <div class="tabla-tit"><h3>Clasificación completa</h3><span id="cuenta-jugadores"></span></div>
   <div id="tabla-pos"></div>
   <div class="footnote">Se actualiza sola mientras el resto termina. Gracias por participar.</div>
@@ -294,15 +293,18 @@ button{font:inherit; cursor:pointer;}
     <div style="text-align:center; margin:10px 0"><img src="qr_cuestionario.png" alt="Código QR del cuestionario" style="width:min(60vw,260px); height:min(60vw,260px); border-radius:16px; box-shadow:var(--shadow-lg); background:#fff; padding:12px;"></div>
     <div class="host-lista" id="host-lista"></div>
     <div class="contador-sala" id="host-cuenta"></div>
-    <button id="host-btn-iniciar" class="btn-grande" style="background:linear-gradient(135deg,var(--green),#0c7a4a); margin-top:12px;">▶ Iniciar para todos</button>
+    <button id="host-btn-iniciar" class="btn-grande" style="background:linear-gradient(135deg,var(--green),#0c7a4a); margin-top:12px;"><span data-ico="play"></span> Iniciar para todos</button>
     <button id="host-btn-reiniciar" class="btn-grande" style="background:linear-gradient(135deg,var(--red),#a01e1e); margin-top:10px;">↺ Reiniciar sesión (borra resultados)</button>
     <div class="err" id="host-err2"></div>
   </div>
 </div>
 
 </div>
-<button class="host-badge" id="btn-modo-host" title="Modo anfitrión">🔑</button>
+<script src="setpi/ico.js"></script>
+<button class="host-badge" id="btn-modo-host" title="Modo anfitrión" data-ico="llave" data-s="22"></button>
 <script>
+/* iconos: sin emojis, imágenes vectoriales (setpi/ico.js) */
+document.querySelectorAll("[data-ico]").forEach(e=>{ e.insertAdjacentHTML("afterbegin", Ico(e.dataset.ico, e.dataset.s ? {s:+e.dataset.s} : null)); });
 (function(){
 "use strict";
 const API_URL = "https://script.google.com/macros/s/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg/exec";
@@ -486,7 +488,7 @@ function mostrarToast(idxPregunta, correcta, puntos){
   if(!elToasts) return;
   const t = document.createElement("div");
   t.className = "toast-tardio " + (correcta ? "ok" : "no");
-  t.innerHTML = `<b>Pregunta ${idxPregunta+1}:</b><span>${correcta ? `✓ correcta · +${puntos} pts` : "✕ incorrecta"}</span>`;
+  t.innerHTML = `<b>Pregunta ${idxPregunta+1}:</b><span>${correcta ? `${Ico("listo")} correcta · +${puntos} pts` : `${Ico("equis")} incorrecta`}</span>`;
   elToasts.appendChild(t);
   requestAnimationFrame(()=>t.classList.add("mostrar"));
   setTimeout(()=>{ t.classList.remove("mostrar"); setTimeout(()=>t.remove(), 350); }, 3400);
@@ -504,7 +506,7 @@ function mostrarReaccionFull(correcta, puntos){
   clearTimeout(reaccionFullTimer);
   elReaccionFull.className = "reaccion-full " + (correcta ? "ok" : "no");
   elReaccionSetpi.innerHTML = avatarSVG((correcta ? "muy_feliz_ojo_cerrado" : "enojado") + ":camisa_azul_alcaldia_setp:gorra_alcaldia_ibague", 230, "cuerpo");
-  elReaccionSello.textContent = correcta ? "👍" : "✋";
+  elReaccionSello.innerHTML = correcta ? '<img src="setpi/f/like_glove.webp" alt="" style="width:min(30vw,118px); display:block">' : Ico("equis", {s:74});
   const frase = correcta ? FRASES_OK[Math.floor(Math.random()*FRASES_OK.length)] : FRASES_NO[Math.floor(Math.random()*FRASES_NO.length)];
   elReaccionTexto.textContent = correcta ? `${frase} +${puntos} pts` : frase;
   requestAnimationFrame(()=>elReaccionFull.classList.add("mostrar"));
@@ -545,8 +547,8 @@ async function responder(idx, opcionIdx, tiempoMs){
     reaccionSetpi(r.correcta);
     mostrarReaccionFull(r.correcta, r.puntos);
     elFeedback.innerHTML = r.correcta
-      ? `<div class="feedback ok">✓ ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${PUNTAJE}</small></div>`
-      : `<div class="feedback no">${opcionIdx<0 ? "⏱ Se acabó el tiempo" : "✕ No era esa"}<small>Total hasta ahora: ${PUNTAJE}</small></div>`;
+      ? `<div class="feedback ok">${Ico("listo")} ¡Bien! +${r.puntos} puntos<small>Total hasta ahora: ${PUNTAJE}</small></div>`
+      : `<div class="feedback no">${opcionIdx<0 ? Ico("reloj") + " Se acabó el tiempo" : Ico("equis") + " No era esa"}<small>Total hasta ahora: ${PUNTAJE}</small></div>`;
     elEsperando.textContent = "Ya respondiste. Esperando a que termine el tiempo de esta pregunta…";
     elEsperando.hidden = false;
   } else {
@@ -580,11 +582,11 @@ function animarConteo(el, hasta, ms){
 }
 function pintarEscenario(tabla){
   const orden = [tabla[1], tabla[0], tabla[2]];
-  const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"], tamanos = [64,92,56], estrellas = ["✨✨","👑✨✨✨","✨✨"];
+  const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"], tamanos = [64,92,56];
   elEscenario.innerHTML = orden.map((f,i)=>{
     if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><div class="bloque"><span class="num">${num[i]}°</span></div></div>`;
     const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
-    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="estrellas">${estrellas[i]}</span><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><div class="bloque"><span class="num">${num[i]}°</span><span class="pts-ticker" data-pts="${f.puntos}">0 pts</span></div></div>`;
+    return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><div class="bloque"><span class="num">${num[i]}°</span><span class="pts-ticker" data-pts="${f.puntos}">0 pts</span></div></div>`;
   }).join("");
   elEscenario.querySelectorAll(".pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 500+i*200));
 }

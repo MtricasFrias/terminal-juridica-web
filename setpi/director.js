@@ -177,6 +177,23 @@
     }
     async function point(k) { a.rest(a.stance); await a.play(C.pointR(k || 1)); a.rest('R'); }
     const doneAway = () => { a.show(false); setState('AWAY'); };
+    /* globo de texto sobre su cabeza (sin emojis). Si arriba no hay aire hasta el texto de la página, se mueve a un sitio con espacio. */
+    /* límites libres para el globo: ni sobre el QR/texto de la página ni sobre el panel */
+    function bubbleBox() {
+      const l = L(), top = a.y - l.K * a.S, band = [top - .7 * a.S, top];
+      let minX = 8, maxX = (l.side ? l.pr.left : l.sr.width) - 8, minY = 6;
+      l.obs.forEach(o => {
+        if (o.bottom > band[0] - 4 && o.top < band[1]) { if (o.right <= a.x) minX = Math.max(minX, o.right + 8); else if (o.left >= a.x) maxX = Math.min(maxX, o.left - 8); }
+        if (o.right > a.x - .8 * a.S && o.left < a.x + .8 * a.S && o.bottom <= top + 4) minY = Math.max(minY, o.bottom + 4);
+      });
+      return { minX, maxX, minY, maxW: Math.max(a.S * 1.2, Math.min(a.S * 2.7, maxX - minX)) };
+    }
+    async function say(text, secs) {
+      await space(a.S * .5); S.say(a, text, bubbleBox());
+      await a.wait(secs || clamp(1.5 + text.length * .07, 1.9, 4.2));
+      S.sayClear(a);
+    }
+    async function sayNow(text) { await space(a.S * .5); return S.say(a, text, bubbleBox()); }
 
     /* ================= comportamientos autónomos ================= */
     const BEH = {
@@ -287,6 +304,10 @@
           await enter(sp.x, sp.y, 1.9); await front(); await wave(2, { force: true });   // vuelve corriendo por detrás del panel
         } finally { D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; }
       },
+      /* analizando una pregunta: "?" sobre la cabeza y mira alrededor pensando */
+      think: async () => { setState('THINKING'); await front(); a.fx('question'); await a.play(C.around()); a.rest('F'); await a.wait(rnd(.4, 1)); if (Math.random() < .45) { a.fx('question'); await a.play(C.lookUser()); a.rest('F'); } },
+      /* mira el podio (el panel está a su derecha) */
+      watchPodium: async () => { setState('WATCHING'); await toR(1); await a.wait(rnd(1.6, 2.6)); await front(); },
       /* un bus pasa por detrás: lo mira y lo saluda */
       busWave: async () => {
         const b = D.busTarget; if (!b) return; setState('GREETING');
@@ -317,10 +338,11 @@
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
     /* ---- elección: cada comportamiento declara SUS condiciones ---- */
-    const COOL = { lookAround: 16, wander: 9, greet: 45, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 90, peekQR: 110, nap: 140, busWave: 18, ride: 240 };
+    const COOL = { think: 7, watchPodium: 6, lookAround: 16, wander: 9, greet: 45, thumbs: 38, clap: 45, play: 40, inviteQR: 44, lookLock: 30, peekaboo: 45, peekQR: 60, nap: 140, busWave: 18, ride: 110 };
     function weights() {
       const l = L(), ph = D.phase, n = D.players, idle = idleFor(), W = {}, hostBusy = D.t - D.hostT < 7;
       const qrOpen = ph === 'lobby';
+      if (ph === 'quiz') { const q = D.quiz; return q.inTrans ? { watchPodium: 4, wander: .6, thumbs: .5 } : { think: 5, lookAround: 1.2, wander: .6, thumbs: .4 }; }
       if (hostBusy) return { lookAround: .6 };                                  // el anfitrión escribe el PIN: SETPI no estorba
       W.lookAround = ph === 'podium' ? 1 : 2.2;
       W.wander = ph === 'podium' ? 1.2 : 2.6;
@@ -330,11 +352,11 @@
       if (D.energy > .5 && ph !== 'podium') W.play = .9 + (D.energy - .5) * 3;
       if (ph === 'pin') W.lookLock = idle > 10 ? 3.4 : 1.2;                          // mira el candado, señala el PIN
       if (qrOpen) W.inviteQR = (n === 0 ? 4.2 : n <= 2 ? 2.4 : .5) * (idle > 14 ? 1.5 : 1);   // invita a escanear cuando falta gente
-      if (l.canHide && ph !== 'podium') W.peekaboo = n <= 3 ? 1.5 : .6;
-      if (ph !== 'podium' && valid(clamp(l.qr.right + 3 + .55 * l.SU, l.xMin, l.xMaxAt(l.yU)), l.yU)) W.peekQR = 1.2;
+      if (l.canHide && ph !== 'podium') W.peekaboo = n <= 3 ? 2.6 : 1.2;
+      if (ph !== 'podium' && valid(clamp(l.qr.right + 3 + .55 * l.SU, l.xMin, l.xMaxAt(l.yU)), l.yU)) W.peekQR = 1.9;
       if ((ph === 'pin' && idle > 45) || (qrOpen && n === 0 && idle > 38) || (D.energy < .25 && idle > 25)) W.nap = 5 + Math.min(6, (idle - 30) / 6);
       if (D.busTarget && ph !== 'podium') W.busWave = 5.5;
-      if (ph !== 'podium' && idle > 20 && D.energy > .3 && D.t - D.lastJoin > 40 && (ph === 'pin' ? idle > 45 : true) && rideGeo()) W.ride = (qrOpen && n === 0 ? 1.7 : .6) + (D.busTarget ? .9 : 0);
+      if (ph !== 'podium' && idle > 20 && D.energy > .3 && D.t - D.lastJoin > 30 && (ph === 'pin' ? idle > 25 : idle > 15) && rideGeo()) W.ride = (qrOpen && n === 0 ? 3 : 1.5) + (D.busTarget ? 1 : 0);
       return W;
     }
     function choose() {
@@ -357,11 +379,11 @@
         try {
           if (D.reaction) {
             const r = D.reaction; D.reaction = null; D.prio = D.reactPrio || 1; D.running = true; layout();
-            try { if (D.reactNeeds && !a.visible && D.phase !== 'quiz') { D.away = false; const sp = spot({ lane: 'L', minDist: 0 }); await enter(sp.x, sp.y, 1.9); } await wakeIfAsleep(); await r(); } finally { D.running = false; D.prio = 0; }
+            try { if (D.reactNeeds && !a.visible) { D.away = false; const sp = spot({ lane: 'L', minDist: 0 }); await enter(sp.x, sp.y, 1.9); } await wakeIfAsleep(); await r(); } finally { D.running = false; D.prio = 0; }
             await settle(); setState(a.visible ? 'IDLE' : 'AWAY'); continue;
           }
-          if (D.phase !== 'quiz' && !a.visible && !D.riding && D.ready) { const sp = spot({ lane: 'L', minDist: 0 }); D.away = false; await enter(sp.x, sp.y, 1.8); continue; }   // red de seguridad: nada lo esconde ya, vuelve
-          if (D.phase === 'quiz' || !a.visible) { await a.wait(.5); continue; }
+          if (!a.visible && !D.riding && D.ready) { const sp = spot({ lane: 'L', minDist: 0 }); D.away = false; await enter(sp.x, sp.y, 1.8); continue; }   // red de seguridad: nada lo esconde ya, vuelve
+          if (!a.visible) { await a.wait(.5); continue; }
           if (D.attentive) { await a.wait(.4); continue; }
           // reposo: respira y parpadea; la duración depende de la energía (cansado = más quieto)
           await settle(); await idle(rnd(2.6, 7.5) * (1.35 - D.energy * .6)); layout();
@@ -372,7 +394,7 @@
       }
     }
     /* siempre vuelve a la pose neutra de frente con su salida (nunca un salto brusco) */
-    async function settle() { a.cancel(); a.lift = 0; if (!a.visible) return; if (asleep()) { await a.play(C.wake()); a.rest('R'); a.face(1); } if (a.stance === 'R') await front(); else { a.face(1); a.rest('F'); } }
+    async function settle() { S.sayClear(a); a.cancel(); a.lift = 0; if (!a.visible) return; if (asleep()) { await a.play(C.wake()); a.rest('R'); a.face(1); } if (a.stance === 'R') await front(); else { a.face(1); a.rest('F'); } }
 
     /* ================= reacciones a eventos de la página ================= */
     /* si estaba escondido detrás del panel, sale corriendo por debajo */
@@ -421,21 +443,47 @@
       } else if (!on && D.attentive) { D.attentive = false; D.hostT = D.t - 3; }
     };
     D.hostTyping = function () { D.hostT = D.t; markActive(); };
+    /* ---- la prueba: SETPI se queda, piensa con "?" en cada pregunta, mira el podio y celebra a quien va ganando ---- */
+    D.top = []; D.quiz = { idx: -1, inTrans: false, total: 10 }; D.lastLeaderT = -99;
+    D.leaderboard = function (top, nJug) {
+      const prev = D.top[0] && D.top[0].nombre; D.top = top || []; D.nJug = nJug || D.top.length;
+      if (D.phase === 'quiz' && prev && D.top[0] && D.top[0].nombre !== prev && a.visible && D.t - D.lastLeaderT > 6) { D.lastLeaderT = D.t; const nm = D.top[0].nombre; D.interrupt(() => reactLeader(nm), 2, true); }
+    };
+    /* el panel avisa cada 0,2 s en qué pregunta va y si está en la pausa entre preguntas */
+    D.quizTick = function (info) {
+      const q = D.quiz, was = q.inTrans; q.total = info.total || q.total;
+      if (info.idx !== q.idx) { q.idx = info.idx; q.inTrans = !!info.inTrans; if (D.phase === 'quiz' && a.visible && !q.inTrans && D.prio < 2) D.interrupt(() => BEH.think(), 1, true); return; }
+      q.inTrans = !!info.inTrans;
+      if (D.phase === 'quiz' && q.inTrans && !was && a.visible && D.prio < 2 && D.t - D.lastLeaderT > 5) D.interrupt(() => BEH.watchPodium(), 1, true);
+    };
+    async function reactLeader(nombre) {
+      setState('REACTING'); markActive(); await emerge(); await toR(1); await a.wait(.15); await point(1); await front();
+      await sayNow('¡' + nombre + ' va primero!'); await clap(3); await a.wait(1.1); S.sayClear(a); if (Math.random() < .5) await thumbs();
+    }
+    async function quizStart() {
+      setState('REACTING'); await emerge(); await front(); await jump('F', .3); await sayNow('¡Que empiece la prueba!'); await a.wait(1.9); S.sayClear(a);
+    }
+    /* al terminar: dice en texto quién ganó el 1.º, 2.º y 3.º y luego pregunta si quedó todo claro */
+    async function announceWinners() {
+      setState('CELEBRATING'); markActive(); await emerge();
+      for (let i = 0; i < 40 && !D.top.length && D.phase === 'podium'; i++) await a.wait(.1);          // espera el último dato del podio
+      const T = D.top.filter(Boolean).slice(0, 3);
+      await front(); await jump('F', .3);
+      if (T.length) {
+        await say('¡Terminó la prueba! Los ganadores son…', 2.3);
+        const lin = ['¡Primer lugar: ', 'Segundo lugar: ', 'Tercer lugar: '];
+        for (let i = 0; i < T.length; i++) {
+          await say(lin[i] + T[i].nombre + (i === 0 ? '!' : ''), clamp(1.6 + T[i].nombre.length * .06, 2.2, 3.4));
+          if (i === 0) { await jump('F', .3); await celebrate(1); } else if (i === 1) await clap(2); else await thumbs();
+        }
+      }
+      await front(); fire(C.lookUser()); await say('¿Quedó todo claro?', 3.4);
+    }
     D.setPhase = function (p) {
       if (D.phase === p) return; D.phase = p; markActive(); D.attentive = false;
-      if (p === 'quiz') {
-        D.interrupt(async () => {
-          const l = L(); setState('EXITING'); await emerge(); await front(); await wave(2, { force: true });
-          await runLeg(l.hideX(), a.y, { speed: 1.8 }); doneAway();                         // se despide y se va por detrás del panel
-        }, 3);
-      } else if (!a.visible) {
-        layout(); const l = L();
-        D.interrupt(async () => {
-          const ty = l.oneLane ? l.yU : l.yL, tx = p === 'podium' ? clamp(l.sr.width * .42, xMinAt(ty), l.xMaxAt(ty)) : spot({ lane: 'L' }).x;
-          await enter(tx, ty, 1.8);
-          if (p === 'podium') { await front(); await jump('F', .36); await celebrate(2); await thumbs(); await clap(3); } else { await front(); await wave(2); }
-        }, 3);
-      } else if (p === 'podium') D.interrupt(async () => { await front(); await jump('F', .36); await celebrate(2); await thumbs(); await clap(3); }, 3);
+      if (p === 'quiz') D.interrupt(quizStart, 3, true);
+      else if (p === 'podium') D.interrupt(announceWinners, 3, true);
+      else D.interrupt(async () => { await front(); await wave(2, { force: true }); }, 3, true);          // vuelve a la sala / al PIN
     };
     stage.addEventListener('click', e => {
       if (!e.target.classList || !e.target.classList.contains('sp-cv')) return;

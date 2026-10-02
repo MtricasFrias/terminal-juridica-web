@@ -150,6 +150,14 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
   .qr-tx{max-width:none; text-align:center;}
   .qr-box img{width:min(56vw,260px); height:min(56vw,260px);}
 }
+.mh-ped{display:flex; flex-direction:column; align-items:center; width:26%;}
+.mh-nom{font-size:clamp(7px,.62vw,10px); font-weight:800; color:var(--navy); background:#fff; border:2px solid var(--navy); border-radius:999px; padding:1px 7px; margin:2px 0 3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; box-shadow:2px 2px 0 rgba(11,31,92,.25);}
+.mh-bloque{position:relative; width:100%; border:3px solid var(--navy); border-bottom:0; border-radius:8px 8px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--navy); font-family:Barlow,sans-serif; box-shadow:4px 0 0 rgba(11,31,92,.3); overflow:hidden;}
+.mh-bloque::before{content:""; position:absolute; left:0; right:0; top:0; height:24%; background:rgba(255,255,255,.42);}
+.mh-bloque span{position:relative;}
+.mh-num{font-weight:900; font-size:.95rem; line-height:1; text-shadow:0 1.5px 0 rgba(255,255,255,.5);}
+.mh-pts-ticker{font-size:.6rem; font-weight:800; margin-top:1px;}
+.p-oro{background:#F6B91D;} .p-plata{background:#C9D1DC;} .p-bronce{background:#D58A4A;}
 </style>
 <link rel="stylesheet" href="setpi/setpi.css">
 </head>
@@ -160,8 +168,9 @@ h2.tit{font-size:clamp(26px,3.3vw,48px); font-weight:700; color:var(--navy); lin
   <button id="btn-prev" aria-label="Anterior">←</button>
   <span class="cont-n mono" id="nav-cont">1 / 19</span>
   <button id="btn-next" aria-label="Siguiente">→</button>
-  <button id="btn-full" aria-label="Pantalla completa" title="Pantalla completa" style="margin-left:10px">⛶</button>
+  <button id="btn-full" aria-label="Pantalla completa" title="Pantalla completa" style="margin-left:10px"></button>
 </div>
+<script src="setpi/ico.js"></script>
 <script src="setpi/engine.js"></script>
 <script src="setpi/fx.js"></script>
 <script src="setpi/bus.js"></script>
@@ -323,9 +332,9 @@ slide("bienvenida","",`
       <h2 class="tit entra" style="animation-delay:.05s">No se trata solo de cumplir un plazo</h2>
       <p class="entra" style="animation-delay:.1s; font-size:clamp(14px,1.35vw,20px); color:var(--ink-soft); max-width:36vw; line-height:1.55;">La finalidad es que la entidad responda <b style="color:var(--navy)">correctamente</b> al ciudadano dentro del término legal, y evite los riesgos de respuestas tardías, incompletas o que no atienden lo pedido.</p>
       <div class="grid" style="grid-template-columns:1fr; gap:.9vh; margin-top:.6vh">
-        <div class="card entra" style="animation-delay:.16s; display:flex; align-items:center; gap:12px"><span style="font-size:1.4rem">📖</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Entender</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">Qué es un derecho de petición y sus términos legales.</div></div></div>
-        <div class="card entra" style="animation-delay:.22s; display:flex; align-items:center; gap:12px"><span style="font-size:1.4rem">🤝</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Coordinar</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">No es solo tarea de Jurídica, sino de todas las áreas.</div></div></div>
-        <div class="card entra" style="animation-delay:.28s; display:flex; align-items:center; gap:12px"><span style="font-size:1.4rem">🧭</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Usar la herramienta</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">La Terminal Jurídica, para no dejar vencer un término.</div></div></div>
+        <div class="card entra" style="animation-delay:.16s; display:flex; align-items:center; gap:12px"><span style="font-size:1.7rem; line-height:0">${Ico("libro")}</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Entender</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">Qué es un derecho de petición y sus términos legales.</div></div></div>
+        <div class="card entra" style="animation-delay:.22s; display:flex; align-items:center; gap:12px"><span style="font-size:1.7rem; line-height:0">${Ico("equipo")}</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Coordinar</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">No es solo tarea de Jurídica, sino de todas las áreas.</div></div></div>
+        <div class="card entra" style="animation-delay:.28s; display:flex; align-items:center; gap:12px"><span style="font-size:1.7rem; line-height:0">${Ico("brujula")}</span><div><b style="color:var(--navy); font-size:clamp(13px,1.1vw,16px)">Usar la herramienta</b><div style="font-size:clamp(11px,.95vw,14px); color:var(--ink-soft)">La Terminal Jurídica, para no dejar vencer un término.</div></div></div>
       </div>
     </div>
     <div class="ilustra entra" style="animation-delay:.15s">${svgSobre("#01274B",240)}</div>
@@ -397,7 +406,7 @@ slide("terminos","",`
   <h2 class="tit entra" style="animation-delay:.05s">Los términos según el tipo de petición</h2>
   <div class="cont" style="justify-content:center">
     <div class="grid g3">${svgTramites()}</div>
-    <div class="card entra" style="animation-delay:.5s"><p style="margin:0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">⚠️ <b style="color:var(--navy)">Excepcionalmente</b> el término puede ampliarse hasta el <b>doble</b> (10→20, 15→30, 30→60), avisando <b>antes</b> de que venza el plazo original. No es un mecanismo habitual.</p></div>
+    <div class="card entra" style="animation-delay:.5s"><p style="margin:0; font-size:clamp(11px,1vw,14px); color:var(--ink-soft)">${Ico("alerta")} <b style="color:var(--navy)">Excepcionalmente</b> el término puede ampliarse hasta el <b>doble</b> (10→20, 15→30, 30→60), avisando <b>antes</b> de que venza el plazo original. No es un mecanismo habitual.</p></div>
   </div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">07 / 19</span></div>
 `);
@@ -410,11 +419,11 @@ slide("fondo","",`
     <div class="contraste">
       <div class="box no entra" style="animation-delay:.18s">
         <img class="avatar-mini entra" alt="" src="data:image/svg+xml,${encodeURIComponent('<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><circle cx=\'20\' cy=\'20\' r=\'20\' fill=\'%23C6362B\'/><circle cx=\'16\' cy=\'17\' r=\'2.2\' fill=\'#fff\'/><circle cx=\'24\' cy=\'17\' r=\'2.2\' fill=\'#fff\'/><path d=\'M14,27 q6,-6 12,0\' stroke=\'#fff\' stroke-width=\'2\' fill=\'none\'/></svg>')}">
-        <div><span class="tag">✕ No es de fondo</span><p style="margin:0 0 .6vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">"¿Cuál es el estado del contrato X?"</p><div class="speech">"La entidad se encuentra comprometida con el cumplimiento de sus funciones…"</div></div>
+        <div><span class="tag">${Ico("equis")} No es de fondo</span><p style="margin:0 0 .6vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">"¿Cuál es el estado del contrato X?"</p><div class="speech">"La entidad se encuentra comprometida con el cumplimiento de sus funciones…"</div></div>
       </div>
       <div class="box si entra" style="animation-delay:.3s">
         <img class="avatar-mini entra" alt="" src="data:image/svg+xml,${encodeURIComponent('<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><circle cx=\'20\' cy=\'20\' r=\'20\' fill=\'%231E8F5F\'/><circle cx=\'16\' cy=\'17\' r=\'2.2\' fill=\'#fff\'/><circle cx=\'24\' cy=\'17\' r=\'2.2\' fill=\'#fff\'/><path d=\'M14,25 q6,7 12,0\' stroke=\'#fff\' stroke-width=\'2\' fill=\'none\'/></svg>')}">
-        <div><span class="tag">✓ Sí es de fondo</span><p style="margin:0 0 .6vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">Misma pregunta</p><div class="speech">"Su solicitud se encuentra en ejecución. A la fecha: […]. El estado de las obligaciones es […]."</div></div>
+        <div><span class="tag">${Ico("listo")} Sí es de fondo</span><p style="margin:0 0 .6vh; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">Misma pregunta</p><div class="speech">"Su solicitud se encuentra en ejecución. A la fecha: […]. El estado de las obligaciones es […]."</div></div>
       </div>
     </div>
   </div>
@@ -427,7 +436,7 @@ slide("urgente","",`
     <div class="cont" style="justify-content:center">
       <h2 class="tit entra" style="animation-delay:.05s">¿Por qué Jurídica pide "urgente" si hay 15 días?</h2>
       <p class="entra" style="animation-delay:.1s; font-size:clamp(13px,1.2vw,18px); color:var(--ink-soft); line-height:1.5">El término legal del ciudadano <b style="color:var(--navy)">no es el mismo</b> que el tiempo interno: recibir, radicar, recolectar información, analizar, redactar, revisar, firmar y notificar toma tiempo.</p>
-      <div class="card entra" style="animation-delay:.2s; background:var(--navy); border:none"><p style="margin:0; color:#fff; font-weight:700; font-size:clamp(12px,1.1vw,16px)">💡 El plazo interno no reemplaza el término legal: es la herramienta para poder cumplirlo.</p></div>
+      <div class="card entra" style="animation-delay:.2s; background:var(--navy); border:none"><p style="margin:0; color:#fff; font-weight:700; font-size:clamp(12px,1.1vw,16px)">${Ico("idea")} El plazo interno no reemplaza el término legal: es la herramienta para poder cumplirlo.</p></div>
     </div>
     <div class="ilustra entra" style="animation-delay:.2s">${svgReloj("#D6488E",210,3)}</div>
   </div>
@@ -465,7 +474,7 @@ slide("comparativa","",`
   <h2 class="tit entra" style="animation-delay:.05s">Derecho de petición vs. acción de tutela</h2>
   <div class="cont" style="justify-content:center">
     <table class="tabla entra" style="animation-delay:.12s">
-      <tr><th>📨 Derecho de petición</th><th>⚖️ Acción de tutela</th></tr>
+      <tr><th>${Ico("carta")} Derecho de petición</th><th>${Ico("balanza")} Acción de tutela</th></tr>
       <tr><td>Es un derecho fundamental</td><td>Mecanismo judicial de protección de derechos fundamentales</td></tr>
       <tr><td>Se presenta ante autoridades</td><td>Se presenta ante un juez</td></tr>
       <tr><td>15 días · documentos: 10 · consulta: 30</td><td>Máximo 10 días para el fallo</td></tr>
@@ -515,7 +524,7 @@ slide("problema","",`
       <div class="box si entra" style="animation-delay:.25s; display:block"><span class="tag">Ahora</span><p style="margin:0; font-size:clamp(12px,1.1vw,16px); line-height:1.6">Semáforo, fecha límite y responsable visibles para todo el equipo — con aviso automático.</p></div>
     </div>
     <div class="grid g3" style="margin-top:.2vh">
-      ${[["📋","Mesa de casos","Cada quien registra y edita lo suyo."],["🗂️","Vista general","Todos consultan el equipo, con filtros."],["✉️","Recordatorios","Automáticos, todos los días hábiles."]].map((c,i)=>`<div class="card entra" style="animation-delay:${.35+i*.08}s; text-align:center"><div style="font-size:clamp(18px,1.8vw,26px)">${c[0]}</div><b style="color:var(--navy); font-size:clamp(11px,1vw,14px); display:block; margin-top:.5vh">${c[1]}</b><div style="font-size:clamp(10px,.85vw,13px); color:var(--ink-soft)">${c[2]}</div></div>`).join("")}
+      ${[["mesa","Mesa de casos","Cada quien registra y edita lo suyo."],["carpetas","Vista general","Todos consultan el equipo, con filtros."],["carta","Recordatorios","Automáticos, todos los días hábiles."]].map((c,i)=>`<div class="card entra" style="animation-delay:${.35+i*.08}s; text-align:center"><div style="font-size:clamp(22px,2.2vw,32px); line-height:1">${Ico(c[0])}</div><b style="color:var(--navy); font-size:clamp(11px,1vw,14px); display:block; margin-top:.5vh">${c[1]}</b><div style="font-size:clamp(10px,.85vw,13px); color:var(--ink-soft)">${c[2]}</div></div>`).join("")}
     </div>
   </div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">15 / 19</span></div>
@@ -541,7 +550,7 @@ slide("cierre","",`
   <div class="cont" style="justify-content:center">
     <p class="entra" style="animation-delay:.1s; font-size:clamp(14px,1.4vw,21px); font-style:italic; color:var(--navy); max-width:60vw; line-height:1.5">"Empieza cuando cada área atiende oportunamente la solicitud de información. Cumplir el término es garantizarle al ciudadano una respuesta real, clara y de fondo."</p>
     <div class="grid g3">
-      ${[["✅","Cada quien","Cambia su clave y activa su correo en la Terminal Jurídica."],["📌","Cuando llegue una petición","Identifica el tipo y responde a Jurídica dentro del plazo interno."],["🤝","Trabajamos","Como una sola entidad frente al ciudadano."]].map((c,i)=>`<div class="card entra" style="animation-delay:${.18+i*.1}s"><b style="color:var(--navy); font-size:clamp(11px,1vw,14px)">${c[0]} ${c[1]}</b><p style="margin:.5vh 0 0; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">${c[2]}</p></div>`).join("")}
+      ${[["listo","Cada quien","Cambia su clave y activa su correo en la Terminal Jurídica."],["chincheta","Cuando llegue una petición","Identifica el tipo y responde a Jurídica dentro del plazo interno."],["equipo","Trabajamos","Como una sola entidad frente al ciudadano."]].map((c,i)=>`<div class="card entra" style="animation-delay:${.18+i*.1}s"><b style="color:var(--navy); font-size:clamp(11px,1vw,14px)">${Ico(c[0])} ${c[1]}</b><p style="margin:.5vh 0 0; font-size:clamp(10px,.9vw,13px); color:var(--ink-soft)">${c[2]}</p></div>`).join("")}
     </div>
   </div>
   <div class="footer"><span>Terminal Jurídica · SETP Ibagué</span><span class="mono">17 / 19</span></div>
@@ -574,11 +583,11 @@ slide("cuestionario","navy",`
         <div class="qr-caja">
           <span class="qr-escanea">¡Escanéame!</span>
           <img id="qr-img" src="qr_cuestionario.png" alt="Código QR del cuestionario">
-          <div class="qr-candado"><span class="qr-candado-ico">🔒</span><span>Esperando el PIN del anfitrión…</span></div>
+          <div class="qr-candado"><span class="qr-candado-ico">${Ico("candado")}</span><span>Esperando el PIN del anfitrión…</span></div>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:1vw; margin-top:.6vh">
-        <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.3rem">🏆</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
+        <div class="card" style="display:flex; align-items:center; gap:8px; padding:10px 12px"><span style="font-size:1.7rem; line-height:0">${Ico("trofeo")}</span><span style="font-weight:700; font-size:clamp(10px,.92vw,13px)">Premio para el 1°, 2° y 3° puesto</span></div>
       </div>
       <span class="link" style="font-size:clamp(9px,.85vw,12px)">mtricasfrias.github.io/terminal-juridica-web/cuestionario.html</span>
     </div>
@@ -594,7 +603,7 @@ slide("cuestionario","navy",`
         <div style="display:flex; justify-content:space-between; align-items:center"><b style="color:var(--navy); font-size:clamp(11px,1vw,14px)">Sala de espera</b><span class="pulso-dot" style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span></div>
         <div id="mh-roster" style="display:flex; flex-wrap:wrap; align-content:flex-start; align-items:flex-start; gap:6px; margin:.8vh 0; min-height:30px; overflow:auto; flex:1;"></div>
         <div id="mh-cuenta" style="font-size:.72rem; color:var(--ink-soft); margin-bottom:.6vh"></div>
-        <button id="mh-btn-iniciar" style="width:100%; background:var(--green); color:#fff; border:none; border-radius:8px; padding:11px; font-weight:800; font-size:.88rem;">▶ Comenzar cuando estés listo</button>
+        <button id="mh-btn-iniciar" style="width:100%; background:var(--green); color:#fff; border:none; border-radius:8px; padding:11px; font-weight:800; font-size:.88rem;">${Ico("play")} Comenzar cuando estés listo</button>
       </div>
       <div id="mh-curso" hidden style="display:flex; flex-direction:column; min-height:0; flex:1; align-items:center; text-align:center;">
         <div id="mh-pregunta-num" style="font-size:clamp(11px,1vw,14px); font-weight:700; color:var(--navy)"></div>
@@ -616,6 +625,7 @@ const deck = document.getElementById("deck");
 SLIDES.forEach(s=>{ const el=document.createElement("section"); el.className="slide "+s.cls; el.id=s.id; el.innerHTML=s.html; deck.appendChild(el); });
 let IDX = Math.max(0, Math.min(SLIDES.length-1, (parseInt((location.hash||"").replace("#",""),10)||1)-1));
 const els = [...document.querySelectorAll(".slide")];
+document.getElementById("btn-full").innerHTML = Ico("pantalla", {s:16});
 const navCont = document.getElementById("nav-cont"), btnPrev=document.getElementById("btn-prev"), btnNext=document.getElementById("btn-next"), btnFull=document.getElementById("btn-full"), progreso=document.getElementById("progreso");
 function ir(i){
   IDX = Math.max(0, Math.min(SLIDES.length-1, i));
@@ -725,24 +735,21 @@ ir(IDX);
   async function actualizarPodio(){
     try{
       const r = await api("quizClasificacion");
-      mhJugandoAhora.textContent = "👥 " + r.jugadores + (r.jugadores===1 ? " persona jugando ahora" : " personas jugando ahora");
+      mhJugandoAhora.innerHTML = Ico("jugadores") + " " + r.jugadores + (r.jugadores===1 ? " persona jugando ahora" : " personas jugando ahora");
       if(!r.tabla.length) return;
       const top3 = r.tabla.slice(0,3);
+      if(SetpiDir) SetpiDir.leaderboard(top3.map(f=>({ nombre:f.jugador, puntos:f.puntos })), r.jugadores);
       const orden = [top3[1], top3[0], top3[2]];
-      const tamanos = [46, 66, 40], colores = ["var(--blue)","var(--gold)","var(--ocobo)"], nums = ["2°","1°","3°"], estrellas = ["✨✨","👑✨✨✨","✨✨"];
+      const tamanos = [46, 66, 40], clases = ["p-plata","p-oro","p-bronce"], nums = ["2°","1°","3°"], alturas = [48,64,38];
       const yaEstaba = podioPintado;
       const entrada = i => yaEstaba ? "" : `opacity:0; animation:mhSube .5s cubic-bezier(.2,.8,.2,1) ${i===1?0:(i===0?.3:.55)}s forwards;`;
       mhPodio.innerHTML = orden.map((f,i)=>{
-        if(!f) return `<div style="width:26%; opacity:.2; height:60px; background:var(--line); border-radius:6px 6px 0 0; align-self:flex-end;"></div>`;
+        if(!f) return `<div style="width:26%; opacity:.2; height:50px; background:var(--line); border:3px solid var(--navy); border-bottom:0; border-radius:8px 8px 0 0; align-self:flex-end;"></div>`;
         const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
-        return `<div style="display:flex; flex-direction:column; align-items:center; width:26%; ${entrada(i)}">
-          <div style="font-size:${i===1?'.95rem':'.72rem'}; letter-spacing:1px; animation:mhTwinkle 1.6s ease-in-out infinite;">${estrellas[i]}</div>
-          <div style="font-size:clamp(7px,.62vw,10px); font-weight:800; color:var(--navy); background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:2px 7px; margin:2px 0 3px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(f.jugador)}</div>
+        return `<div class="mh-ped" style="${entrada(i)}">
+          <div class="mh-nom">${esc(f.jugador)}</div>
           <div style="margin-bottom:-4px">${muneco}</div>
-          <div style="width:100%; height:${i===1?64:i===0?48:38}px; background:linear-gradient(180deg,${colores[i]},var(--navy)); border-radius:6px 6px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:Barlow; box-shadow:0 -2px 10px rgba(0,0,0,.12);">
-            <span style="font-weight:800; font-size:.8rem;">${nums[i]}</span>
-            <span class="mh-pts-ticker" data-pts="${f.puntos}" style="font-size:.6rem; font-weight:700; opacity:.9;">0 pts</span>
-          </div>
+          <div class="mh-bloque ${clases[i]}" style="height:${alturas[i]}px"><span class="mh-num">${nums[i]}</span><span class="mh-pts-ticker" data-pts="${f.puntos}">0 pts</span></div>
         </div>`;
       }).join("");
       if(!yaEstaba) mhPodio.querySelectorAll(".mh-pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 300+i*180));
@@ -763,8 +770,9 @@ ir(IDX);
       const transcurrido = Date.now() - inicioMs;
       const idx = Math.floor(transcurrido / ciclo);
       const restante = Math.max(0, DURACION - (transcurrido - idx*ciclo)/1000);
+      if(SetpiDir && idx < TOTAL_PREGUNTAS) SetpiDir.quizTick({ idx, inTrans: restante<=0, total: TOTAL_PREGUNTAS });
       if(idx >= TOTAL_PREGUNTAS){
-        mhPreguntaNum.textContent = "🏆 ¡Cuestionario terminado!";
+        mhPreguntaNum.textContent = "¡Cuestionario terminado!";
         mhAnilloWrap.hidden = true;
         clearInterval(tickAnillo);
         setpiFase("podium");
@@ -793,7 +801,7 @@ ir(IDX);
     fase("lobby");
     mhRoster.innerHTML = "";
     clearInterval(tickAnillo); clearInterval(pollClasif);
-    mhBtnIniciar.disabled = false; mhBtnIniciar.textContent = "▶ Comenzar cuando estés listo";
+    mhBtnIniciar.disabled = false; mhBtnIniciar.innerHTML = Ico("play") + " Comenzar cuando estés listo";
     mhAnilloWrap.hidden = false; mhJugandoAhora.textContent = ""; podioPintado = false;
     setpiFase("lobby");
     sondearLobby();
@@ -819,13 +827,13 @@ ir(IDX);
   mhPin.addEventListener("keydown", e=>{ if(e.key==="Enter") mhBtnEntrar.click(); });
 
   function avisoPin(btn, textoNormal){
-    btn.textContent = "❌ PIN incorrecto"; btn.disabled = false;
+    btn.innerHTML = Ico("equis") + " PIN incorrecto"; btn.disabled = false;
     if(SetpiDir) SetpiDir.pinError();
-    setTimeout(()=>{ btn.textContent = textoNormal; }, 1900);
+    setTimeout(()=>{ btn.innerHTML = textoNormal; }, 1900);
   }
   mhBtnIniciar.addEventListener("click", async ()=>{
     mhBtnIniciar.disabled = true; mhBtnIniciar.textContent = "Iniciando…";
-    const textoNormal = "▶ Comenzar cuando estés listo";
+    const textoNormal = Ico("play") + " Comenzar cuando estés listo";
     try{
       const r = await api("quizIniciar", TOKEN);
       if(!r.ok){ avisoPin(mhBtnIniciar, textoNormal); return; }

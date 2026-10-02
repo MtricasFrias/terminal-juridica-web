@@ -23,3 +23,12 @@
 .sp-busback,.sp-busfront{position:absolute; left:0; top:0; width:0; height:0; pointer-events:none; will-change:transform; visibility:hidden;}
 .sp-busback{z-index:0;} .sp-busfront{z-index:1;}
 .sp-bus{position:absolute; left:0; top:0; overflow:visible; display:block;}
+/* "?" al analizar una pregunta y globos de texto (sin emojis) */
+.sp-fx.q{width:var(--w); height:var(--w); border-radius:50%; background:#fff; border:3px solid #0B1F5C; box-shadow:3px 3px 0 rgba(11,31,92,.28); display:flex; align-items:center; justify-content:center; font-family:Barlow,sans-serif; font-weight:900; color:#0B1F5C; line-height:1; animation:spQ 2.8s ease-in-out forwards;}
+.sp-fx.q span{display:block; transform:translateY(-4%);}
+@keyframes spQ{0%{opacity:0; transform:translate(-50%,-30%) scale(.2) rotate(-14deg);} 14%{opacity:1; transform:translate(-50%,-62%) scale(1.14) rotate(5deg);} 24%{transform:translate(-50%,-62%) scale(1) rotate(0);} 40%{transform:translate(-50%,-68%) scale(1.05) rotate(-4deg);} 56%{transform:translate(-50%,-62%) scale(1) rotate(4deg);} 74%{opacity:1; transform:translate(-50%,-68%) scale(1.04) rotate(-3deg);} 100%{opacity:0; transform:translate(-50%,-90%) scale(.9);}}
+.sp-say{position:absolute; z-index:4; transform:translate(-50%,-100%); background:#fff; color:#0B1F5C; border:3px solid #0B1F5C; border-radius:18px; padding:.42em .85em; font-family:Barlow,sans-serif; font-weight:800; line-height:1.18; text-align:center; box-shadow:4px 4px 0 rgba(11,31,92,.28); pointer-events:none; animation:spSay .28s cubic-bezier(.2,1.5,.4,1) both; width:max-content;}
+.sp-say::after{content:""; position:absolute; left:calc(50% + var(--tx,0px)); bottom:-10px; width:16px; height:16px; background:#fff; border-right:3px solid #0B1F5C; border-bottom:3px solid #0B1F5C; transform:translateX(-50%) rotate(45deg);}
+.sp-say.out{animation:spSayOut .26s ease-in both;}
+@keyframes spSay{0%{opacity:0; transform:translate(-50%,-90%) scale(.7);} 100%{opacity:1; transform:translate(-50%,-100%) scale(1);}}
+@keyframes spSayOut{to{opacity:0; transform:translate(-50%,-108%) scale(.92);}}
