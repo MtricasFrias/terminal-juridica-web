@@ -197,14 +197,14 @@
         a.show(false); a.cancel(); a.lift = 0; D.away = true; P.setState('AWAY'); bus.front = false; bus.apply();
         await hold(.4);
         /* se asoma por la ventanilla y saluda mientras el bus arranca; desaparece al pasar tras el QR / texto */
-        const win = g.win && have('bwin');
-        const departure = a.tween('x', -(VBW * g.k) - 80, win ? 3.5 : 3.3, win ? 'in' : 'in3', bus);
+        const win = g.win && have('wavew');
+        const departure = a.tween('x', -(VBW * g.k) - 80, win ? 3.4 : 3.3, win ? 'acc' : 'in3', bus);
         if (win) {
           const xL = P.xMinAt(g.y) - P.WID * g.s, wx = () => bus.x + 144 * g.k;
           let started = false;
-          a.scaleAt = null; a.setS(g.s); a.stance = 'F'; a.autoIdle = false; a.face(1); a.lift = 0; a.clipL = xL; a.noShadow = true; a._setPose({ f: 'bwin_1', sx: g.ws, sy: g.ws });
+          a.scaleAt = null; a.setS(g.s); a.stance = 'F'; a.autoIdle = false; a.face(1); a.lift = 0; a.clipL = xL; a.noShadow = true; a._setPose({ f: 'wavew_2', sx: g.ws, sy: g.ws });
           const follow = () => {
-            a.place(wx(), bus.y - 64 * g.k + .025 * g.s);
+            const sill = bus.y - 64 * g.k; a.clipB = sill; a.place(wx(), sill + .64 * g.s * g.ws);      // pies muy por debajo: solo se ve de la barbilla hacia arriba
             if (!started && wx() < l.pr.left - .3 * g.s) { started = true; fire(C.bwin(3, g.ws)); }          // empieza a saludar cuando la ventanilla sale de detrás del panel
             if (wx() < xL - .5 * g.s && a.visible) a.show(false);
           };
@@ -216,15 +216,17 @@
         await hold(rnd(13, 22));                                                      // paseo
         /* regreso: otro bus llega, SETPI aparece en la puerta y baja */
         D.away = false; D.active = D.t;
+        let sh = 0; for (const f of [.4, .3, .2, .1]) { if (P.valid(g.xn - f * g.s + RIDE.e3 * g.s, g.y)) { sh = f; break; } }
+        const xe = g.xn - sh * g.s;
         a.cancel(); bus.clipX = l.pr.left; bus.place(l.pr.left + 26, g.y, g.k); bus.show(true, false);
-        await a.tween('x', g.xn, 1.9, 'out', bus); bus.front = true; bus.apply();
+        await a.tween('x', xe, 1.9, 'out', bus); bus.front = true; bus.apply();
         await a.tween('dy', 3 * g.k, .12, 'out', bus); await a.tween('dy', 0, .22, 'io', bus);
         await hold(.3);
         if (have('bexit')) {
-          const x0 = g.xn + RIDE.e1 * g.s; a.autoIdle = false; a.stance = 'R'; a.face(1); a.place(x0, g.y); a.lift = RIDE.el1 * g.s; a.show(true);
+          const x0 = xe + RIDE.e1 * g.s; a.autoIdle = false; a.stance = 'R'; a.face(1); a.place(x0, g.y); a.lift = RIDE.el1 * g.s; a.show(true);
           await a.play([{ f: 'bexit_1', t: .12, a: .35 }, { f: 'bexit_1', t: .1, a: .7 }, { f: 'bexit_1', t: .5 }]);
-          fire([{ f: 'bexit_2', t: .4, fade: .05 }]); await Promise.all([a.tween('x', g.xn + RIDE.e2 * g.s, .34, 'io'), a.tween('lift', RIDE.el2 * g.s, .34, 'io')]);
-          fire([{ f: 'bexit_4', t: .5, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.e3 * g.s, .42, 'out'), a.tween('lift', .2 * g.s, .2, 'out')]); await a.tween('lift', 0, .22, 'in'); a.fx('dust', { n: 3 });
+          fire([{ f: 'bexit_2', t: .4, fade: .05 }]); await Promise.all([a.tween('x', xe + RIDE.e2 * g.s, .34, 'io'), a.tween('lift', RIDE.el2 * g.s, .34, 'io')]);
+          fire([{ f: 'bexit_4', t: .5, fade: .04 }]); await Promise.all([a.tween('x', xe + RIDE.e3 * g.s, .42, 'out'), a.tween('lift', .2 * g.s, .2, 'out')]); await a.tween('lift', 0, .22, 'in'); a.fx('dust', { n: 3 });
           await a.play([{ f: 'bexit_3', t: .55, fade: .05 }]);
         } else { const sp = P.spot({ lane: 'L', minDist: 0 }); a.cancel(); await P.enter(sp.x, sp.y, 1.9); }
         a.stance = 'F'; a.rest('F');

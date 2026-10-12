@@ -8,7 +8,7 @@
   const S = g.Setpi = g.Setpi || {};
   const CANCEL = S.CANCEL = { cancelado: true };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const ease = { out: t => 1 - (1 - t) * (1 - t), in: t => t * t, in3: t => t * t * t, io: t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, lin: t => t };
+  const ease = { acc: t => t * (.45 + .55 * t), out: t => 1 - (1 - t) * (1 - t), in: t => t * t, in3: t => t * t * t, io: t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, lin: t => t };
 
   /* ---------- carga de frames (los del movimiento primero; el resto en segundo plano) ---------- */
   const CORE = ['idle_a', 'idle_b', 'blink_f', 'turn_34', 'blink_34', 'turn_f', 'run_1', 'run_2', 'run_3', 'run_4', 'run_5', 'run_6'];
@@ -46,7 +46,7 @@
       this.mod = { dx: 0, dy: 0, rot: 0, sx: 1, sy: 1, a: 1, br: 1 };
       this.dpr = Math.min(2, g.devicePixelRatio || 1);
       this.scaleAt = null;         // y -> S (profundidad); lo pone el director
-      this.pathHook = null; this.clipL = -1e9; this.clipR = 1e9;       // recorte: solo se ve lo que queda a la derecha de clipL (esconderse tras el QR)
+      this.pathHook = null; this.clipL = -1e9; this.clipR = 1e9; this.clipB = 1e9;       // recorte: solo se ve lo que queda a la derecha de clipL (esconderse tras el QR)
     }
     /* ---------- tamaño / posición ---------- */
     setCap(Scap) {                // lienzo para el tamaño máximo; el dibujo usa S <= Scap
@@ -63,13 +63,13 @@
     setS(s) { this.S = clamp(s, 20, this.Scap); this.dirty = true; }
     place(x, y) { this.x = x; if (y != null) this.y = y; this.dirty = true; }
     face(d) { if (d !== this.facing) { this.facing = d; this.dirty = true; } }
-    show(v) { this.visible = v; this.root.style.visibility = v ? 'visible' : 'hidden'; this.sh.style.visibility = v ? 'visible' : 'hidden'; this.dirty = true; }
+    show(v) { this.visible = v; this.dirty = true; if (v && this.cvW) this.render(); this.root.style.visibility = v ? 'visible' : 'hidden'; this.sh.style.visibility = v ? 'visible' : 'hidden'; }
     /* ---------- promesas cancelables ---------- */
     _p(fn) { return new Promise((res, rej) => { const rec = { res, rej }; this.pending.add(rec); fn(() => { this.pending.delete(rec); res(); }); }); }
     cancel() {
       this.walk = null; this.anim = null; this.tw = []; this.timers = [];
       const p = [...this.pending]; this.pending.clear(); p.forEach(r => r.rej(CANCEL));
-      this.clipL = -1e9; this.mod.rot = 0; this.mod.sx = this.mod.sy = 1; this.mod.dx = this.mod.dy = 0; this.mod.a = 1; this.mod.br = 1;
+      this.clipL = -1e9; this.clipB = 1e9; this.mod.rot = 0; this.mod.sx = this.mod.sy = 1; this.mod.dx = this.mod.dy = 0; this.mod.a = 1; this.mod.br = 1;
     }
     wait(sec) { return this._p(done => this.timers.push({ t: sec, done })); }
     /* ---------- clips: lista de {f, t, dx, dy, rot, sx, sy, fade} ---------- */
@@ -226,7 +226,8 @@
       } else this._blit(ctx, f, this.mod, flip, 1);
       const L0 = this.x - this.cvW / 2, il = this.clipL > -1e8 ? Math.max(0, this.clipL - L0) : 0, ir = this.clipR < 1e8 ? Math.max(0, L0 + this.cvW - this.clipR) : 0;   // lo que cae detrás del panel / tarjeta no se transparenta
       const V = this._v || (this._v = {}), sv = (k, el, prop, val) => { if (V[k] !== val) { V[k] = val; el.style[prop] = val; } };    // solo se escribe en el DOM lo que cambió
-      sv('cl', this.cv, 'clipPath', il || ir ? 'inset(0 ' + ir.toFixed(1) + 'px 0 ' + il.toFixed(1) + 'px)' : '');
+      const ib = this.clipB < 1e8 ? Math.max(0, (this.y - this.lift) - (this.up * this.Scap + 2) + this.cvH - this.clipB) : 0;
+      sv('cl', this.cv, 'clipPath', il || ir || ib ? 'inset(0 ' + ir.toFixed(1) + 'px ' + ib.toFixed(1) + 'px ' + il.toFixed(1) + 'px)' : '');
       sv('rt', this.root, 'transform', 'translate3d(' + this.x.toFixed(1) + 'px,' + (this.y - this.lift).toFixed(1) + 'px,0)');
       const sw = this.S * .62 * (1 - clamp(this.lift / (this.S * .9), 0, .55)), shh = this.S * .11;
       sv('sd', this.sh, 'display', this.noShadow ? 'none' : '');

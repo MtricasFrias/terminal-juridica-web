@@ -85,6 +85,6 @@
     bow: () => [T('bow_1', .45, { fade: .08 }), T('bow_2', .85, { fade: .06 }), T('bow_3', .75, { fade: .06 }), END()],
     clear: { q: t => [T('clear_1', t || 2, { fade: .08 })], wave: t => [T('clear_2', .3, { fade: .08 }), T('clear_2', t || 1.2, { sway: { a: 1.2, p: 1.2 } })], ok: t => [T('clear_3', t || 1.4, { fade: .08 })] },
     /* viaje en bus: saludando por la ventanilla y bajando por la puerta */
-    bwin: (n, sc) => { sc = sc || .9; return [T('bwin_1', .3, { fade: .1, sx: sc, sy: sc })].concat(rep([T('bwin_2', .34, { sx: sc, sy: sc }), T('bwin_3', .34, { sx: sc, sy: sc })], n || 3)); }
+    bwin: (n, sc) => { sc = sc || 1; return [T('wavew_1', .26, { fade: .08, sx: sc, sy: sc })].concat(rep([T('wavew_2', .36, { sx: sc, sy: sc }), T('wavew_3', .36, { sx: sc, sy: sc })], n || 3), [T('wavew_2', .3, { sx: sc, sy: sc })]); }
   });
 })(window);

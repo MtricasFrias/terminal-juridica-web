@@ -224,14 +224,14 @@
     async function wakeIfAsleep() { if (asleep()) { a.fx('alert'); await a.play(C.wake()); a.rest('R'); a.face(1); } }
 
     /* ---- geometría del viaje: la parada está en el carril alto, pegada al borde del panel (la puerta cabe entera a la vista) ---- */
-    const RIDE = { wait: .62, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12, e1: .8, e2: .86, e3: 1.02, el1: .12, el2: .06 };   // e*/el*: bajada por la puerta (x y altura del escalón)   // fracciones de S respecto a la trompa del bus
+    const RIDE = { wait: .62, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12, e1: .62, e2: .5, e3: .3, el1: .12, el2: .06 };   // e*/el*: bajada por la puerta (x y altura del escalón)   // fracciones de S respecto a la trompa del bus
     const VBW = 356;
     function rideGeo() {
       const l = L(); if (!bus || !l.side || l.oneLane) return null;
       let y = l.yU, s = l.SU, xn = l.pr.left - 8 - 1.06 * s;
       const hr = x => Math.min(headroom(x, y), headroom(x + .5 * s, y), headroom(x + s, y));
       /* la ventanilla (SETPI asomado, más alto que de pie) pasa de largo bajo el texto: se mide el aire a todo lo largo del recorrido */
-      const wantW = S.Frames.has('bwin_1'), hrW = () => { let h = 1e9; for (let x = xMinAt(y); x <= xn + 1.44 * s; x += .25 * s) h = Math.min(h, headroom(x, y)); return h; };
+      const wantW = S.Frames.has('wavew_3'), hrW = () => { let h = 1e9; for (let x = xMinAt(y); x <= xn + 1.44 * s; x += .25 * s) h = Math.min(h, headroom(x, y)); return h; };
       /* el escalón sube a SETPI: si arriba no hay aire hasta el texto, la parada baja un poco (más cerca de la cámara = más espacio) */
       for (let i = 0; i < 9 && y < l.yL && hr(xn) < (RIDE.l3 + .06) * s; i++) { y = Math.min(l.yL, y + 14); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; }
       if (hr(xn) < (RIDE.l3 + .03) * s) return null;
@@ -239,8 +239,8 @@
       /* dónde espera SETPI antes de que llegue el bus: lo más atrás posible; en pantallas angostas se pega más a la puerta */
       let wait = null; for (const w of [RIDE.wait, .45, .3, .15]) { const wx = xn - w * s; if (wx >= xMinAt(y) && valid(wx, y)) { wait = w; break; } }
       if (wait == null) return null;
-      const ws = Math.min(.9, ((wantW ? hrW() : -1e9) + .36 * s - 6) / (.69 * s));       // escala con la que SETPI cabe en la ventanilla sin tocar el texto de arriba
-      return { y, s, k, xn, wait, win: wantW && ws >= .64, ws };
+      const ws = Math.min(1, ((wantW ? hrW() : -1e9) + .335 * s - 6) / (.38 * s));       // escala con la que SETPI cabe en la ventanilla sin tocar el texto de arriba
+      return { y, s, k, xn, wait, win: wantW && ws >= .7, ws };
     }
     D.dbg = { rideGeo, headroom, valid, xMinAt, spot, goTo };
     /* ================= bucle principal: reacciones > comportamiento autónomo ================= */
@@ -274,7 +274,7 @@
     async function emerge() { const l = L(); if (a.x > l.xMaxAt(a.y) + 4) { a.face(-1); a.stance = 'R'; await runLeg(l.xMaxAt(a.y) - .1 * a.S, a.y, { speed: 1.2 }); } }
     /* entra corriendo desde detrás del panel (o por el borde derecho si el panel está apilado) */
     async function enter(tx, ty, speed) {
-      const l = L(); a.cancel(); a.stance = 'R'; a.face(-1); a.setS(l.sAt(ty)); a.place(l.hideX(), ty); a.show(true); a.rest('R');
+      const l = L(); a.cancel(); a.stance = 'R'; a.face(-1); a.setS(l.sAt(ty)); a.place(l.hideX(), ty); a.rest('R'); a.show(true);
       await runLeg(tx, ty, { speed: speed || 1.7 });
     }
     /* el anfitrión enfoca / escribe en el campo del PIN: SETPI se vuelve hacia el panel y mira con atención */
@@ -328,18 +328,18 @@
       wasActive = now;
     }).observe(slide, { attributes: true, attributeFilter: ['class'] });
     D.intro = function () {
-      if (!D.ready) return; layout(); const l = L(); a.cancel(); a.show(false);
+      if (!D.ready) return; a.cancel(); a.show(false); kick(); layout(); const l = L();
       D.interrupt(async () => {
         setState('REACTING'); const s = spot({ lane: 'L', minDist: 0 }); await enter(s.x, s.y, 1.7); await front(); await wave(2, { force: true });
       }, 1);
     };
     function boot() {
       if (!layout()) { setTimeout(boot, 300); return; }
-      const l = L(), s = spot({ lane: 'L', minDist: 0 }); a.place(s.x, s.y); a.rest('F'); a.show(true); D.state = 'IDLE'; D.ready = true;
+      const l = L(), s = spot({ lane: 'L', minDist: 0 }); a.place(s.x, s.y); a.rest('F'); a.show(!slide.classList.contains('activa')); D.state = 'IDLE'; D.ready = true;
       if (reduced) { a.update(0); return; }
       kick(); main();
       setTimeout(layout, 1500);                                       // tras las animaciones de entrada de la diapositiva
-      if (slide.classList.contains('activa')) setTimeout(() => { if (D.state === 'IDLE' && !D.reaction) D.intro(); }, 400);
+      if (slide.classList.contains('activa')) setTimeout(() => { if (!D.reaction) D.intro(); }, 350);
     }
     const P = { a, D, L, C, CANCEL, rnd, clamp, WID, bus, setState, fire, front, toR, runLeg, leg, backLeg, goTo, room, space, headroom, hits, box, valid, clear, xMinAt, spot, nearQR, idle, hop, jump, wave, thumbs, clap, surprised, shake, celebrate, point, say, sayNow, bubbleBox, rideGeo, RIDE, VBW, enter, emerge, wakeUp, wakeIfAsleep, asleep, markActive, settle, layout };
     D.P = P; if (S.Scenes) S.Scenes(D, P);
