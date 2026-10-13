@@ -115,6 +115,8 @@
 @keyframes gZancB{from{transform:translateY(-2.6px);} to{transform:translateY(0);}}
 @keyframes gRebote{from{transform:translateY(0);} to{transform:translateY(-.9px);}}
 @keyframes gRespira{from{transform:translateY(0);} to{transform:translateY(-.6px);}}
+.sp-banca{position:absolute; left:0; top:0; width:0; height:0; opacity:0; transition:opacity .25s ease-out; pointer-events:none; will-change:transform;}
+.sp-banca svg{position:absolute; display:block; overflow:visible;}
 .sp-paleta{position:absolute; left:0; top:0; width:0; height:0; opacity:0; transition:opacity .14s ease-out; pointer-events:none; will-change:transform;}
 .sp-paleta .pa-giro{position:absolute; left:0; top:0; width:0; height:0;}
 .sp-paleta svg{position:absolute; display:block; overflow:visible;}

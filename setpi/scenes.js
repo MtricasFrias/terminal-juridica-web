@@ -236,8 +236,12 @@
     });
     /* sentado en una banca balanceando las piernas (esperando) */
     def('bench', 'rest', 120, c => (c.ph === 'pin' && c.idle > 25) || (c.ph === 'lobby' && c.n <= 2 && c.idle > 20) ? 2.6 : (c.ph === 'lobby' || c.ph === 'pin') && c.idle > 14 ? .6 : 0, async () => {
-      P.setState('IDLE'); const s = P.spot({ lane: 'L' }); await P.goTo(s.x, s.y); await fit('bench'); await P.front(); await hold(.4);
-      a.fx('dust', { n: 2 }); await a.play(C.bench(2 + (Math.random() < .5 ? 1 : 0))); fin();
+      P.setState('IDLE'); const s = P.spot({ lane: 'L' }); await P.goTo(s.x, s.y); await fit('bench'); await P.front();
+      const bq = D.banca;       // la banca es un objeto aparte (igual en todos los cuadros): aparece detrás de SETPI, él se sienta, y se va al levantarse
+      try {
+        if (bq) { bq.pon(a.x, a.y - a.lift, a.S); bq.muestra(true); }
+        await hold(.45); a.fx('dust', { n: 2 }); await a.play(C.bench(2 + (Math.random() < .5 ? 1 : 0))); fin(); await hold(.3);
+      } finally { if (bq) bq.muestra(false); }
     }, ['bench']);
     /* un bus pasa por detrás: lo mira y lo saluda */
     def('busWave', 'bus', 30, c => D.busTarget && c.ph !== 'podium' ? (c.ph === 'quiz' ? 1.5 : 5.5) : 0, async () => {
@@ -246,14 +250,18 @@
       await hold(.3); await P.front();
     });
     /* viaje en bus: espera en la parada, llega el bus (detrás del panel), sube por la puerta y se despide por la ventanilla; vuelve en otro bus y baja por la puerta */
-    def('ride', 'bus', 100, c => (c.ph === 'pin' || c.ph === 'lobby') && c.idle > 8 && D.energy > .12 && D.t - D.lastJoin > 12 && P.rideGeo() ? ((c.ph === 'lobby' && c.n === 0 ? 3 : 1.8) + (D.busTarget ? 1 : 0)) * (D.rides ? (D.t - D.lastRideT > 150 ? 2.5 : 1) : 4) : 0, async () => {
+    def('ride', 'bus', 100, c => (c.ph === 'pin' || c.ph === 'lobby') && c.idle > 8 && D.energy > .12 && D.t - D.lastJoin > 12 && !D.busSale && P.rideGeo() ? ((c.ph === 'lobby' && c.n === 0 ? 3 : 1.8) + (D.busTarget ? 1 : 0)) * (D.rides ? (D.t - D.lastRideT > 150 ? 2.5 : 1) : 4) : 0, async () => {
       const g = P.rideGeo(), bus = P.bus, RIDE = P.RIDE, VBW = P.VBW; if (!g) return; const l = L();
       const apply0 = bus.apply;
+      /* el bus es un vehículo: solo se mueve (llega o se va) con el semáforo peatonal en rojo y con tiempo suficiente; en el cuestionario la calle ya está libre */
+      const sinPeatones = t => !D.mundo || D.mundo.hold || (D.luz === 'rojo' && D.luzRest > t);
+      const esperaRojo = async t => { for (let i = 0; i < 160 && !sinPeatones(t); i++) await a.wait(.4); };
       P.setState('RIDING'); D.riding = true; D.rides = (D.rides || 0) + 1; D.lastRideT = D.t;      // la primera vez pesa x4: que se vea pronto
       try {
         if (l.zebra && a.y > l.yU + 10) { await P.emerge(); await P.goTo(l.zebra.x, l.yU, { noZebra: true, free: false }); }   // viene de la calle: primero a la acera
         if (D.busTarget && Math.random() < .5) await SC.busWave.run();
         await P.goTo(g.xn - g.wait * g.s, g.y); P.setState('RIDING');
+        if (!sinPeatones(2.4)) { await P.front(); await a.play(C.around()); fin(); await esperaRojo(2.4); }          // el bus espera su turno: no entra con el verde peatonal
         await P.toR(1); await hold(.35); a.fx('alert'); await P.sayNow('¡Ahí viene mi bus!'); await hold(1); S.sayClear(a); D.lastSayT = D.t;
         bus.clipX = l.pr.left; bus.place(l.pr.left + 26, g.y, g.k); bus.show(true, false);
         const arrive = a.tween('x', g.xn, 1.9, 'out', bus);
@@ -267,8 +275,9 @@
         fire([{ f: 'bus_4', t: .6, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.f4 * g.s, .5, 'io'), a.tween('lift', RIDE.l4 * g.s, .5, 'io'), a.tween('a', 0, .45, 'in', a.mod), a.tween('br', .35, .45, 'lin', a.mod)]);
         a.show(false); a.cancel(); a.lift = 0; D.away = true; P.setState('AWAY'); bus.front = false; bus.apply();
         await hold(.4);
-        await a.tween('x', -(VBW * g.k) - 80, 3.3, 'in3', bus); bus.apply = apply0; bus.show(false);
+        await esperaRojo(3.6); await a.tween('x', -(VBW * g.k) - 80, 3.3, 'in3', bus); bus.apply = apply0; bus.show(false);
         await hold(rnd(13, 22));                                                      // paseo
+        await esperaRojo(2.4);                                                        // el bus de regreso tampoco llega con el verde peatonal
         /* regreso: otro bus llega, SETPI aparece en la puerta y baja */
         D.away = false; D.active = D.t;
         let sh = 0; for (const f of [.4, .3, .2, .1]) { if (P.valid(g.xn - f * g.s + RIDE.e3 * g.s, g.y)) { sh = f; break; } }
@@ -291,10 +300,17 @@
           await a.play(J.land);
         } else { const sp = P.spot({ lane: 'L', minDist: 0 }); a.cancel(); await P.enter(sp.x, sp.y, 1.9); }
         a.stance = 'F'; a.rest('F');
-        a.tween('x', -(VBW * g.k) - 80, 3.1, 'in3', bus).then(() => bus.show(false)).catch(() => { });     // el bus se va por detrás del contenido
+        /* el bus que dejó a SETPI espera a que el semáforo peatonal llegue a rojo para irse (sigue solo aunque SETPI haga otra cosa) */
+        bus.front = false; bus.apply(); D.busSale = true;
+        { const sal = { va: false, t: 0, x0: 0 };
+          D.drivers.push(dt => {
+            if (!sal.va) { if (sinPeatones(3.6)) { sal.va = true; sal.x0 = bus.x; } return false; }
+            sal.t += dt; const p = Math.min(1, sal.t / 3.1); bus.x = sal.x0 + (-(VBW * g.k) - 80 - sal.x0) * p * p * p; bus.apply();
+            if (p >= 1) { bus.show(false); D.busSale = false; return true; } return false;
+          }); }
         const sp = P.spot({ lane: 'L', minDist: 0 }); await P.goTo(sp.x, sp.y, { speed: 1.4 });           // SETPI se aparta a la carretera (más cerca de la cámara)
         await P.front(); await hold(.3); await P.sayNow('¡Ya volví! ¿Listos?'); await P.wave(2, { force: true }); await hold(.5); S.sayClear(a); D.lastSayT = D.t;
-      } finally { bus.apply = apply0; a.lift = 0; D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; a.clipL = -1e9; a.noShadow = false; if (!a.scaleAt) a.scaleAt = y => L().sAt(y); }
+      } finally { bus.apply = apply0; a.lift = 0; D.riding = false; D.away = false; if (bus && !D.busSale) bus.show(false); a.mod.a = 1; a.mod.br = 1; a.clipL = -1e9; a.noShadow = false; if (!a.scaleAt) a.scaleAt = y => L().sAt(y); }
     });
 
     /* si el semáforo peatonal empieza a parpadear (o se pone en rojo) y SETPI sigue en la calle, vuelve a la acera por la cebra */

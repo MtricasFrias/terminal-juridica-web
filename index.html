@@ -204,6 +204,9 @@ tr.vg-filters th{padding:5px 6px 9px; text-transform:none; letter-spacing:0; fon
 .tabs{display:flex; gap:6px; margin:16px 0 0; flex-wrap:wrap;}
 .tab{padding:9px 16px; border-radius:999px; border:1px solid var(--line); background:var(--paper); font-weight:700; font-size:.82rem; color:var(--ink-soft);}
 .tab.active{background:var(--primary); color:#fff; border-color:var(--primary);}
+.tab-matriz{text-decoration:none; display:inline-block; background:var(--green,#26B67A); color:#fff; border-color:transparent;}
+.live-status{margin-left:auto; align-self:center; font-size:.72rem; font-weight:700; color:var(--ink-soft); padding:0 6px;}
+.live-status.ok{color:var(--green);} .live-status.err{color:var(--red);}
 
 .badge-demo{display:inline-block; background:var(--amber-bg); color:var(--amber); font-size:.68rem; font-weight:700; padding:3px 9px; border-radius:999px; margin-left:8px;}
 .footnote{text-align:center; color:var(--ink-soft); font-size:.72rem; margin-top:28px; line-height:1.6;}
@@ -591,6 +594,7 @@ function store(k, v){
    - en la página alojada fuera de Google (GitHub Pages, tu sitio): fetch, que no depende de las cuentas de Google del navegador.
    (Las barras de la dirección van escapadas: Google recorta el código que tenga dos barras seguidas dentro de un texto.) */
 const API_URL = "https:\/\/script.google.com\/macros\/s\/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg\/exec";
+const MATRIZ_URL = "";   // enlace de la Matriz de procesos en Google Hojas, SIN https:// (se arma abajo)
 function api(fn, ...args){
   return (window.google && google.script && google.script.run) ? apiGoogle(fn, args) : apiWeb(fn, args);
 }
@@ -665,6 +669,7 @@ function aplicarDatos(r){
   HOLIDAY_SET = new Set(r.festivos);
   TIPOS = r.tipos; DEPENDENCIAS = r.dependencias;
   const p = r.hoy.split("-"); TODAY = new Date(+p[0], +p[1]-1, +p[2]);
+  LIVE.ok = true; LIVE.t = new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
 }
 async function cargar(){
   const r = await api("datos", TOKEN);
@@ -699,22 +704,31 @@ function guardarYa(id){
 }
 function guardarPendientes(){ return Promise.all([...dirty].map(id=>guardarYa(id))); }
 
+const LIVE = {ok:true, t:""};
+function pintaLive(){ const e=document.getElementById("live-status"); if(!e || !LIVE.t) return; e.textContent = LIVE.ok ? "● En vivo · "+LIVE.t : "○ Sin conexión · reintentando…"; e.className="live-status "+(LIVE.ok?"ok":"err"); e.title="Todos los computadores ven los mismos datos: la página se actualiza sola cada 15 s."; }
+let sincronizando = false;
 async function refrescar(){
-  if(!TOKEN && !INVITADO) return;
-  await guardarPendientes();
+  if((!TOKEN && !INVITADO) || sincronizando) return;
+  sincronizando = true;
   try{
+    await guardarPendientes();
     const antes = JSON.stringify(CASOS);
-    const tabAntes = viewTab;
     const r = INVITADO ? await api("datosPublicos") : await api("datos", TOKEN);
-    if(viewTab==="mine" || tabAntes==="mine" || viewTab==="norma") return;      // no pisar la edición propia
+    LIVE.ok = true; LIVE.t = new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",second:"2-digit"}); pintaLive();
+    if(viewTab==="norma") return;
     const a = document.activeElement;
-    if(a && a.matches && a.matches("#vg-host input, #vg-host select")) return;   // está escribiendo un filtro: se actualiza en el próximo ciclo
+    if(a && a.matches && a.matches("#vg-host input, #vg-host select, #body input, #body select, #body textarea")) return;   // está escribiendo: se actualiza en el próximo ciclo
+    if(dirty.size) return;                                                                                                    // tiene cambios por guardar: no se pisan
     if(JSON.stringify(r.casos) !== antes){ CASOS = r.casos; PROFILES = r.usuarios.map(u=>Object.assign({}, u, {coord:u.rol==="coord"})); render(); }
   }catch(e){
+    LIVE.ok = false; if(!LIVE.t) LIVE.t = "-"; pintaLive();
     if(INVITADO && /desactivada/.test(e.message)){ INVITADO = false; ME = null; renderLogin(e.message); }   // la Dirección apagó la consulta abierta
-  }
+  }finally{ sincronizando = false; }
 }
-setInterval(()=>{ if((TOKEN || INVITADO) && viewTab!=="mine" && viewTab!=="norma") refrescar(); }, 60000);
+setInterval(()=>{ if((TOKEN || INVITADO) && !document.hidden && viewTab!=="norma") refrescar(); }, 15000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refrescar(); });
+window.addEventListener("online", ()=>refrescar());
+window.addEventListener("focus", ()=>refrescar());
 
 /* ===================== LOGIN ===================== */
 function renderLogin(msg){
@@ -1451,7 +1465,7 @@ function render(){
   app.innerHTML = `
     ${petalos(9)}
     ${topbar(profile)}
-    <div class="tabs">${tabs.map(([k,l])=>`<button class="tab ${viewTab===k?'active':''}" data-tab="${k}">${l}</button>`).join("")}</div>
+    <div class="tabs">${tabs.map(([k,l])=>`<button class="tab ${viewTab===k?'active':''}" data-tab="${k}">${l}</button>`).join("")}${MATRIZ_URL?`<a class="tab tab-matriz" href="${"https:\/\/"+MATRIZ_URL}" target="_blank" rel="noopener">Matriz de procesos · en vivo ↗</a>`:""}<span id="live-status" class="live-status" aria-live="polite"></span></div>
     <div id="body"></div>
     ${escenaCiudad()}
     <div class="footnote">Terminal Jurídica · SETP Ibagué</div>`;
@@ -1475,7 +1489,7 @@ function render(){
   else if(viewTab==="norma"){ bodyEl.innerHTML = renderNormativa(); wireNormativa(); }
   else if(viewTab==="control" && profile.coord){ renderControlOperativo(bodyEl); }
   else renderMisProcesos(bodyEl, profile);
-  animarNumeros(bodyEl);
+  animarNumeros(bodyEl); pintaLive();
 }
 
 function renderMisProcesos(bodyEl, profile){

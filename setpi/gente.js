@@ -171,6 +171,23 @@
     return G;
   };
 
+  /* ---- la banca (tablón + patas) como objeto aparte: la misma en todos los cuadros, así no se corta ni aparece y desaparece ---- */
+  S.Banca = function (stage, a) {
+    const el = document.createElement('div'); el.className = 'sp-banca';
+    el.innerHTML = `<svg viewBox="-70 -34 140 40" aria-hidden="true">
+      <ellipse cx="0" cy="-.5" rx="58" ry="3.6" fill="rgba(11,18,32,.18)"/>
+      <rect x="-45.6" y="-22.5" width="7.4" height="22" rx="1.6" fill="#383F4F" stroke="#222838" stroke-width="1"/><rect x="-44" y="-21.6" width="2.4" height="20" fill="#566078" opacity=".7"/>
+      <rect x="38.2" y="-22.5" width="7.4" height="22" rx="1.6" fill="#383F4F" stroke="#222838" stroke-width="1"/><rect x="39.8" y="-21.6" width="2.4" height="20" fill="#566078" opacity=".7"/>
+      <rect x="-60" y="-28.4" width="120" height="6.4" rx="2.4" fill="#7F583C" stroke="#3B281C" stroke-width="1"/><rect x="-58" y="-27.6" width="116" height="1.9" rx=".9" fill="#A57852" opacity=".9"/><rect x="-58" y="-24.2" width="116" height="1.6" fill="#4F3524" opacity=".55"/>
+    </svg>`;
+    stage.insertBefore(el, a.layerA);
+    const svg = el.querySelector('svg'), B = { on: false };
+    /* se coloca donde están los pies de SETPI (el ancla de los dibujos) y a su escala */
+    B.pon = (x, y, Sz) => { const k = Sz / 100; svg.style.width = (140 * k).toFixed(1) + 'px'; svg.style.height = (40 * k).toFixed(1) + 'px'; svg.style.left = (-70 * k).toFixed(1) + 'px'; svg.style.top = (-34 * k).toFixed(1) + 'px'; el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)'; };
+    B.muestra = v => { B.on = v; el.style.opacity = v ? '1' : '0'; };
+    return B;
+  };
+
   /* ---- la paleta del paletero (PARE / SIGA) ---- */
   S.Paleta = function (stage, a) {
     const GL = { wave_f2: [-.406, -.5215], wave_f3: [.394, -.63] };             // dónde queda el guante (en alto de SETPI) en cada dibujo de la mano levantada

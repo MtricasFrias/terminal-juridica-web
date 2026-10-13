@@ -22,7 +22,8 @@
     const L = () => D.L;
     const setState = s => { D.state = s; };
     const bus = S.Bus ? S.Bus(slide, stage, a) : null;
-    D.paleta = S.Paleta ? S.Paleta(stage, a) : null;       // la paleta PARE / SIGA del paletero (va por detrás de SETPI)
+    D.paleta = S.Paleta ? S.Paleta(stage, a) : null;
+    D.banca = S.Banca ? S.Banca(stage, a) : null;       // la banca de la escena 'bench'       // la paleta PARE / SIGA del paletero (va por detrás de SETPI)
     const fire = (c, o) => a.play(c, o).catch(() => { });          // clip que corre en paralelo (no se espera)
 
     /* ================= escenario: todo derivado del layout real (nunca px fijos) ================= */
@@ -327,7 +328,8 @@
     let last = 0, chain = 0, wall = 0, sense = 0;
     const reduced = g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isActive = () => !document.hidden && slide.classList.contains('activa');
-    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); if (D.mundo) { const pl = D.luz; D.mundo.step(dt); if (D.luz !== pl && D.onLuz) D.onLuz(D.luz, pl); } D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); if (D.paleta) D.paleta.sync(); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
+    D.drivers = [];       // movimientos que siguen solos aunque SETPI cambie de escena (p. ej. el bus esperando el rojo para irse)
+    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); if (D.drivers.length) D.drivers = D.drivers.filter(f => !f(dt)); if (D.mundo) { const pl = D.luz; D.mundo.step(dt); if (D.luz !== pl && D.onLuz) D.onLuz(D.luz, pl); } D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); if (D.paleta) D.paleta.sync(); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
     function kick() {
       const my = ++chain; last = 0;
       const f = ts => {
