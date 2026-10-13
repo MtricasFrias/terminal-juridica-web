@@ -169,412 +169,205 @@ button{font-family:inherit; cursor:pointer;}
 .p-oro{background:#F6B91D;} .p-plata{background:#C9D1DC;} .p-bronce{background:#D58A4A;}
 </style>
 <style>
-/* ===================== LA RUTA DEL SETP: presentación interactiva (calle del SETP de día) ===================== */
+/* ===================== Presentación lineal: Derecho de petición (SETP · Jurídica) ===================== */
 :root{
-  --s-navy:#0B1F5C; --s-blue:#2A5BA0; --s-yellow:#F2B418; --s-yellow-d:#8A5F00; --s-pink:#0B1F5C; --s-green:#2E8B57; --s-red:#B83A2E;
-  --s-ink:#0D1730; --s-mut:#44547A; --s-line:#D3DEEF; --s-paper:#fff;
-  --t10:#3E6BAE; --t15:#254A8C; --t30:#0B1F5C;
+  --s-navy:#0B1F5C; --s-blue:#2A5BA0; --s-yellow:#F2B418; --s-yellow-d:#8A5F00;
+  --s-ink:#0D1730; --s-mut:#44547A; --s-line:#D3DEEF; --s-paper:#fff; --s-fondo:#EEF2F8;
   --ease:cubic-bezier(.23,1,.32,1);
   --f-cond:'Barlow Condensed','Barlow',sans-serif;
 }
-.progreso{display:none;}
-.nav{background:rgba(11,31,92,.94); backdrop-filter:none; transition:opacity .3s; z-index:60;}
-.nav:not(.despierto){pointer-events:none;}
+.progreso{display:none !important;}
+/* la barra de navegación sigue en el diseño (la escena del reto mide su altura) pero no se ve ni recibe clics */
+#nav{opacity:0 !important; pointer-events:none !important;} #nav *{pointer-events:none !important;}
+.slide{transition:opacity .35s ease;}
 
-/* ---------- el mundo: cielo, ciudad, avenida, acera y calle (la misma calle de la diapositiva del reto) ---------- */
+/* ---------- fondo: la calle del SETP, quieta y tenue ---------- */
 #mundo{position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:linear-gradient(180deg,#EEF2F8 0%,#E3EAF4 55%,#D2DDEC 100%);}
-.mu-sol,.mu-nube{display:none;}
-.mu-sol{position:absolute; top:5vh; left:46vw; width:4.4vw; height:4.4vw; min-width:40px; min-height:40px; border-radius:50%; background:#FFF1B8; border:.5vw solid rgba(255,255,255,.55);}
-.mu-nube{position:absolute; left:0; will-change:transform; animation:muNube linear infinite; opacity:.92;}
-.mu-nube svg{display:block; width:100%; height:auto;}
-@keyframes muNube{from{transform:translateX(-26vw);} to{transform:translateX(126vw);}}
-.mu-ciudad{position:absolute; left:0; right:0; top:50vh; height:30vh; width:100%; display:block;}
-.mu-av{position:absolute; left:0; right:0; top:74.2vh; height:5vh; background:linear-gradient(180deg,#7C889D,#6B778C); border-top:.4vh solid #AEB9CB;}
-.mu-av i{position:absolute; left:0; right:0; top:2.3vh; border-top:2px dashed rgba(255,255,255,.55);}
-.mu-acera{position:absolute; left:0; right:0; top:79.2vh; height:6.4vh; background:linear-gradient(180deg,#D5DCE8,#C3CDDB); border-top:.4vh solid #EEF2F8;}
-.mu-acera::after{content:""; position:absolute; left:0; right:0; bottom:-.8vh; height:.8vh; background:#E2B13A;}
-.mu-calle{position:absolute; left:0; right:0; top:86.4vh; bottom:0; background:linear-gradient(180deg,#56627A,#444F66);}
-.mu-calle i{position:absolute; left:0; right:0; top:7vh; border-top:3px dashed rgba(255,255,255,.4);}
-.mu-veh{position:absolute; left:0; will-change:transform; animation:muPasa linear infinite;}
-.mu-veh svg{display:block; width:100%; height:auto;}
-.mu-veh.izq{animation-name:muPasaIzq;}
-.mu-veh.izq svg{transform:scaleX(-1);}
-@keyframes muPasa{from{transform:translateX(-16vw);} to{transform:translateX(112vw);}}
-@keyframes muPasaIzq{from{transform:translateX(112vw);} to{transform:translateX(-16vw);}}
-body.en-quiz #mundo *{animation-play-state:paused !important;}
+.mu-ciudad{position:absolute; left:0; right:0; top:52vh; height:30vh; width:100%; display:block;}
+.mu-av{position:absolute; left:0; right:0; top:80vh; height:4vh; background:linear-gradient(180deg,#8995AA,#77839A); border-top:.4vh solid #AEB9CB;}
+.mu-acera{position:absolute; left:0; right:0; top:84vh; height:5vh; background:linear-gradient(180deg,#D5DCE8,#C3CDDB); border-top:.4vh solid #EEF2F8;}
+.mu-acera::after{content:""; position:absolute; left:0; right:0; bottom:-.7vh; height:.7vh; background:#E2B13A;}
+.mu-calle{position:absolute; left:0; right:0; top:89.7vh; bottom:0; background:linear-gradient(180deg,#56627A,#444F66);}
 
-/* ---------- estación (diapositiva de contenido) ---------- */
-.slide.m{padding:0; display:block; background:transparent; color:var(--s-navy);}
-.m-top{position:absolute; left:3vw; right:3vw; top:3vh; height:12vh; display:flex; gap:1.2vw; align-items:stretch;}
-.m-mapa{flex:none; display:flex; align-items:center; gap:.8vw; padding:0 1.6vw; background:var(--s-yellow); color:var(--s-navy); border:0; border-radius:1.2vw; font:700 clamp(18px,1.9vw,40px)/1 var(--f-cond); letter-spacing:.06em; text-transform:uppercase; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.45); transition:transform .16s var(--ease), background-color .2s; }
-.m-mapa:active{transform:scale(.97);}
-@media (hover:hover){.m-mapa:hover{background:#FFC93C;}}
-.m-mapa svg{width:2.6vw; height:2.6vw; min-width:24px; min-height:24px;}
-.m-plate{flex:1; min-width:0; display:flex; align-items:center; gap:1.4vw; padding:0 1.8vw; background:var(--s-navy); color:#fff; border-radius:1.2vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.5);}
-.m-badge{flex:none; width:7.6vh; height:7.6vh; border-radius:50%; display:grid; place-items:center; background:var(--rc,#fff); color:var(--rt,var(--s-navy)); font:700 clamp(26px,3.6vh,60px)/1 var(--f-cond);}
-.m-plate h2{flex:1; min-width:0; margin:0; font:700 clamp(30px,4.4vw,96px)/1 var(--f-cond); letter-spacing:0; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.m-ruta{flex:none; font:600 clamp(14px,1.45vw,30px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:#BFD6F5;}
-.m-body{position:absolute; left:3vw; right:3vw; top:17.5vh; bottom:30vh; display:flex; flex-direction:column; gap:2.4vh; min-height:0;}
-
-.card2{background:var(--s-paper); border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2.4vh 1.8vw;}
-.btn2{display:inline-flex; align-items:center; justify-content:center; gap:.7vw; border:0; border-radius:1.1vw; padding:1.5vh 1.8vw; background:var(--s-blue); color:#fff; font:700 clamp(17px,1.8vw,38px)/1.05 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; cursor:pointer; transition:transform .16s var(--ease), background-color .2s, box-shadow .2s; }
-.btn2:active{transform:scale(.97);}
-@media (hover:hover){.btn2:hover{background:#2278CC;}}
-.btn2.y{background:var(--s-yellow); color:var(--s-navy);}
-@media (hover:hover){.btn2.y:hover{background:#FFC93C;}}
-.btn2.n{background:var(--s-navy);}
-.btn2.g{background:#fff; color:var(--s-navy); box-shadow:inset 0 0 0 .3vh var(--s-line);}
-button:focus-visible,[tabindex]:focus-visible{outline:.45vh solid var(--s-yellow); outline-offset:.4vh;}
-
-/* ---------- la pantalla del bus (consejo de SETPI) y el botón de siguiente parada ---------- */
-#hud{position:fixed; left:0; right:0; bottom:0; height:0; z-index:25; pointer-events:none; opacity:0; transition:opacity .35s;}
-body.en-m #hud{opacity:1;}
-.hud-led{position:fixed; left:3vw; width:60vw; bottom:3vh; height:11vh; display:flex; align-items:center; gap:1.2vw; padding:0 1.4vw; background:#0B1F5C; border:.5vh solid #1E3470; border-radius:1.2vw; pointer-events:auto;}
-.hud-n{flex:none; width:6.4vh; height:6.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(20px,3.4vh,44px)/1 var(--f-cond);}
-.hud-t{flex:1; min-width:0; margin:0; color:#fff; font:600 clamp(18px,2.15vw,46px)/1.15 var(--f-cond); letter-spacing:.02em; transition:opacity .25s var(--ease), transform .25s var(--ease);}
-.hud-t.cambia{opacity:0; transform:translateY(.8vh);}
-.hud-sig{position:fixed; left:65vw; width:19vw; bottom:3vh; height:11vh; pointer-events:auto; border:0; border-radius:1.2vw; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(17px,1.9vw,40px)/1.05 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; cursor:pointer; transition:transform .16s var(--ease), background-color .2s;}
-.hud-sig:active{transform:scale(.97);}
-@media (hover:hover){.hud-sig:hover{background:#FFC93C;}}
+/* ---------- marco de cada diapositiva ---------- */
+.slide.c{padding:0; display:block; background:transparent; color:var(--s-navy);}
+.c-top{position:absolute; left:3vw; right:3vw; top:3vh; height:11.5vh;}
+.c-plate{height:100%; display:flex; align-items:center; gap:2vw; padding:0 2vw; background:var(--s-navy); color:#fff; border-radius:1.2vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.5); border-bottom:.9vh solid var(--s-yellow);}
+.c-plate h2{flex:1; min-width:0; margin:0; font:700 clamp(24px,4.3vw,92px)/1.2 var(--f-cond); letter-spacing:0; color:#fff; white-space:nowrap;}
+.c-kick{flex:none; max-width:20vw; text-align:right; font:600 clamp(13px,1.35vw,28px)/1.15 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:#BFD6F5;}
+.c-body{position:absolute; left:3vw; right:3vw; top:16.5vh; bottom:22vh; display:flex; flex-direction:column; gap:2.2vh; min-height:0;}
+.lado-n{position:fixed; left:.7vw; top:50%; transform:translateY(-50%); z-index:40; font:600 clamp(12px,1vw,22px)/1 var(--f-cond); letter-spacing:.14em; color:var(--s-mut); opacity:.75; writing-mode:vertical-rl; transform:translateY(-50%) rotate(180deg); font-variant-numeric:tabular-nums; pointer-events:none;}
+.borde{position:fixed; top:0; bottom:0; width:4vw; z-index:35; cursor:pointer; background:transparent; border:0; padding:0; opacity:0; transition:opacity .2s; color:var(--s-navy); font:700 clamp(28px,3vw,60px)/1 var(--f-cond);}
+.borde:hover{opacity:.45;}
+.borde.izq{left:0;} .borde.der{right:0;}
+body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 #guia-stage{position:fixed; inset:0; z-index:30; pointer-events:none; overflow:visible;}
 #guia-stage .sp-cv{pointer-events:none;}
-body.en-quiz #guia-stage, body.en-quiz #hud{display:none;}
 
-/* ---------- portada ---------- */
-.slide.cv2{padding:0; display:grid; grid-template-columns:56vw minmax(0,1fr); background:var(--s-navy); color:#fff;}
-.cv2-izq{position:relative; display:flex; flex-direction:column; min-height:0; z-index:2;}
-.cv2-cab{display:flex; align-items:center; gap:2vw; height:13vh; padding:0 3vw; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(17px,1.9vw,40px)/1.1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase;}
-.cv2-cab .logo-tab{background:#fff; padding:1vh .8vw; border-radius:.6vw; line-height:0;}
-.cv2-cab .logo-tab img{height:9vh;}
-.cv2-cuerpo{flex:1; display:flex; flex-direction:column; justify-content:center; gap:3.4vh; padding:2vh 3vw 8vh;}
-.cv2-cuerpo h1{margin:0; font:700 clamp(46px,6.2vw,132px)/.98 var(--f-cond); letter-spacing:0; color:#fff;}
-.cv2-cuerpo h1 em{font-style:normal; color:var(--s-yellow);}
-.cv2-cuerpo p{margin:0; font-size:clamp(19px,1.9vw,42px); line-height:1.4; color:#CFE0FA; max-width:28ch;}
-.cv2-cuerpo .btn2{align-self:flex-start; padding:2.2vh 2.6vw; font-size:clamp(22px,2.4vw,52px);}
-.cv2-cuerpo small{font:600 clamp(14px,1.2vw,26px)/1 var(--f-cond); letter-spacing:.09em; text-transform:uppercase; color:#9FB9E6;}
-.cv2-foto{position:relative; overflow:hidden;}
-.cv2-foto img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 16%;}
-.cv2-foto.sem img{object-position:50% 38%;}
-.cv2-franja{position:absolute; left:0; right:0; bottom:0; height:5vh; background:#F2B418; z-index:3;}
-body.en-cover #hud{opacity:0;}
+/* ---------- animación automática, paso a paso ---------- */
+.a{opacity:0; transform:translateY(1.8vh);}
+.slide.activa .a{animation:aKF .75s var(--ease) both; animation-delay:calc(.35s + var(--i, 0) * var(--paso, 1s));}
+.slide.final .a{animation:none; opacity:1; transform:none;}
+@keyframes aKF{from{opacity:0; transform:translateY(1.8vh);} to{opacity:1; transform:none;}}
+@keyframes barKF{from{transform:scaleX(0);} to{transform:none;}}
+@keyframes sellaKF{0%{opacity:0; transform:rotate(-16deg) scale(2.2);} 60%{opacity:1; transform:rotate(-7deg) scale(.96);} 100%{opacity:1; transform:rotate(-8deg) scale(1);}}
+@media (prefers-reduced-motion:reduce){.a{opacity:1; transform:none;} .slide.activa .a,.barra,.dd,.bus-run,.cv3 *{animation:none !important;}}
 
-/* ---------- objetivo ---------- */
-.obj{flex:1; display:grid; grid-template-columns:repeat(3,1fr); gap:1.6vw; min-height:0;}
-.obj-c{position:relative; text-align:left; border:0; background:#fff; border-radius:1.4vw; padding:2.6vh 1.8vw; display:flex; flex-direction:column; gap:1.2vh; cursor:pointer; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); transition:transform .3s var(--ease), background-color .25s; overflow:hidden; color:var(--s-navy);}
-.obj-c:active{transform:scale(.985);}
-.obj-n{width:9vh; height:9vh; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 clamp(32px,5vh,76px)/1 var(--f-cond);}
-.obj-c h3{margin:0; font:700 clamp(34px,4.2vw,90px)/1 var(--f-cond); color:var(--s-navy);}
-.obj-c p{margin:0; font-size:clamp(17px,1.65vw,36px); line-height:1.4; color:var(--s-mut); max-height:0; opacity:0; transition:max-height .45s var(--ease), opacity .3s var(--ease);}
-.obj-c.on p{max-height:22vh; opacity:1;}
-.obj-c.on{transform:translateY(-1.2vh); background:#F4F7FC; box-shadow:0 1.6vh 2.8vh -1.2vh rgba(11,31,92,.45), inset 0 0 0 .4vh var(--s-navy);}
-.obj-c::after{content:"Toca para ver"; margin-top:auto; font:600 clamp(13px,1.15vw,24px)/1 var(--f-cond); letter-spacing:.09em; text-transform:uppercase; color:var(--s-blue); transition:opacity .2s;}
-.obj-c.on::after{opacity:0;}
-.led2{display:flex; align-items:center; gap:1.4vw; background:var(--s-navy); color:#fff; border-radius:1.2vw; padding:2.2vh 1.8vw;}
-.led2 b{flex:none; font:700 clamp(15px,1.45vw,31px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; background:var(--s-yellow); color:var(--s-navy); padding:.8vh 1vw; border-radius:.4vw;}
-.led2 p{margin:0; font:600 clamp(20px,2.2vw,48px)/1.15 var(--f-cond); color:#fff;}
+.card3{background:var(--s-paper); border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2.4vh 1.8vw;}
+.tag3{display:inline-block; align-self:flex-start; font:700 clamp(14px,1.4vw,30px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; background:var(--s-navy); color:#fff; padding:.9vh 1.1vw; border-radius:.5vw;}
+.tx3{margin:0; font:500 clamp(18px,1.75vw,38px)/1.38 'Public Sans',sans-serif; color:var(--s-ink);}
+.tx3 b{font-weight:700; color:var(--s-navy);}
+.tx3.m{color:var(--s-mut);}
+.ej3{margin:0; background:#EFF3FA; border-radius:.6vw; padding:1.2vh 1vw; font:italic 500 clamp(16px,1.55vw,34px)/1.35 'Public Sans',sans-serif; color:var(--s-navy);}
+.idea{display:flex; align-items:center; gap:1.4vw; background:var(--s-navy); color:#fff; border-radius:1.2vw; padding:2vh 1.8vw;}
+.idea b{flex:none; font:700 clamp(14px,1.4vw,30px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; background:var(--s-yellow); color:var(--s-navy); padding:.9vh 1vw; border-radius:.4vw;}
+.idea p{margin:0; font:600 clamp(20px,2.15vw,46px)/1.2 var(--f-cond); color:#fff;}
+.nota3{margin:0; font:500 clamp(14px,1.45vw,31px)/1.4 'Public Sans',sans-serif; color:var(--s-mut);}
 
-/* ---------- mapa de la ruta ---------- */
-.mapa-svg{width:100%; height:100%; display:block; overflow:visible;}
-.mp-lin{fill:none; stroke-width:15; stroke-linecap:round;}
-.mp-nom{font:700 28px var(--f-cond); letter-spacing:.06em; text-transform:uppercase;}
-.mp-et{font:700 26px var(--f-cond); fill:var(--s-navy); text-anchor:middle; pointer-events:none;}
-.mp-est{cursor:pointer; outline:none;}
-.mp-est .anillo{transform-box:fill-box; transform-origin:center; transition:transform .25s var(--ease);}
-@media (hover:hover){.mp-est:hover .anillo{transform:scale(1.18);}}
-.mp-est:focus-visible .anillo{stroke:var(--s-pink);}
-.mp-est:active .anillo{transform:scale(1.04);}
-.mp-ping{transform-box:fill-box; transform-origin:center; animation:mpPing 1.8s var(--ease) infinite; fill:none; stroke-width:5;}
-@keyframes mpPing{from{transform:scale(1); opacity:.9;} to{transform:scale(1.9); opacity:0;}}
-.mp-term{fill:var(--s-navy);}
-.mp-term-t{font:700 38px var(--f-cond); letter-spacing:.1em; fill:var(--s-navy); text-anchor:middle;}
-.mp-et.b{fill:#fff;}
-.mapa-cont{position:absolute; right:0; top:-1vh; font:600 clamp(14px,1.4vw,30px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:var(--s-navy); background:#fff; padding:1vh 1.2vw; border-radius:.8vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4);}
-.m-body.mp{position:absolute;}
+/* ---------- columnas ---------- */
+.g2{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; gap:1.8vw;}
+.g3{flex:1; min-height:0; display:grid; grid-template-columns:repeat(3,1fr); gap:1.6vw;}
+.col3{display:flex; flex-direction:column; gap:1.4vh;}
+.num3{width:8.4vh; height:8.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 clamp(30px,4.6vh,70px)/1 var(--f-cond);}
+.h3x{margin:0; font:700 clamp(30px,3.6vw,78px)/1 var(--f-cond); color:var(--s-navy);}
 
-/* ---------- ¿Qué es? : sello de radicado ---------- */
-.fund{flex:1; display:grid; grid-template-columns:1fr 1.15fr; gap:1.8vw; min-height:0;}
-.fund-q{display:flex; flex-direction:column; gap:1.6vh;}
-.fund-q .tag{align-self:flex-start; font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.07em; text-transform:uppercase; background:var(--s-navy); color:#fff; padding:.9vh 1.1vw; border-radius:.5vw;}
-.fund-q p{margin:0; font:600 clamp(22px,2.5vw,56px)/1.25 'Public Sans',sans-serif; color:var(--s-navy);}
-.fund-q p mark{background:#F6E2A6; color:inherit; padding:0 .2em; border-radius:.3em;}
-.fund-s{display:flex; flex-direction:column; gap:1.6vh; min-height:0;}
-.fund-tabs{display:flex; gap:.7vw; flex-wrap:wrap;}
-.fund-tabs button{border:0; border-radius:.9vw; padding:1vh 1.2vw; background:#E4EEFB; color:var(--s-navy); font:700 clamp(15px,1.55vw,34px)/1 var(--f-cond); letter-spacing:.04em; text-transform:uppercase; cursor:pointer; transition:transform .16s var(--ease), background-color .2s;}
-.fund-tabs button:active{transform:scale(.96);}
-.fund-tabs button.on{background:var(--s-blue); color:#fff;}
-.carta{position:relative; flex:1; min-height:0; background:#fff; border-radius:1.2vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.45); padding:2.4vh 2vw; display:flex; flex-direction:column; gap:1.2vh; overflow:hidden;}
-.carta-t{font:700 clamp(24px,2.7vw,58px)/1 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; color:var(--s-navy);}
-.carta-c{margin:0; font-size:clamp(16px,1.6vw,34px); line-height:1.4; color:var(--s-mut);}
-.carta .btn2{align-self:flex-start; margin-top:auto;}
-.sello{position:absolute; right:3%; top:14%; padding:1.2vh 1.4vw; border:.7vh solid var(--s-navy); border-radius:1vw; color:var(--s-navy); font:700 clamp(22px,2.7vw,58px)/1 var(--f-cond); letter-spacing:.06em; text-transform:uppercase; text-align:center; transform:rotate(-9deg) scale(2.4); opacity:0; pointer-events:none; background:rgba(255,255,255,.55);}
-.sello small{display:block; font-size:.5em; letter-spacing:.1em; margin-top:.5vh;}
-.carta.sella .sello{animation:selloKF .5s var(--ease) forwards;}
-.carta.sella{animation:cartaKF .5s var(--ease);}
-@keyframes selloKF{0%{opacity:0; transform:rotate(-20deg) scale(2.4);} 60%{opacity:1; transform:rotate(-8deg) scale(.96);} 100%{opacity:1; transform:rotate(-9deg) scale(1);}}
-@keyframes cartaKF{0%,40%{transform:translateY(0);} 55%{transform:translateY(.6vh);} 100%{transform:translateY(0);}}
+/* ---------- los tres términos ---------- */
+.terms{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:space-around; gap:1.6vh;}
+.term{display:grid; grid-template-columns:7vw minmax(0,1fr); gap:1.6vw; align-items:center;}
+.term .n{height:8.6vh; display:grid; place-items:center; background:var(--s-navy); color:#fff; border-radius:.8vw; font:700 clamp(32px,4.6vh,76px)/1 var(--f-cond);}
+.term .pista{background:#E4EBF6; border-radius:.8vw; height:8.6vh; position:relative; overflow:hidden;}
+.term .barra{position:absolute; left:0; top:0; bottom:0; display:flex; align-items:center; padding:0 1.4vw; background:var(--s-blue); color:#fff; font:700 clamp(18px,2vw,44px)/1 var(--f-cond); letter-spacing:.03em; transform:scaleX(0); transform-origin:left center; white-space:nowrap;}
+.slide.activa .term .barra{animation:barKF 1.1s var(--ease) both; animation-delay:calc(.6s + var(--i) * 1s);}
+.slide.final .term .barra{animation:none; transform:none;}
+.term .t{margin-top:.8vh;}
+.term .t p{margin:0; font:500 clamp(16px,1.6vw,34px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
+.term.x1 .barra{width:33.3%;} .term.x2 .barra{width:50%; background:#1F4A8A;} .term.x3 .barra{width:100%; background:var(--s-navy);}
 
-/* ---------- simulador de plazo ---------- */
-.sim{flex:1; display:grid; grid-template-columns:1.25fr .75fr; grid-template-rows:minmax(0,1fr) auto; gap:1.8vw; min-height:0;}
-.sim-izq{display:flex; flex-direction:column; justify-content:space-between; gap:1.6vh;}
-.sim-tipos{display:grid; grid-template-columns:repeat(3,1fr); gap:1vw;}
-.sim-tipos button{display:flex; flex-direction:column; align-items:flex-start; gap:.8vh; padding:1.6vh 1.1vw; border:0; border-radius:1.1vw; background:#EEF4FC; color:var(--s-navy); cursor:pointer; text-align:left; transition:transform .16s var(--ease), background-color .2s, box-shadow .2s;}
-.sim-tipos button:active{transform:scale(.97);}
-.sim-tipos b{font:700 clamp(32px,4.4vw,92px)/.9 var(--f-cond);}
-.sim-tipos span{font:600 clamp(14px,1.4vw,30px)/1.15 'Public Sans',sans-serif;}
-.sim-tipos button.on{color:#fff;}
-.sim-tipos button[data-d="10"].on{background:var(--t10);} .sim-tipos button[data-d="15"].on{background:var(--t15);} .sim-tipos button[data-d="30"].on{background:var(--t30);}
-.sim-opt{display:flex; align-items:center; gap:1vw; font:600 clamp(17px,1.7vw,36px)/1.2 'Public Sans',sans-serif; cursor:pointer;}
-.sim-opt input{width:3.2vh; height:3.2vh; accent-color:var(--s-blue);}
-.sim-sl{display:flex; align-items:center; gap:1.2vw;}
-.sim-sl>span{flex:none; font:600 clamp(15px,1.5vw,32px)/1.1 'Public Sans',sans-serif; color:var(--s-mut); max-width:11ch;}
-.sim-sl output{flex:none; min-width:2.2em; text-align:center; font:700 clamp(34px,4.4vw,92px)/1 var(--f-cond); color:var(--s-navy);}
-.sim-sl input[type=range]{flex:1; min-width:0; height:5vh; accent-color:var(--s-blue);}
-.sim-der{display:flex; align-items:center; gap:1.6vw;}
-.sem{flex:none; display:flex; flex-direction:column; gap:1.2vh; padding:1.4vh .9vw; background:#10161F; border-radius:1.1vw;}
-.sem i{display:block; width:6.2vh; height:6.2vh; border-radius:50%; background:#2A3342; transition:background-color .25s var(--ease), transform .3s var(--ease);}
-.sem[data-e="v"] i:nth-child(3){background:#2FD07D; transform:scale(1.08);}
-.sem[data-e="a"] i:nth-child(2){background:#FFC21A; transform:scale(1.08);}
-.sem[data-e="r"] i:nth-child(1){background:#F25A4A; transform:scale(1.08);}
-.sim-txt{display:flex; flex-direction:column; gap:.6vh; min-width:0;}
-.sim-txt b{font:700 clamp(30px,3.6vw,78px)/1 var(--f-cond); color:var(--s-navy);}
-.sim-txt span{font:600 clamp(15px,1.5vw,32px)/1.2 'Public Sans',sans-serif; color:var(--s-mut);}
-.sim-txt em{font-style:normal; align-self:flex-start; font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.07em; text-transform:uppercase; padding:.8vh 1vw; border-radius:.5vw; background:#D9F0E2; color:#17603A; transition:background-color .25s, color .25s;}
-.sim-der[data-e="a"] em{background:#FBEBB8; color:#6B4A00;} .sim-der[data-e="r"] em{background:#FADFDC; color:#8B2A24;}
-.sim-bar{grid-column:1/-1; padding:2vh 1.8vw 1.6vh;}
-.sim-reg{position:relative; height:5.4vh; background:#E4EEFB; border-radius:1vh; overflow:visible;}
-.sim-fill{position:absolute; left:0; top:0; bottom:0; width:0; border-radius:1vh; background:var(--s-blue); transition:width .35s var(--ease), background-color .25s;}
-.sim-reg[data-e="a"] .sim-fill{background:#E6A800;} .sim-reg[data-e="r"] .sim-fill{background:var(--s-red);}
-.sim-marca{position:absolute; top:100%; font:600 clamp(12px,1.1vw,24px)/1 var(--f-cond); letter-spacing:.06em; color:var(--s-mut); transform:translateX(-50%); padding-top:.5vh; font-variant-numeric:tabular-nums;}
-.sim-marca::before{content:""; position:absolute; left:50%; top:-5.4vh; height:5.4vh; border-left:1px solid rgba(11,31,92,.18);}
-.sim-nota{margin:3.8vh 0 0; font-size:clamp(12px,1.05vw,22px); color:var(--s-mut);}
+/* ---------- caso práctico ---------- */
+.casos{flex:1; min-height:0; display:flex; flex-direction:column; gap:1vh;}
+.caso{display:grid; grid-template-columns:5vh minmax(0,1.5fr) auto minmax(0,1fr); gap:1.2vw; align-items:center; background:#fff; border-radius:1vw; padding:0 1.2vw; flex:1; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.35);}
+.caso b.n{width:4.4vh; height:4.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-fondo); border:2px solid var(--s-line); color:var(--s-mut); font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond);}
+.caso .q{font:600 clamp(17px,1.7vw,36px)/1.2 'Public Sans',sans-serif; color:var(--s-ink);}
+.caso .d{font:700 clamp(22px,2.4vw,52px)/1 var(--f-cond); color:#fff; background:var(--s-blue); padding:.8vh 1.1vw; border-radius:.6vw; opacity:0;}
+.slide.activa .caso .d{animation:aKF .6s var(--ease) both; animation-delay:calc(.35s + var(--i) * 1.6s + .8s);}
+.slide.final .caso .d{animation:none; opacity:1;}
+.caso .w{font:500 clamp(14px,1.35vw,29px)/1.25 'Public Sans',sans-serif; color:var(--s-mut);}
 
-/* ---------- clasificador (buses 10 / 15 / 30) ---------- */
-.cls{flex:1; display:grid; grid-template-rows:minmax(0,1fr) auto; gap:1.8vh; min-height:0; position:relative;}
-.cls-carta{position:relative; display:flex; flex-direction:column; justify-content:center; gap:1.4vh; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2.2vh 2vw; overflow:hidden; animation:cartaEntra .45s var(--ease);}
-@keyframes cartaEntra{from{opacity:0; transform:translateX(-4vw) rotate(-2deg);} to{opacity:1; transform:none;}}
-.cls-carta.sale{transition:transform .5s var(--ease), opacity .4s var(--ease); opacity:0;}
-.cls-carta.mal{animation:malKF .4s var(--ease);}
-@keyframes malKF{0%,100%{transform:translateX(0);} 20%{transform:translateX(-1vw);} 45%{transform:translateX(.9vw);} 70%{transform:translateX(-.5vw);}}
-.cls-n{position:absolute; right:1.4vw; top:1.4vh; font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.08em; color:var(--s-mut);}
-.cls-t{margin:0; font:600 clamp(24px,3vw,66px)/1.25 'Public Sans',sans-serif; color:var(--s-navy); max-width:46ch;}
-.cls-fb{min-height:5.6vh; font:600 clamp(17px,1.75vw,38px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
-.cls-fb.bien{color:#17603A;} .cls-fb.mal{color:#8B2A24;}
-.cls-buses{display:grid; gap:1.2vw;}
-.cls-bus{position:relative; display:flex; align-items:center; gap:1vw; border:0; border-radius:1.8vw 1.8vw 1vw 1vw; padding:1.4vh 1.2vw; background:var(--bc); color:var(--bt,#fff); text-align:left; cursor:pointer; box-shadow:0 1.2vh 2vh -1vh rgba(11,31,92,.5); transition:transform .18s var(--ease); }
-.cls-bus:active{transform:scale(.97);}
-@media (hover:hover){.cls-bus:hover{transform:translateY(-.8vh);}}
-.cls-bus::after{content:""; position:absolute; left:8%; right:8%; bottom:-.6vh; height:.9vh; border-radius:.5vh; background:rgba(11,31,92,.35);}
-.cls-bus b{flex:none; display:grid; place-items:center; min-width:5.4vw; height:7.4vh; background:#fff; color:var(--s-navy); border-radius:.7vw; font:700 clamp(30px,3.6vw,76px)/1 var(--f-cond);}
-.cls-bus span{font:700 clamp(16px,1.6vw,34px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase;}
-.cls-bus.ok{animation:busOk .5s var(--ease);} .cls-bus.no{animation:malKF .4s var(--ease); outline:.6vh solid var(--s-red);} .cls-bus.pista{animation:pista 1s var(--ease) 2;}
-@keyframes busOk{0%{transform:translateY(0);} 35%{transform:translateY(-1.6vh);} 100%{transform:translateY(0);}}
-@keyframes pista{0%,100%{transform:translateY(0);} 50%{transform:translateY(-1.2vh);}}
-.cls-fin{display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:1.8vh; background:#fff; border-radius:1.4vw; padding:2.4vh 2vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); animation:cartaEntra .5s var(--ease);}
-.cls-fin h3{margin:0; font:700 clamp(36px,4.8vw,100px)/1 var(--f-cond); color:var(--s-navy);}
-.cls-fin p{margin:0; font:600 clamp(18px,1.9vw,40px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
-
-/* ---------- respuesta de fondo ---------- */
-.fondo{flex:1; display:grid; grid-template-columns:.9fr 1.3fr; gap:1.8vw; min-height:0;}
-.fondo-q{display:flex; flex-direction:column; gap:1.4vh;}
-.fondo-q button{display:flex; align-items:center; gap:1vw; border:0; border-radius:1.1vw; padding:1.5vh 1.2vw; background:#fff; color:var(--s-navy); font:700 clamp(20px,2.2vw,48px)/1.1 var(--f-cond); letter-spacing:.03em; text-align:left; cursor:pointer; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4); transition:transform .16s var(--ease), background-color .2s;}
-.fondo-q button:active{transform:scale(.97);}
-.fondo-q button b{flex:none; width:6vh; height:6vh; border-radius:50%; display:grid; place-items:center; background:var(--s-blue); color:#fff; font-size:.9em;}
-.fondo-q button.on{background:var(--s-navy); color:#fff;} .fondo-q button.on b{background:var(--s-yellow); color:var(--s-navy);}
-.fondo-def{margin:0; font:600 clamp(17px,1.65vw,36px)/1.35 'Public Sans',sans-serif; color:var(--s-navy); background:#FFF6D8; border-radius:1.1vw; padding:1.6vh 1.3vw; min-height:9vh;}
-.fondo-r{display:flex; flex-direction:column; gap:1.4vh; min-height:0;}
-.fondo-p{margin:0; font:700 clamp(20px,2.2vw,48px)/1.2 var(--f-cond); letter-spacing:.02em; background:var(--s-navy); color:#fff; border-radius:1.1vw; padding:1.4vh 1.4vw;}
-.fondo-op{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; gap:1.2vw;}
-.fondo-op button{position:relative; border:0; border-radius:1.2vw; background:#fff; padding:1.8vh 1.3vw; text-align:left; font:italic 500 clamp(16px,1.65vw,36px)/1.35 'Public Sans',sans-serif; color:var(--s-navy); cursor:pointer; box-shadow:0 1.2vh 2.2vh -1vh rgba(11,31,92,.4); transition:transform .18s var(--ease), background-color .2s;}
-.fondo-op button:active{transform:scale(.98);}
-.fondo-op button.ok{background:#D9F0E2;} .fondo-op button.no{background:#FADFDC; animation:malKF .4s var(--ease);}
-.fondo-op button em{display:block; margin-top:1vh; font:700 clamp(15px,1.5vw,32px)/1.2 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; font-style:normal;}
-.fondo-fb{margin:0; min-height:5vh; font:600 clamp(16px,1.55vw,33px)/1.3 'Public Sans',sans-serif; color:var(--s-navy);}
-
-/* ---------- ampliación ---------- */
-.amp{flex:1; display:grid; grid-template-columns:1fr 1.1fr; gap:1.8vw; min-height:0;}
-.amp-c{display:flex; flex-direction:column; gap:1.3vh;}
-.amp-c button{flex:1; display:flex; align-items:center; gap:1.1vw; border:0; border-radius:1.1vw; padding:1vh 1.2vw; background:#fff; color:var(--s-navy); text-align:left; font:600 clamp(17px,1.7vw,37px)/1.25 'Public Sans',sans-serif; cursor:pointer; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4); transition:transform .16s var(--ease), background-color .2s;}
-.amp-c button:active{transform:scale(.98);}
-.amp-c button i{flex:none; width:5vh; height:5vh; border-radius:1vh; border:.5vh solid var(--s-line); display:grid; place-items:center; background:#fff; transition:background-color .2s, border-color .2s;}
-.amp-c button i svg{width:70%; height:70%; opacity:0; transform:scale(.6); transition:opacity .2s, transform .25s var(--ease);}
-.amp-c button.on{background:#EAF7EF;} .amp-c button.on i{background:var(--s-green); border-color:var(--s-green);} .amp-c button.on i svg{opacity:1; transform:none;}
-.amp-r{display:flex; flex-direction:column; gap:1.4vh; min-height:0;}
-.amp-b{flex:1; display:flex; flex-direction:column; justify-content:space-around; gap:1vh;}
-.amp-f{display:grid; grid-template-columns:5.6vw minmax(0,1fr); gap:1vw; align-items:center;}
-.amp-f .ins2{display:grid; place-items:center; height:7.4vh; border-radius:.8vw; color:#fff; font:700 clamp(28px,3.2vw,68px)/1 var(--f-cond);}
-.amp-pista{position:relative; height:7.4vh; background:#E4EEFB; border-radius:.8vw; overflow:hidden;}
-.amp-pista .b1,.amp-pista .b2{position:absolute; top:0; bottom:0; display:flex; align-items:center; padding:0 .8vw; font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); white-space:nowrap;}
-.amp-pista .b1{left:0; color:#fff;}
-.amp-pista .b2{border:.4vh dashed currentColor; border-left:0; background:transparent; opacity:.35; transition:opacity .4s var(--ease), background-color .3s;}
-.amp.listo .amp-pista .b2{opacity:1; background:rgba(255,255,255,.55);}
-.amp-v{display:flex; align-items:center; gap:1.2vw; border-radius:1.2vw; padding:1.6vh 1.4vw; background:#FBEBB8; color:#5E4300; font:700 clamp(20px,2.2vw,48px)/1.1 var(--f-cond); letter-spacing:.03em; transition:background-color .3s, color .3s;}
-.amp.listo .amp-v{background:#D9F0E2; color:#17603A;}
+/* ---------- ampliación y plazos ---------- */
+.amp3{flex:1; min-height:0; display:grid; grid-template-columns:1.1fr 1fr; gap:1.8vw;}
+.conds{display:flex; flex-direction:column; gap:1.2vh; justify-content:space-between;}
+.cond{display:flex; align-items:center; gap:1.1vw; background:#fff; border-radius:1vw; padding:1.2vh 1.2vw; flex:1; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.35);}
+.cond b{flex:none; width:5.6vh; height:5.6vh; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 clamp(20px,2.6vh,40px)/1 var(--f-cond);}
+.cond p{margin:0; font:600 clamp(17px,1.65vw,36px)/1.25 'Public Sans',sans-serif; color:var(--s-ink);}
+.vis-amp{display:flex; flex-direction:column; justify-content:center; gap:2vh;}
+.vis-amp .pista{position:relative; height:9vh; background:#E4EBF6; border-radius:.8vw; overflow:hidden;}
+.vis-amp .b1,.vis-amp .b2{position:absolute; top:0; bottom:0; display:flex; align-items:center; padding:0 1.2vw; font:700 clamp(18px,2vw,44px)/1 var(--f-cond); white-space:nowrap;}
+.vis-amp .b1{left:0; width:50%; background:var(--s-blue); color:#fff; transform:scaleX(0); transform-origin:left center;}
+.vis-amp .b2{left:50%; width:50%; border:.5vh dashed var(--s-navy); border-left:0; color:var(--s-navy); opacity:0;}
+.slide.activa .vis-amp .b1{animation:barKF 1s var(--ease) both; animation-delay:calc(.35s + 5 * 1s);}
+.slide.activa .vis-amp .b2{animation:aKF .8s var(--ease) both; animation-delay:calc(.35s + 6 * 1s);}
+.slide.final .vis-amp .b1{animation:none; transform:none;} .slide.final .vis-amp .b2{animation:none; opacity:1;}
+.vis-amp .eje{display:flex; justify-content:space-between; font:600 clamp(13px,1.2vw,26px)/1 var(--f-cond); letter-spacing:.06em; color:var(--s-mut);}
 
 /* ---------- documentos: 10 días + 3 de entrega ---------- */
-.doc{flex:1; display:flex; flex-direction:column; gap:2vh; min-height:0;}
-.doc-pista{flex:1; position:relative; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2.2vh 1.6vw; display:flex; flex-direction:column; justify-content:center; gap:2vh;}
-.doc-dias{display:grid; grid-template-columns:repeat(13,1fr); gap:.5vw;}
-.doc-dias i{display:grid; place-items:center; height:9vh; border-radius:.8vw; background:#E4EEFB; color:var(--s-mut); font:700 clamp(18px,2.1vw,44px)/1 var(--f-cond); font-style:normal; transition:background-color .25s var(--ease), color .25s, transform .3s var(--ease);}
-.doc-dias i.on{background:var(--s-blue); color:#fff; transform:translateY(-.8vh);}
-.doc-dias i.ent{background:#FFF0C4;} .doc-dias i.ent.on{background:var(--s-yellow); color:var(--s-navy);}
-.doc-leyenda{display:grid; grid-template-columns:10fr 3fr; gap:.5vw; font:700 clamp(14px,1.4vw,30px)/1 var(--f-cond); letter-spacing:.06em; text-transform:uppercase; color:var(--s-mut);}
-.doc-leyenda span:last-child{text-align:center;}
-.doc-estado{display:flex; align-items:center; gap:1.4vw; min-height:11vh;}
-.doc-estado .sello2{flex:none; padding:1.2vh 1.4vw; border:.7vh solid var(--s-navy); border-radius:1vw; color:var(--s-navy); font:700 clamp(20px,2.4vw,52px)/1 var(--f-cond); letter-spacing:.06em; text-transform:uppercase; transform:rotate(-5deg) scale(1.8); opacity:0;}
-.doc-estado .sello2.on{animation:sello2KF .5s var(--ease) forwards;}
-@keyframes sello2KF{0%{opacity:0; transform:rotate(-14deg) scale(2.2);} 60%{opacity:1; transform:rotate(-4deg) scale(.96);} 100%{opacity:1; transform:rotate(-5deg) scale(1);}}
-.doc-estado p{margin:0; font:600 clamp(18px,1.9vw,40px)/1.3 'Public Sans',sans-serif; color:var(--s-navy);}
-.doc-acc{display:flex; gap:1vw; align-items:center;}
-.doc-acc .chip-reserva{margin-left:auto; font:600 clamp(15px,1.5vw,32px)/1.25 'Public Sans',sans-serif; background:#FFF6D8; color:#5E4300; border-radius:1vw; padding:1.2vh 1.2vw; max-width:46ch;}
+.dias{display:grid; grid-template-columns:repeat(13,1fr); gap:.5vw;}
+.dd{display:grid; place-items:center; height:8vh; border-radius:.7vw; background:#E4EBF6; color:var(--s-mut); font:700 clamp(18px,2vw,42px)/1 var(--f-cond); opacity:.35;}
+.dd.cp{background:#FFF0C4;}
+.slide.activa .dd{animation:diaKF .5s var(--ease) both; animation-delay:calc(1s + var(--k) * .2s);}
+.slide.final .dd{animation:none; opacity:1; background:var(--s-blue); color:#fff;} .slide.final .dd.cp{background:var(--s-yellow); color:var(--s-navy);}
+@keyframes diaKF{from{opacity:.35;} to{opacity:1; background:var(--s-blue); color:#fff; transform:translateY(-.5vh);}}
+.slide.activa .dd.cp{animation-name:diaCp;}
+@keyframes diaCp{from{opacity:.35;} to{opacity:1; background:var(--s-yellow); color:var(--s-navy); transform:translateY(-.5vh);}}
+.dleg{display:grid; grid-template-columns:10fr 3fr; gap:.5vw; font:700 clamp(13px,1.3vw,28px)/1 var(--f-cond); letter-spacing:.07em; text-transform:uppercase; color:var(--s-mut);}
+.dleg span:last-child{text-align:center;}
+.efecto{display:grid; grid-template-columns:1fr 1fr; gap:1.6vw;}
+.efecto .card3 h4{margin:0 0 .6vh; font:700 clamp(22px,2.4vw,52px)/1 var(--f-cond); color:var(--s-navy);}
 
-/* ---------- recursos ---------- */
-.rec{flex:1; display:grid; grid-template-columns:1fr 1.1fr; gap:1.8vw; min-height:0;}
-.rec-q{display:flex; flex-direction:column; gap:1.4vh;}
-.rec-q button{flex:1; display:flex; align-items:center; gap:1.2vw; border:0; border-radius:1.2vw; padding:1.2vh 1.3vw; background:#fff; color:var(--s-navy); text-align:left; font:600 clamp(18px,1.85vw,40px)/1.25 'Public Sans',sans-serif; cursor:pointer; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4); transition:transform .16s var(--ease), background-color .2s;}
-.rec-q button:active{transform:scale(.98);}
-.rec-q button b{flex:none; width:6.4vh; height:6.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-blue); color:#fff; font:700 clamp(22px,2.4vw,50px)/1 var(--f-cond);}
-.rec-q button.on{background:var(--s-navy); color:#fff;} .rec-q button.on b{background:var(--s-yellow); color:var(--s-navy);}
-.rec-r{position:relative; display:flex; flex-direction:column; justify-content:center; gap:1.8vh; background:#fff; border-radius:1.4vw; padding:2.4vh 2vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); min-height:0;}
-.rec-r .vacio{font:600 clamp(20px,2.1vw,46px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
-.rec-tag{align-self:flex-start; font:700 clamp(30px,3.8vw,80px)/1 var(--f-cond); letter-spacing:.04em; text-transform:uppercase; padding:1vh 1.4vw; border-radius:.8vw; color:#fff; animation:cartaEntra .4s var(--ease);}
-.rec-txt{margin:0; font:600 clamp(20px,2.1vw,46px)/1.3 'Public Sans',sans-serif; color:var(--s-navy); animation:cartaEntra .4s var(--ease);}
+/* ---------- gestión de términos ---------- */
+.via{flex:1; min-height:0; display:flex; align-items:center; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2vh 2vw;}
+.via .linea{position:absolute; left:10%; right:10%; top:9.6vh; height:1.2vh; background:#DCE5F3; border-radius:1vh;}
+.via .pasos{position:relative; width:100%; display:grid; grid-template-columns:repeat(5,1fr); padding-top:5vh;}
+.paso3{display:flex; flex-direction:column; align-items:center; gap:.8vh; text-align:center;}
+.paso3 b.c{position:relative; z-index:1; width:10.4vh; height:10.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 clamp(24px,4vh,60px)/1 var(--f-cond);}
+.paso3 h4{margin:.6vh 0 0; font:700 clamp(20px,2.2vw,46px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase; color:var(--s-navy);}
+.paso3 p{margin:0; font:500 clamp(15px,1.6vw,34px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
+.bus-run{position:absolute; top:.2vh; left:10%; width:6vw; margin-left:-3vw; pointer-events:none; opacity:0;}
+.bus-run svg{display:block; width:100%; height:auto;}
+.slide.activa .bus-run{animation:busKF 4s linear both, aKF .4s var(--ease) both; animation-delay:.35s,.35s;}
+.slide.final .bus-run{animation:none; opacity:1; left:90%;}
+@keyframes busKF{from{left:10%;} to{left:90%;} }
 
-/* ---------- tutelas ---------- */
-.tut{flex:1; display:grid; grid-template-columns:1fr 1fr; gap:1.8vw; min-height:0;}
-.mito{display:flex; flex-direction:column; justify-content:center; gap:1.6vh; background:#fff; border-radius:1.4vw; padding:2.4vh 2vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); position:relative; overflow:hidden;}
-.mito q{display:block; font:700 clamp(28px,3.4vw,74px)/1.1 var(--f-cond); color:var(--s-navy); quotes:"«" "»";}
-.mito p{margin:0; font:600 clamp(18px,1.8vw,38px)/1.35 'Public Sans',sans-serif; color:var(--s-mut); min-height:12vh;}
-.mito .sello3{position:absolute; right:2vw; top:2vh; padding:1vh 1.4vw; border:.7vh solid var(--s-red); border-radius:1vw; color:var(--s-red); font:700 clamp(28px,3.2vw,70px)/1 var(--f-cond); letter-spacing:.08em; transform:rotate(-8deg) scale(2.2); opacity:0; pointer-events:none;}
-.mito.revela .sello3{animation:selloKF .5s var(--ease) forwards;}
-.tut-d{display:flex; flex-direction:column; gap:1.6vh; min-height:0;}
-.tut-ruta{position:relative; flex:1; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:2vh 1.6vw; display:flex; flex-direction:column; justify-content:space-between; min-height:0; overflow:hidden;}
-.tut-nodos{display:grid; grid-template-columns:1fr 1.1fr; gap:2vw; align-items:center; flex:1;}
-.tut-nodo{display:grid; place-items:center; text-align:center; gap:.8vh; font:700 clamp(18px,1.9vw,40px)/1.1 var(--f-cond); letter-spacing:.04em; text-transform:uppercase; color:var(--s-navy);}
-.tut-nodo i{display:block; width:7.5vh; height:7.5vh; border-radius:50%; background:#E4EEFB; transition:background-color .3s;}
-.tut-nodo.on i{background:var(--s-green);}
-.tut-dest{display:flex; flex-direction:column; gap:1.2vh;}
-.tut-dest .tut-nodo{grid-template-columns:auto 1fr; text-align:left; justify-items:start;}
-.tut-sobre{position:absolute; left:6%; top:36%; width:5vw; height:3.6vw; background:var(--s-yellow); border-radius:.4vw; opacity:0; display:grid; place-items:center; color:var(--s-navy); font:700 clamp(15px,1.5vw,30px)/1 var(--f-cond);}
-.tut-sobre.vuela{animation:sobreKF 1.8s var(--ease) forwards;}
-@keyframes sobreKF{0%{opacity:0; transform:translate(0,0) scale(.8);} 12%{opacity:1; transform:translate(0,0) scale(1);} 55%{opacity:1; transform:translate(20vw,0) scale(1);} 100%{opacity:1; transform:translate(33vw,-4vh) scale(.9);}}
-.tut-regla{margin:0; font:600 clamp(17px,1.65vw,36px)/1.3 'Public Sans',sans-serif; color:var(--s-navy); background:#FFF6D8; border-radius:1.1vw; padding:1.4vh 1.3vw;}
-.hechos{display:flex; gap:.8vw; flex-wrap:wrap;}
-.hechos span{font:700 clamp(15px,1.5vw,32px)/1.1 var(--f-cond); letter-spacing:.04em; text-transform:uppercase; background:var(--s-navy); color:#fff; padding:1vh 1vw; border-radius:.6vw;}
-
-/* ---------- comparación petición / tutela ---------- */
-.cmp2{flex:1; display:flex; flex-direction:column; gap:1.8vh; min-height:0;}
-.seg{align-self:flex-start; display:flex; background:#fff; border-radius:1.3vw; padding:.6vh; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4);}
-.seg button{border:0; border-radius:1vw; padding:1.4vh 2vw; background:transparent; color:var(--s-navy); font:700 clamp(18px,2vw,44px)/1 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; cursor:pointer; transition:background-color .25s var(--ease), color .25s, transform .16s var(--ease);}
-.seg button:active{transform:scale(.97);}
-.seg button.on{background:var(--s-blue); color:#fff;} .seg button[data-k="t"].on{background:var(--s-red);}
-.cmp2-tabla{flex:1; display:grid; grid-template-rows:repeat(4,1fr); gap:1.2vh; min-height:0;}
-.cmp2-f{display:grid; grid-template-columns:.7fr 2fr; align-items:center; gap:1.4vw; background:#fff; border-radius:1.1vw; padding:0 1.4vw; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.4);}
-.cmp2-f b{font:700 clamp(17px,1.7vw,36px)/1.1 var(--f-cond); letter-spacing:.06em; text-transform:uppercase; color:var(--s-mut);}
-.cmp2-f span{font:600 clamp(19px,2vw,44px)/1.25 'Public Sans',sans-serif; color:var(--s-navy); transition:opacity .22s var(--ease), transform .22s var(--ease);}
-.cmp2.cambia .cmp2-f span{opacity:0; transform:translateX(1.2vw);}
-
-/* ---------- gestión del plazo ---------- */
-.ges{flex:1; display:flex; flex-direction:column; gap:2vh; min-height:0;}
-.ges-via{position:relative; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); padding:8vh 2vw 2vh;}
-.ges-linea{position:relative; height:1.2vh; background:#DCE8FA; border-radius:1vh; margin:0 10%;}
-.ges-linea i{position:absolute; left:0; top:0; bottom:0; width:0; background:var(--s-blue); border-radius:1vh; transition:width .8s var(--ease);}
-.ges-paradas{display:grid; grid-template-columns:repeat(5,1fr); margin-top:-4.4vh;}
-.ges-p{border:0; background:transparent; display:flex; flex-direction:column; align-items:center; gap:1vh; cursor:pointer; padding:0; font:700 clamp(16px,1.6vw,34px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase; color:var(--s-navy); }
-.ges-p b{width:7.6vh; height:7.6vh; border-radius:50%; display:grid; place-items:center; background:#fff; border:.7vh solid #B9CBE8; color:var(--s-navy); font:700 clamp(22px,2.6vw,56px)/1 var(--f-cond); transition:background-color .3s var(--ease), border-color .3s, color .3s, transform .3s var(--ease);}
-.ges-p.on b{background:var(--s-blue); border-color:var(--s-blue); color:#fff;}
-.ges-p.ya b{transform:scale(1.18); background:var(--s-yellow); border-color:var(--s-yellow); color:var(--s-navy);}
-.ges-bus{position:absolute; top:.3vh; left:0; width:5.4vw; pointer-events:none; transition:transform .8s var(--ease);}
-.ges-bus svg{display:block; width:100%; height:auto;}
-.ges-det{flex:1; display:grid; grid-template-columns:1fr auto; gap:1.6vw; align-items:center; background:var(--s-navy); color:#fff; border-radius:1.4vw; padding:2vh 2vw; min-height:0;}
-.ges-det h3{margin:0 0 .6vh; font:700 clamp(28px,3.4vw,72px)/1 var(--f-cond); color:var(--s-yellow);}
-.ges-det p{margin:0; font:500 clamp(18px,1.9vw,40px)/1.3 'Public Sans',sans-serif;}
-.ges-det .btn2{align-self:center;}
-.ges-plz{display:flex; height:6.4vh; border-radius:1vw; overflow:hidden; font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.03em;}
-.ges-plz span{display:flex; align-items:center; padding:0 1vw; white-space:nowrap; opacity:.5; transition:opacity .35s var(--ease);}
-.ges-plz .a{flex:0 0 62%; background:#BCD6F7; color:#17509F;} .ges-plz .b{flex:1; background:var(--s-yellow); color:var(--s-navy);}
-.ges-plz.A .a,.ges-plz.B .b{opacity:1;}
-
-/* ---------- demora interna: fichas de dominó ---------- */
-.dem{flex:1; display:grid; grid-template-rows:minmax(0,1fr) auto; gap:2vh; min-height:0;}
-.dem-fichas{display:flex; align-items:flex-end; justify-content:center; gap:3.4vw; padding:0 3vw; background:#fff; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); min-height:0; overflow:hidden;}
-.ficha{position:relative; flex:1; max-width:15vw; height:70%; margin-bottom:0; transform-origin:100% 100%; transition:transform .55s var(--ease), background-color .3s; transition-delay:calc(var(--k) * .42s); background:var(--s-blue); color:#fff; border-radius:1vw 1vw .4vw .4vw; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1vh; text-align:center; padding:1vh .6vw;}
-.ficha b{font:700 clamp(18px,1.9vw,40px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase;}
-.ficha span{font:500 clamp(13px,1.3vw,28px)/1.25 'Public Sans',sans-serif;}
-.ficha:nth-child(4){background:var(--s-red);}
-.dem.cae .ficha{transform:rotate(68deg);}
-.dem.cae .ficha:nth-child(4){transform:rotate(78deg);}
-.dem.tiempo .ficha{background:var(--s-green); transition-delay:0s;}
-.dem-ctl{display:flex; align-items:center; gap:1.6vw;}
-.dem-ctl .sim-opt{background:#fff; border-radius:1.1vw; padding:1.4vh 1.4vw; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.4);}
-.dem-fb{margin-left:auto; font:700 clamp(20px,2.2vw,48px)/1.1 var(--f-cond); letter-spacing:.03em; color:var(--s-navy); max-width:26ch; text-align:right;}
-
-/* ---------- Terminal Jurídica: antes y ahora ---------- */
-.ter{flex:1; display:grid; grid-template-columns:1.3fr .7fr; gap:1.8vw; min-height:0;}
-.ter-izq{display:flex; flex-direction:column; gap:1.6vh; min-height:0;}
-.ter-pan{position:relative; flex:1; min-height:0; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.4); overflow:hidden; background:#fff;}
-.ter-antes,.ter-ahora{position:absolute; inset:0; padding:2vh 1.6vw; transition:opacity .35s var(--ease), transform .35s var(--ease);}
-.ter-antes{background:#F1F4F9; opacity:0; transform:translateX(4%); pointer-events:none;}
-.ter.antes .ter-antes{opacity:1; transform:none; pointer-events:auto;} .ter.antes .ter-ahora{opacity:0; transform:translateX(-4%); pointer-events:none;}
-.nota-pegada{position:absolute; width:20%; padding:1.4vh .9vw; background:#E4EAF3; color:var(--s-navy); font:600 clamp(15px,1.55vw,34px)/1.2 'Public Sans',sans-serif; border-radius:.3vw; box-shadow:0 .8vh 1.4vh -.6vh rgba(0,0,0,.35); transform:rotate(var(--r)); }
-
-.ter-fila{display:grid; grid-template-columns:auto 1fr auto; gap:1.1vw; align-items:center; padding:1.3vh .4vw; border-bottom:1px solid var(--s-line); cursor:pointer; background:transparent; border-left:0; border-right:0; border-top:0; width:100%; text-align:left; transition:background-color .2s;}
-.ter-fila:hover{background:#F2F7FD;}
-.ter-fila .luz{width:3.6vh; height:3.6vh; border-radius:50%; background:var(--c);}
-.ter-fila b{display:block; font:700 clamp(17px,1.8vw,38px)/1.15 'Public Sans',sans-serif; color:var(--s-navy);}
-.ter-fila span{font:500 clamp(13px,1.3vw,28px)/1.2 'Public Sans',sans-serif; color:var(--s-mut);}
-.ter-fila em{font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; font-style:normal; padding:.7vh .8vw; border-radius:.5vw; background:#E4EEFB; color:var(--s-navy);}
-.ter-sobre{position:absolute; right:2vw; bottom:2vh; display:flex; align-items:center; gap:.8vw; background:var(--s-navy); color:#fff; border-radius:1vw; padding:1.2vh 1.2vw; font:600 clamp(15px,1.5vw,32px)/1.2 'Public Sans',sans-serif; opacity:0; transform:translateY(2vh) scale(.95); transition:opacity .3s var(--ease), transform .4s var(--ease);}
-.ter-sobre.on{opacity:1; transform:none;}
-.ter-der{display:flex; flex-direction:column; gap:1.2vh;}
-.ter-der .chip{flex:1; display:flex; align-items:center; gap:1vw; background:#fff; border-radius:1.1vw; padding:0 1.2vw; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.4); font:700 clamp(18px,1.95vw,42px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase; color:var(--s-navy);}
-.ter-der .chip small{display:block; margin-top:.3vh; font:500 clamp(13px,1.25vw,27px)/1.2 'Public Sans',sans-serif; letter-spacing:0; text-transform:none; color:var(--s-mut);}
-.ter-der .chip i{flex:none; width:5vh; height:5vh; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 clamp(20px,2.2vw,44px)/1 var(--f-cond); font-style:normal;}
-
-
-/* ---------- QR ---------- */
-.qr2{flex:1; display:grid; grid-template-columns:auto minmax(0,1fr); gap:3vw; align-items:center; min-height:0;}
-.qr2-c{display:flex; flex-direction:column; gap:1.4vh; align-items:stretch;}
-.qr2-c img{width:min(42vh,26vw); height:min(42vh,26vw); background:#fff; padding:1.4vh; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.45); display:block;}
-.qr2-u{background:var(--s-navy); color:#fff; font:600 clamp(13px,1.2vw,26px)/1.25 'Public Sans',sans-serif; padding:1.2vh .9vw; border-radius:.6vw; text-align:center; word-break:break-all;}
-.pasos{display:flex; flex-direction:column; gap:1.6vh;}
-.paso{display:flex; align-items:center; gap:1.4vw; background:#fff; border-radius:1.3vw; padding:2vh 1.4vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4); animation:cartaEntra .5s var(--ease) both; animation-delay:calc(var(--k) * .12s);}
-.paso b{flex:none; width:7.4vh; height:7.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(28px,3.2vw,68px)/1 var(--f-cond);}
-.paso p{margin:0; font:600 clamp(20px,2.1vw,46px)/1.2 'Public Sans',sans-serif; color:var(--s-navy);}
-.paso p small{display:block; margin-top:.4vh; font-weight:500; font-size:.72em; color:var(--s-mut);}
-
-/* ---------- cierre ---------- */
-.cie{flex:1; display:grid; grid-template-columns:1.1fr .9fr; gap:2vw; min-height:0;}
-.cie-q{display:flex; flex-direction:column; justify-content:center; gap:2vh; background:var(--s-navy); color:#fff; border-radius:1.4vw; padding:2.6vh 2.2vw;}
-.cie-q p{margin:0; font:700 clamp(32px,4vw,86px)/1.04 var(--f-cond); color:#fff;}
-.cie-q p em{font-style:normal; color:var(--s-yellow);}
-.cie-q small{font:500 clamp(17px,1.7vw,36px)/1.35 'Public Sans',sans-serif; color:#CFE0FA;}
-.cie-d{display:flex; flex-direction:column; gap:1.4vh;}
-.cie-d>span{font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:var(--s-navy);}
-.cie-r{flex:1; display:grid; grid-template-columns:1fr 1fr; gap:1vw;}
-.cie-r button{border:0; border-radius:1.1vw; padding:1vh 1vw; background:#fff; text-align:left; font:600 clamp(15px,1.5vw,32px)/1.25 'Public Sans',sans-serif; color:var(--s-navy); cursor:pointer; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.4); transition:transform .16s var(--ease), background-color .2s; display:flex; align-items:center; gap:.8vw;}
-.cie-r button:active{transform:scale(.97);}
-@media (hover:hover){.cie-r button:hover{background:#FFF6D8;}}
-.cie-r button b{flex:none; width:4.6vh; height:4.6vh; border-radius:50%; display:grid; place-items:center; background:var(--s-blue); color:#fff; font:700 clamp(18px,1.9vw,40px)/1 var(--f-cond);}
-.cie-go{display:flex; gap:1vw;}
-.cie-go .btn2{flex:1;}
+/* ---------- Terminal Jurídica ---------- */
+.ter3{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr; gap:1.8vw;}
+.antes3{background:#F1F4F9; position:relative;}
+.nota-p{display:inline-block; margin:.6vh .4vw; padding:1.2vh .9vw; background:#E4EAF3; border-radius:.3vw; font:600 clamp(15px,1.5vw,32px)/1.2 'Public Sans',sans-serif; color:var(--s-navy); box-shadow:0 .8vh 1.4vh -.6vh rgba(0,0,0,.3);}
+.board3 .fila3{display:grid; grid-template-columns:auto 1fr auto; gap:1vw; align-items:center; padding:.9vh .4vw; border-bottom:1px solid var(--s-line);}
+.board3 .fila3:last-child{border-bottom:0;}
+.board3 .luz3{width:3.6vh; height:3.6vh; border-radius:50%; background:var(--c);}
+.board3 b{display:block; font:700 clamp(18px,1.95vw,42px)/1.15 'Public Sans',sans-serif; color:var(--s-navy);}
+.board3 span.s{font:500 clamp(14px,1.4vw,30px)/1.2 'Public Sans',sans-serif; color:var(--s-mut);}
+.board3 em{font:700 clamp(16px,1.7vw,36px)/1 var(--f-cond); letter-spacing:.05em; text-transform:uppercase; font-style:normal; padding:.7vh .8vw; border-radius:.5vw; background:#E4EBF6; color:var(--s-navy);}
+.chips3{display:grid; grid-template-columns:repeat(4,1fr); gap:1.2vw;}
+.chip3{background:#fff; border-radius:1vw; padding:2vh 1vw; box-shadow:0 .8vh 1.8vh -1vh rgba(11,31,92,.35); font:700 clamp(19px,2.1vw,44px)/1.1 var(--f-cond); letter-spacing:.03em; text-transform:uppercase; color:var(--s-navy);}
+.chip3 small{display:block; margin-top:.6vh; font:500 clamp(14px,1.4vw,30px)/1.25 'Public Sans',sans-serif; letter-spacing:0; text-transform:none; color:var(--s-mut);}
+.aviso3{display:flex; align-items:center; gap:1vw; background:var(--s-navy); color:#fff; border-radius:1vw; padding:1.4vh 1.4vw; font:600 clamp(16px,1.7vw,36px)/1.2 'Public Sans',sans-serif;}
+.qr3{flex:1; min-height:0; display:grid; grid-template-columns:auto minmax(0,1fr); gap:3vw; align-items:center;}
+.qr3 .qc{display:flex; flex-direction:column; gap:1.4vh; align-items:stretch;}
+.qr3 img{width:min(46vh,28vw); height:min(46vh,28vw); background:#fff; padding:1.4vh; border-radius:1.4vw; box-shadow:0 1.2vh 2.6vh -1.2vh rgba(11,31,92,.45); display:block;}
+.qr3 .url{background:var(--s-navy); color:#fff; font:600 clamp(13px,1.2vw,26px)/1.25 'Public Sans',sans-serif; padding:1.2vh .9vw; border-radius:.6vw; text-align:center; word-break:break-all;}
+.paso4{display:flex; align-items:center; gap:1.4vw; background:#fff; border-radius:1.3vw; padding:2vh 1.4vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4);}
+.paso4 b{flex:none; width:7.4vh; height:7.4vh; border-radius:50%; display:grid; place-items:center; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(28px,3.2vw,68px)/1 var(--f-cond);}
+.paso4 p{margin:0; font:600 clamp(20px,2.1vw,46px)/1.2 'Public Sans',sans-serif; color:var(--s-navy);}
+.paso4 p small{display:block; margin-top:.4vh; font-weight:500; font-size:.72em; color:var(--s-mut);}
 
 /* ---------- normativa ---------- */
-.nor{flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:1.6vw; min-height:0;}
-.nor-c{display:flex; align-items:center; gap:1.4vw; background:#fff; border-radius:1.4vw; padding:0 1.6vw; box-shadow:0 1.2vh 2.4vh -1.2vh rgba(11,31,92,.4); animation:cartaEntra .5s var(--ease) both; animation-delay:calc(var(--k) * .1s);}
-.nor-c b{flex:none; min-width:8.4vw; height:9vh; padding:0 .8vw; display:grid; place-items:center; border-radius:.9vw; background:var(--bc,var(--s-blue)); color:var(--bt,#fff); font:700 clamp(26px,3.3vw,70px)/1 var(--f-cond);}
-.nor-c h3{margin:0 0 .5vh; font:700 clamp(20px,2.1vw,46px)/1.15 'Public Sans',sans-serif; color:var(--s-navy);}
-.nor-c p{margin:0; font:500 clamp(15px,1.5vw,32px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
-.nor-aviso{grid-column:1/-1; display:none;}
+.nor3{display:flex; flex-direction:column; gap:1.4vh; flex:1; min-height:0;}
+.nor3 .r{flex:1; display:flex; align-items:center; gap:1.4vw; background:#fff; border-radius:1.2vw; padding:0 1.6vw; box-shadow:0 1vh 2vh -1vh rgba(11,31,92,.4);}
+.nor3 .r b{flex:none; min-width:8.4vw; height:8vh; padding:0 .8vw; display:grid; place-items:center; border-radius:.8vw; background:var(--s-navy); color:#fff; font:700 clamp(24px,3.2vw,70px)/1 var(--f-cond);}
+.nor3 h3{margin:0 0 .4vh; font:700 clamp(20px,2.1vw,46px)/1.15 'Public Sans',sans-serif; color:var(--s-navy);}
+.nor3 p{margin:0; font:500 clamp(15px,1.5vw,32px)/1.3 'Public Sans',sans-serif; color:var(--s-mut);}
 
-@media (max-width:1500px){.m-ruta{display:none;}}
-@media (max-width:900px){
-  .m-plate h2{font-size:clamp(22px,6vw,40px);} .m-ruta{display:none;}
-  .fund,.sim,.fondo,.amp,.rec,.tut,.ter,.qr2,.cie,.nor,.obj{grid-template-columns:1fr;}
-}
-@media (prefers-reduced-motion:reduce){ .mu-nube,.mu-veh,.mp-ping{animation:none;} *{transition-duration:.01ms !important;} }
+/* ---------- portada jurídica ---------- */
+.slide.cv3{padding:0; display:grid; grid-template-columns:54vw minmax(0,1fr); background:var(--s-navy); color:#fff;}
+.cv3-izq{display:flex; flex-direction:column; min-height:0; position:relative; z-index:2;}
+.cv3-cab{display:flex; align-items:center; gap:2vw; height:13vh; padding:0 3vw; background:var(--s-yellow); color:var(--s-navy); font:700 clamp(17px,1.9vw,40px)/1.1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase;}
+.cv3-cab .logo-tab{background:#fff; padding:1vh .8vw; border-radius:.6vw; line-height:0;}
+.cv3-cab .logo-tab img{height:9vh;}
+.cv3-cuerpo{flex:1; display:flex; flex-direction:column; justify-content:center; gap:3.4vh; padding:2vh 3vw 6vh;}
+.cv3-cuerpo h1{margin:0; font:700 clamp(46px,6.2vw,132px)/.98 var(--f-cond); letter-spacing:0; color:#fff;}
+.cv3-cuerpo h1 em{font-style:normal; color:var(--s-yellow);}
+.cv3-cuerpo p{margin:0; font-size:clamp(19px,1.9vw,42px); line-height:1.4; color:#CFE0FA; max-width:28ch;}
+.cv3-cuerpo small{font:600 clamp(14px,1.2vw,26px)/1 var(--f-cond); letter-spacing:.09em; text-transform:uppercase; color:#9FB9E6;}
+.cv3-der{position:relative; background:#E8EDF6; overflow:hidden; color:var(--s-navy);}
+.cv3-der .marca{position:absolute; right:-2vw; top:-6vh; font:700 40vw/1 var(--f-cond); color:#DCE4F1; pointer-events:none;}
+.cv3-der .balanza{position:absolute; left:50%; top:5vh; width:min(31vw,62vh); transform:translateX(-50%);}
+.cv3-der .balanza .beam{transform-origin:200px 74px; animation:balKF 2.6s var(--ease) .5s both;}
+@keyframes balKF{0%{transform:rotate(-7deg);} 35%{transform:rotate(5deg);} 65%{transform:rotate(-2.5deg);} 100%{transform:rotate(0);}}
+.cv3-der .doc{position:absolute; left:3vw; bottom:9vh; width:24vw; background:#fff; border-radius:.9vw; padding:2.2vh 1.4vw; box-shadow:0 1.4vh 3vh -1.2vh rgba(11,31,92,.5);}
+.cv3-der .doc small{display:block; font:700 clamp(13px,1.2vw,26px)/1.1 var(--f-cond); letter-spacing:.09em; text-transform:uppercase; color:var(--s-mut);}
+.cv3-der .doc p{margin:1vh 0 0; font:italic 500 clamp(15px,1.45vw,32px)/1.35 'Public Sans',sans-serif; color:var(--s-navy);}
+.cv3-der .sello{position:absolute; right:.8vw; bottom:-3.6vh; padding:.9vh 1vw; border:.6vh solid var(--s-navy); border-radius:.8vw; color:var(--s-navy); font:700 clamp(18px,2vw,44px)/1 var(--f-cond); letter-spacing:.1em; text-transform:uppercase; background:rgba(255,255,255,.8); transform:rotate(-8deg); opacity:0; animation:sellaKF .5s var(--ease) 1.5s forwards;}
+.slide.final .cv3-der .sello{animation:none; opacity:1;}
+.cv3-franja{position:absolute; left:0; right:0; bottom:0; height:4.4vh; background:var(--s-yellow); z-index:3;}
+@media (max-width:900px){ .c-kick{display:none;} .g2,.g3,.amp3,.ter3,.qr3,.efecto{grid-template-columns:1fr;} .caso{grid-template-columns:5vh 1fr auto;} .caso .w{display:none;} }
+
+.g3>.a,.g2>.a,.casos>.a,.terms>.a{display:flex; flex-direction:column;}
+.g3>.a>.card3,.g2>.a>.card3,.casos>.a>.caso{flex:1;}
+.casos>.a{flex:1;} .terms>.a{flex:1; justify-content:center;}
+.ter3>.a>.card3{flex:1;}
+.cond{width:100%;}
+.nor3>.a{flex:1;} .nor3>.a>.r{flex:1;}
+.efecto>.a>.card3{flex:1;}
+.g3 .num3{margin-bottom:.4vh;}
+
+.g2 .tx3{font-size:clamp(20px,2.05vw,44px);} .g2 .ej3{font-size:clamp(17px,1.7vw,37px);}
+.g2 .card3{justify-content:center;}
+.g3 .tx3{font-size:clamp(19px,1.9vw,42px);}
+.ter3 .tx3{font-size:clamp(18px,1.75vw,38px);}
+.cond p{font-size:clamp(18px,1.85vw,40px);}
 </style>
 <link rel="stylesheet" href="setpi/setpi.css">
-<link rel="stylesheet" href="setpi/escena.css?v=17">
+<link rel="stylesheet" href="setpi/escena.css?v=18">
 </head>
 <body>
 <div class="progreso" id="progreso" style="width:5%"></div>
@@ -592,7 +385,7 @@ body.en-cover #hud{opacity:0;}
 <script src="setpi/bus.js"></script>
 <script src="setpi/clips.js"></script>
 <script src="setpi/escena.js"></script>
-<script src="setpi/gente.js"></script>
+<script src="setpi/gente.js?v=18"></script>
 <script src="setpi/mundo.js"></script>
 <script src="setpi/scenes.js"></script>
 <script src="setpi/director.js"></script>
@@ -617,493 +410,182 @@ function rutaPon(idx){
 window.addEventListener("resize", ()=>{ if(rutaPon.last !== undefined) rutaPon(rutaPon.last); });
 function busG(color){ return `<rect x="1" y="2" width="60" height="22" rx="5" fill="${color}"/><rect x="1" y="14.5" width="60" height="3" fill="#D6488E"/>${[5,14,23,32,41].map(x=>`<rect x="${x}" y="6" width="7.5" height="7" rx="1.5" fill="#CDE5F7"/>`).join("")}<rect x="50" y="5.5" width="8.5" height="9" rx="1.5" fill="#AACDEC"/><circle cx="60.5" cy="19.5" r="1.6" fill="#FFE282"/>${[12,49].map(x=>`<circle cx="${x}" cy="25" r="4.6" fill="#141E2C"/><circle cx="${x}" cy="25" r="1.9" fill="#96A0AF"/>`).join("")}`; }
 
-/* ===================== LA RUTA DEL SETP: presentación interactiva y no lineal ===================== */
+/* ===================== Presentación lineal: Derecho de petición (SETP · Jurídica) =====================
+   Cada diapositiva se anima sola, paso a paso, y se avanza con una sola tecla por diapositiva. Contenido: material de apoyo del Área Jurídica. */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const RUTAS = {
-  1: { n: "La norma", c: "#fff", t: "var(--s-navy)", b: "1" }, 2: { n: "La respuesta", c: "#fff", t: "var(--s-navy)", b: "2" },
-  3: { n: "El riesgo", c: "#fff", t: "var(--s-navy)", b: "3" }, 4: { n: "La herramienta", c: "#fff", t: "var(--s-navy)", b: "4" }, 5: { n: "Terminal", c: "#fff", t: "var(--s-navy)", b: "T" }
-};
-const RUTA_EST = { 1: ["fundamento", "terminos", "clasificar", "caso"], 2: ["fondo", "ampliacion", "documentos", "recursos"], 3: ["tutelas", "comparativa", "gestion", "demora"], 4: ["terminal", "demoqr"], 5: ["cierre", "normativa", "cuestionario"] };
-const NOMBRE = { fundamento: "¿Qué es el derecho de petición?", terminos: "Los tres términos", clasificar: "Información o consulta", caso: "Caso práctico", fondo: "Respuesta de fondo", ampliacion: "Ampliar el término", documentos: "Si no responden", recursos: "¿Hay recurso?", tutelas: "Tutelas", comparativa: "Petición y tutela", gestion: "Gestión del plazo", demora: "Demora interna", terminal: "Terminal Jurídica", demoqr: "Pruébala", cierre: "Cierre", normativa: "Normativa", cuestionario: "Reto en vivo" };
-const CORTO = { fundamento: "¿Qué es?", terminos: "Los tres términos", clasificar: "Información o consulta", caso: "Caso práctico", fondo: "Respuesta de fondo", ampliacion: "Ampliar el término", documentos: "Si no responden", recursos: "¿Hay recurso?", tutelas: "Tutelas", comparativa: "Petición y tutela", gestion: "Gestión del plazo", demora: "Demora interna", terminal: "Terminal Jurídica", demoqr: "Pruébala", cierre: "Cierre", normativa: "Normativa", cuestionario: "Reto en vivo" };
-const rutaDe = id => +Object.keys(RUTA_EST).find(r => RUTA_EST[r].includes(id)) || 0;
-const TIPS = {
-  objetivo: "Toca cada verbo: así se trabaja cada solicitud que llega.",
-  mapa: "Elige una parada. Puedes recorrer la ruta en el orden que quieras.",
-  fundamento: "Radica distintos escritos: ¿cambia algo el título?",
-  terminos: "Elige un término y mueve los días: mira cómo cambia el semáforo.",
-  clasificar: "Arrastra cada solicitud al bus que le corresponde.",
-  caso: "Un solo escrito, cinco puntos. Sube cada uno al bus correcto.",
-  fondo: "Toca cada sello y elige la respuesta que sí es de fondo.",
-  ampliacion: "Marca las cuatro condiciones para poder ampliar el término.",
-  documentos: "Corre los días y mira qué pasa al llegar al día 10.",
-  recursos: "Toca una situación y mira qué procede.",
-  tutelas: "¿Verdad o mito? Toca la tarjeta y luego envía una tutela.",
-  comparativa: "Cambia de lado y compara punto por punto.",
-  gestion: "Avanza el bus por las cinco paradas del plazo.",
-  demora: "Empuja la primera ficha. ¿Y si el área entrega a tiempo?",
-  terminal: "Cambia entre antes y ahora. Toca una fila para ver el aviso.",
-  demoqr: "Escanea el código y entra a consultar.",
-  cierre: "Repasa lo que quieras o sube al reto en vivo.",
-  normativa: "Toca una norma para volver a la parada donde la usamos."
-};
-const ICO_MAPA = `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 22 C10 22 9 10 16 10 S23 22 27 22" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><circle cx="5" cy="22" r="3.4" fill="currentColor"/><circle cx="27" cy="22" r="3.4" fill="currentColor"/><circle cx="16" cy="10" r="3.4" fill="currentColor"/></svg>`;
-const ICO_OK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-const SLIDES = [], INIT = {}, ENTER = {}, VIS = new Set();
+const SLIDES = [];
 function slide(id, cls, html) { SLIDES.push({ id, cls: cls || "", html }); }
-function M(id, ruta, titulo, body) {
-  const R = RUTAS[ruta];
-  slide(id, "m", `<div class="m-top"><button class="m-mapa" data-ir="mapa" aria-label="Volver al mapa de la ruta">${ICO_MAPA}Mapa</button>
-    <div class="m-plate" style="--rc:${R.c};--rt:${R.t}"><b class="m-badge">${R.b}</b><h2>${titulo}</h2><span class="m-ruta">${R.n}</span></div></div>
-    <div class="m-body">${body}</div>`);
+const A = (i, h, c = "", st = "") => `<div class="a ${c}" style="--i:${i};${st}">${h}</div>`;
+function C(id, titulo, kick, body, bodyStyle = "") {
+  const fs = Math.min(4.3, 66 / (titulo.length * .37)).toFixed(2);
+  slide(id, "c", `<div class="c-top"><div class="c-plate"><h2 style="font-size:clamp(22px,${fs}vw,92px)">${titulo}</h2><span class="c-kick">${kick}</span></div></div><div class="c-body" style="${bodyStyle}">${body}</div>`);
 }
-const irId = id => ir(SLIDES.findIndex(s => s.id === id));
-const esc = s => String(s).replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
+const idea = (r, t) => `<div class="idea"><b>${r}</b><p>${t}</p></div>`;
+const card = (tag, cuerpo) => `<div class="card3 col3">${tag ? `<span class="tag3">${tag}</span>` : ""}${cuerpo}</div>`;
 
-/* ===================== SETPI, guía de la ruta ===================== */
-const Guia = (() => {
-  let A = null, ok = false, stage = null, activo = true, raf = 0, last = 0, hideT = 0; const cola = [];
-  const H = () => innerHeight, W = () => innerWidth;
-  const cuando = f => ok ? f() : cola.push(f);
-  function loop() { const f = ts => { raf = requestAnimationFrame(f); if (!activo || document.hidden) { last = 0; return; } const dt = Math.min(.05, (ts - (last || ts)) / 1000); last = ts; A.update(dt); }; raf = requestAnimationFrame(f); }
-  function init() {
-    stage = document.getElementById("guia-stage");
-    if (!(window.Setpi && Setpi.Frames && Setpi.Actor)) return;
-    Setpi.base = "setpi/";
-    Setpi.Frames.load("setpi/").then(() => { A = new Setpi.Actor(stage); A.setCap(Math.max(240, H() * .36)); ok = true; A.show(true); A.rest("F"); loop(); cola.splice(0).forEach(f => f()); }).catch(() => { });
-  }
-  function colocar(x, y, s) { cuando(() => { A.cancel(); A.setS(s); A.place(x, y); A.face(1); A.rest("F"); }); }
-  async function clip(fr, o) { if (!ok) return; try { A.cancel(); await A.play(fr, o); } catch (e) { if (e !== Setpi.CANCEL) { /* otra animación tomó el control */ } return; } A.rest("F"); }
-  let habla = false;
-  function di(t, ms, size) { if (!habla) return; cuando(() => { Setpi.say(A, t, { minX: W() * .03, maxX: W() * .98, minY: H() * .02, size: size || .15, maxW: Math.min(W() * .34, A.S * 3.4) }); clearTimeout(hideT); hideT = setTimeout(() => Setpi.sayClear(A), ms || 3800); }); }
-  const R = {
-    ok: () => clip(Setpi.C.likeF()), no: () => clip(Setpi.C.shake(2)), win: () => clip(Setpi.C.likeF()),
-    think: () => clip(Setpi.C.think()), wave: () => clip(Setpi.C.waveF(1, 1.4)), point: () => clip(Setpi.C.present()), alert: () => clip(Setpi.C.think()),
-    clap: () => clip(Setpi.C.applaud(3)), lupa: () => clip(Setpi.C.lupa()), tablet: () => clip(Setpi.C.tablet()), talk: () => clip(Setpi.C.talk()), shrug: () => clip(Setpi.C.shrug()), dance: () => clip(Setpi.C.talk())
-  };
-  return {
-    init, activo(v) { activo = v; if (!v) { try { A && A.cancel(); } catch (e) { } } },
-    casa() { colocar(W() * .945, H() * .858, H() * .15); },
-    portada() { colocar(W() * .8, H() * .93, H() * .27); },
-    en(x, y, s) { colocar(x, y, s); },
-    react(k) { cuando(() => R[k] && R[k]()); },
-    di, habla(v) { habla = v; },
-    corre(x, y) { return new Promise(res => { if (!ok) return res(); A.cancel(); A.moveTo(x, y, { speed: A.S * 3, gait: "run" }).then(() => { A.rest("F"); res(); }).catch(() => res()); }); },
-    pos() { return ok ? { x: A.x, y: A.y } : null }
-  };
-})();
-
-/* ===================== pantalla del bus (consejo) y siguiente parada ===================== */
-const HUD = {
-  init() {
-    const d = document.createElement("div"); d.id = "hud";
-    d.innerHTML = `<div class="hud-led"><b class="hud-n"></b><p class="hud-t"></p></div><button class="hud-sig"></button>`;
-    document.body.appendChild(d); this.n = $(".hud-n", d); this.t = $(".hud-t", d); this.sig = $(".hud-sig", d);
-    this.sig.addEventListener("click", () => { if (this.dest) irId(this.dest); });
-  },
-  set(id) {
-    const r = rutaDe(id), lista = RUTA_EST[r] || [], k = lista.indexOf(id), sig = k >= 0 && k < lista.length - 1 ? lista[k + 1] : null;
-    this.n.textContent = RUTAS[r] ? RUTAS[r].b : "1";
-    this.t.classList.add("cambia"); const txt = TIPS[id] || ""; setTimeout(() => { this.t.textContent = txt; this.t.classList.remove("cambia"); }, 160);
-    if (id === "mapa") { this.sig.style.display = "none"; this.dest = null; return; }
-    this.sig.style.display = ""; this.dest = sig || "mapa"; this.sig.textContent = sig ? "Siguiente parada ▸" : "Volver al mapa ▸";
-  }
-};
-
-/* ===================== diapositivas ===================== */
-slide("cover", "cv2", `
-  <div class="cv2-izq">
-    <div class="cv2-cab"><span class="logo-tab"><img src="img/setp-logo-color.png" alt="TransMusical SETP"></span><span>Capacitación interna<br>SETP Ibagué</span></div>
-    <div class="cv2-cuerpo">
+/* ---------- portada: el tema es jurídico ---------- */
+slide("cover", "cv3", `
+  <div class="cv3-izq">
+    <div class="cv3-cab"><span class="logo-tab"><img src="img/setp-logo-color.png" alt="TransMusical SETP"></span><span>Capacitación interna<br>SETP Ibagué</span></div>
+    <div class="cv3-cuerpo">
       <h1>Derecho de petición: <em>términos</em> y respuesta de fondo</h1>
       <p>Cómo identificar la solicitud, asignar el término y coordinar una respuesta oportuna.</p>
-      <button class="btn2 y" data-ir="objetivo">Iniciar la ruta ▸</button>
       <small>Área Jurídica · Material de apoyo</small>
     </div>
   </div>
-  <div class="cv2-foto"><img src="img/paradero-carrera5-vertical.jpg" alt="Paradero TransMusical en la carrera 5 con calle 30, Ibagué"></div>
-  <div class="cv2-franja"></div>`);
-
-M("objetivo", 1, "¿Qué buscamos hoy?", `
-  <div class="obj">
-    <button class="obj-c"><b class="obj-n">1</b><h3>Identificar</h3><p>Reconocer qué está solicitando realmente la persona.</p></button>
-    <button class="obj-c"><b class="obj-n">2</b><h3>Clasificar</h3><p>Distinguir información, consulta y solicitudes generales.</p></button>
-    <button class="obj-c"><b class="obj-n">3</b><h3>Coordinar</h3><p>Dar tiempo suficiente para elaborar y comunicar una respuesta completa.</p></button>
+  <div class="cv3-der">
+    <div class="marca" aria-hidden="true">§</div>
+    <svg class="balanza" viewBox="0 0 400 330" aria-hidden="true"><g fill="none" stroke="#0B1F5C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M200 60V284"/><path d="M128 298H272"/>
+      <g class="beam"><path d="M64 74H336"/><path d="M64 74L34 188M64 74L94 188"/><path d="M336 74L306 188M336 74L366 188"/><path d="M18 188H110Q64 244 18 188Z" fill="#F2B418"/><path d="M290 188H382Q336 244 290 188Z" fill="#F2B418"/></g>
+      <circle cx="200" cy="48" r="16" fill="#F2B418"/></g></svg>
+    <div class="doc"><div class="sello">Radicado</div><small>Constitución Política · artículo 23</small><p>Permite presentar peticiones respetuosas a las autoridades por motivos de interés general o particular y obtener pronta resolución.</p></div>
   </div>
-  <div class="led2"><b>Idea central</b><p>El término no se define solo por el título del escrito, sino por su contenido y por las normas aplicables.</p></div>`);
-INIT.objetivo = el => $$(".obj-c", el).forEach(c => c.addEventListener("click", () => { const abre = !c.classList.contains("on"); $$(".obj-c", el).forEach(x => x.classList.remove("on")); c.classList.toggle("on", abre); if (abre) Guia.react("point"); }));
+  <div class="cv3-franja"></div>`);
 
-M("mapa", 1, "Mapa de la ruta", `<div id="mapa-svg" style="flex:1;min-height:0"></div>`);
+/* ---------- 1. objetivo ---------- */
+C("objetivo", "¿Qué buscamos con esta capacitación?", "Objetivo",
+  `<div class="g3">${[["1", "Identificar", "Reconocer qué está solicitando realmente la persona."], ["2", "Clasificar", "Distinguir información, consulta y solicitudes generales."], ["3", "Coordinar", "Dar tiempo suficiente para elaborar y comunicar una respuesta completa."]].map((c, i) => A(i, `<div class="card3 col3"><b class="num3">${c[0]}</b><h3 class="h3x">${c[1]}</h3><p class="tx3 m">${c[2]}</p></div>`)).join("")}</div>` +
+  A(3, idea("Idea central", "El término no se define solo por el título del escrito, sino por su contenido y por las normas aplicables.")));
 
-/* ---- mapa de la ruta: cuatro líneas y una terminal; se puede ir a cualquier parada ---- */
-const LINEAS = [{ r: 1, y: 58, col: "#2A5BA0" }, { r: 2, y: 184, col: "#2A5BA0" }, { r: 3, y: 310, col: "#2A5BA0" }, { r: 4, y: 436, col: "#2A5BA0" }];
-function etiqueta(t) { const p = t.split(" "); if (t.length <= 18 || p.length < 2) return [t]; let best = 1, d = 99; for (let i = 1; i < p.length; i++) { const a = p.slice(0, i).join(" ").length, b = p.slice(i).join(" ").length, dd = Math.abs(a - b); if (dd < d) { d = dd; best = i; } } return [p.slice(0, best).join(" "), p.slice(best).join(" ")]; }
-function mapaSVG() {
-  const xs = [470, 720, 970, 1220]; let s = `<svg class="mapa-svg" viewBox="0 0 1600 540" role="group" aria-label="Mapa de la ruta de la capacitación">`;
-  LINEAS.forEach(L => {
-    s += `<path class="mp-lin" d="M120 ${L.y}H1340" stroke="${L.col}"/><circle cx="82" cy="${L.y}" r="40" fill="#0B1F5C"/><text x="82" y="${L.y + 15}" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="46" fill="#fff">${L.r}</text>`;
-    s += `<text class="mp-nom" x="132" y="${L.y - 28}" fill="#0B1F5C">${RUTAS[L.r].n}</text>`;
-    RUTA_EST[L.r].forEach((id, k) => {
-      const x = xs[k], lab = etiqueta(CORTO[id]);
-      s += `<g class="mp-est" data-id="${id}" tabindex="0" role="button" aria-label="${esc(NOMBRE[id])}" transform="translate(${x},${L.y})"><circle class="mp-ping" r="26" stroke="#F2B418" opacity="0"/><circle class="anillo" r="27" fill="#fff" stroke="${L.col}" stroke-width="11"/><circle class="vis" r="12" fill="#F2B418" opacity="0"/>${lab.map((t, i) => `<text class="mp-et" y="${57 + i * 27}">${esc(t)}</text>`).join("")}<rect x="-130" y="-40" width="260" height="${72 + lab.length * 31}" fill="transparent"/></g>`;
-    });
-  });
-  s += `<rect x="1340" y="12" width="260" height="516" rx="30" class="mp-term"/><rect x="1340" y="12" width="260" height="76" rx="30" fill="#F2B418"/><rect x="1340" y="58" width="260" height="30" fill="#F2B418"/><text class="mp-term-t" x="1470" y="63">TERMINAL</text>`;
-  RUTA_EST[5].forEach((id, k) => { const y = 178 + k * 128; s += `<g class="mp-est" data-id="${id}" tabindex="0" role="button" aria-label="${esc(NOMBRE[id])}" transform="translate(1385,${y})"><circle class="mp-ping" r="26" stroke="#F2B418" opacity="0"/><circle class="anillo" r="27" fill="#fff" stroke="#F2B418" stroke-width="11"/><circle class="vis" r="12" fill="#F2B418" opacity="0"/><text class="mp-et b" x="38" y="10" style="text-anchor:start">${esc(CORTO[id])}</text><rect x="-34" y="-34" width="262" height="68" fill="transparent"/></g>`; });
-  return s + `</svg>`;
-}
-INIT.mapa = el => {
-  $("#mapa-svg", el).innerHTML = mapaSVG();
-  let ocupado = false;
-  const ir_ = async g => { if (ocupado) return; ocupado = true; const r = $(".anillo", g).getBoundingClientRect(); await Guia.corre(r.left + r.width / 2, r.bottom - r.height * .1); setTimeout(() => { ocupado = false; irId(g.dataset.id); }, 250); };
-  $$(".mp-est", el).forEach(g => { g.addEventListener("click", () => ir_(g)); g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); ir_(g); } }); });
-};
-ENTER.mapa = el => {
-  let sig = null; $$(".mp-est", el).forEach(g => { const v = VIS.has(g.dataset.id); $(".vis", g).setAttribute("opacity", v ? 1 : 0); $(".mp-ping", g).setAttribute("opacity", 0); if (!v && !sig && g.dataset.id !== "cuestionario") sig = g; });
-  if (sig) $(".mp-ping", sig).setAttribute("opacity", .9);
-  const n = [...VIS].filter(i => NOMBRE[i]).length; setTimeout(() => { if (HUD.t) HUD.t.textContent = "Elige una parada: puedes ir en cualquier orden. Visitadas: " + n + " de " + (Object.keys(NOMBRE).length - 1) + "."; }, 420);
-  setTimeout(() => { const g = sig || $(".mp-est", el), r = $(".anillo", g).getBoundingClientRect(); Guia.en(r.left + r.width / 2, r.bottom - r.height * .1, innerHeight * .12); }, 120);
-};
+/* ---------- 2. fundamento ---------- */
+C("fundamento", "¿Qué es el derecho de petición?", "Fundamento constitucional y legal",
+  `<div class="g2">` +
+  A(0, card("Constitución Política · artículo 23", `<p class="tx3">Permite presentar peticiones respetuosas a las autoridades por motivos de interés general o particular y obtener pronta resolución.</p>`)) +
+  A(1, card("Ley 1755 de 2015 · artículos 13 y 14", `<p class="tx3">No es necesario escribir «derecho de petición» para que la actuación pueda estar protegida por este derecho. Se debe revisar el contenido y el trámite aplicable.</p>`)) +
+  `</div>` + A(2, idea("Para recordar", "No todo mensaje se clasifica automáticamente igual: analiza qué pide, para qué lo pide y si existe un procedimiento o término especial.")));
 
-M("fundamento", 1, "¿Qué es el derecho de petición?", `
-  <div class="fund">
-    <div class="fund-q"><span class="tag">Constitución · artículo 23</span>
-      <p>Permite presentar <mark>peticiones respetuosas</mark> a las autoridades, por motivos de <mark>interés general o particular</mark>, y obtener <mark>pronta resolución</mark>.</p></div>
-    <div class="fund-s"><span class="tag" style="align-self:flex-start;font:700 clamp(15px,1.5vw,32px)/1 var(--f-cond);letter-spacing:.07em;text-transform:uppercase;background:var(--s-navy);color:#fff;padding:.9vh 1.1vw;border-radius:.5vw">Ley 1755 · arts. 13 y 14: el título no manda</span>
-      <div class="fund-tabs"></div>
-      <div class="carta"><div class="carta-t"></div><p class="carta-c"></p><div class="sello">Es derecho de petición<small>Se revisa el contenido</small></div><button class="btn2 y">Radicar el escrito</button></div></div>
-  </div>`);
-INIT.fundamento = el => {
-  const C = [["Derecho de petición", "Derecho de petición", "Solicito copia del contrato 025 de 2026."], ["Solicitud", "Solicitud", "Solicito información sobre el estado del contrato."], ["Oficio", "Oficio", "Pido que se me informe quién es el responsable del trámite."], ["Correo", "Asunto: una duda", "Quisiera saber en qué estado va mi trámite."]];
-  const tabs = $(".fund-tabs", el), carta = $(".carta", el); let cur = 0;
-  tabs.innerHTML = C.map((c, i) => `<button data-i="${i}">${c[0]}</button>`).join("");
-  const pon = i => { cur = i; carta.classList.remove("sella"); $(".carta-t", el).textContent = C[i][1]; $(".carta-c", el).textContent = C[i][2]; $$("button", tabs).forEach((b, k) => b.classList.toggle("on", k === i)); };
-  tabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) pon(+b.dataset.i); });
-  $(".btn2", carta).addEventListener("click", () => { carta.classList.remove("sella"); void carta.offsetWidth; carta.classList.add("sella"); Guia.react("ok"); Guia.di("No importa cómo se titule: se revisa lo que pide.", 3600); });
-  pon(0);
-};
+/* ---------- 3. los tres términos ---------- */
+const term = (i, n, cls, label, txt) => A(i, `<div class="term ${cls}"><div class="n">${n}</div><div><div class="pista"><span class="barra">${label}</span></div><div class="t"><p>${txt}</p></div></div></div>`);
+C("terminos", "Los tres términos del artículo 14", "Ley 1755 de 2015",
+  `<div class="terms">` + term(0, 10, "x1", "10 días hábiles*", "Peticiones de información y documentos.") + term(1, 15, "x2", "15 días hábiles*", "Regla general: solicitudes que no tengan un término especial aplicable.") + term(2, 30, "x3", "30 días hábiles*", "Consultas a las autoridades sobre materias a su cargo.") + `</div>` +
+  A(3, `<p class="nota3">*Como regla general, los términos administrativos se cuentan en días hábiles, verificando siempre la norma especial aplicable y el calendario oficial.</p>`) +
+  A(4, idea("En la práctica", "Primero clasifica la solicitud; después asigna el término.")));
 
-M("terminos", 1, "Los tres términos", `
-  <div class="sim">
-    <div class="card2 sim-izq">
-      <div class="sim-tipos">
-        <button data-d="10"><b>10</b><span>Información y documentos</span></button>
-        <button data-d="15"><b>15</b><span>Regla general</span></button>
-        <button data-d="30"><b>30</b><span>Consultas</span></button>
-      </div>
-      <label class="sim-opt"><input type="checkbox" class="sim-amp"> Ampliar el término (hasta el doble, excepcional)</label>
-      <div class="sim-sl"><span>Días hábiles transcurridos</span><output class="sim-n">0</output><input type="range" class="sim-r" min="0" max="13" value="0" aria-label="Días hábiles transcurridos"></div>
-    </div>
-    <div class="card2 sim-der" data-e="v"><div class="sem" data-e="v"><i></i><i></i><i></i></div><div class="sim-txt"><b class="sim-big">Faltan 10</b><span class="sim-sub">días hábiles</span><em class="sim-est">En plazo</em></div></div>
-    <div class="card2 sim-bar"><div class="sim-reg" data-e="v"><div class="sim-fill"></div></div><p class="sim-nota">Semáforo ilustrativo. Los términos se cuentan en días hábiles: verifica la norma especial y el calendario oficial.</p></div>
-  </div>`);
-INIT.terminos = el => {
-  let d = 15; const r = $(".sim-r", el), amp = $(".sim-amp", el), reg = $(".sim-reg", el), fill = $(".sim-fill", el);
-  const lim = () => d * (amp.checked ? 2 : 1);
-  const marcas = () => { $$(".sim-marca", reg).forEach(m => m.remove()); const L = lim(), paso = L > 30 ? 10 : 5; for (let x = 0; x <= L; x += paso) { const m = document.createElement("i"); m.className = "sim-marca"; m.style.left = (x / L * 100) + "%"; m.textContent = x; reg.appendChild(m); } };
-  const pinta = () => {
-    const L = lim(), e = +r.value, rest = L - e, umbral = Math.max(2, Math.round(L * .3));
-    const est = rest <= 0 ? "r" : rest <= umbral ? "a" : "v";
-    $(".sem", el).dataset.e = est; $(".sim-der", el).dataset.e = est; reg.dataset.e = est;
-    $(".sim-n", el).textContent = e;
-    $(".sim-big", el).textContent = rest > 1 ? "Faltan " + rest : rest === 1 ? "Falta 1" : rest === 0 ? "Vence hoy" : "Vencido";
-    $(".sim-sub", el).textContent = rest > 0 ? (rest === 1 ? "día hábil" : "días hábiles") : rest === 0 ? "último día del término" : "hace " + (-rest) + (rest === -1 ? " día hábil" : " días hábiles");
-    $(".sim-est", el).textContent = est === "v" ? "En plazo" : est === "a" ? "Último tramo" : rest === 0 ? "Vence hoy" : "Fuera de plazo";
-    fill.style.width = Math.min(100, e / L * 100) + "%";
-  };
-  const pon = v => { d = v; r.max = lim() + 3; if (+r.value > +r.max) r.value = r.max; $$(".sim-tipos button", el).forEach(b => b.classList.toggle("on", +b.dataset.d === d)); marcas(); pinta(); };
-  $$(".sim-tipos button", el).forEach(b => b.addEventListener("click", () => { pon(+b.dataset.d); Guia.react("think"); }));
-  amp.addEventListener("change", () => { r.max = lim() + 3; marcas(); pinta(); Guia.di(amp.checked ? "Ampliar es excepcional: hasta el doble y avisando antes." : "Sin ampliación: el término es el de la norma.", 3600); });
-  let ult = "v"; r.addEventListener("input", () => { pinta(); const e = $(".sem", el).dataset.e; if (e !== ult) { ult = e; if (e === "r") Guia.react("alert"); else if (e === "a") Guia.react("lupa"); } });
-  pon(15);
-};
-ENTER.terminos = el => { const r = $(".sim-r", el); r.value = 0; r.dispatchEvent(new Event("input")); };
+/* ---------- 4. información o consulta ---------- */
+C("clasificar", "Información o consulta: ¿cuál es la diferencia?", "Clasificación práctica",
+  `<div class="g2">` +
+  A(0, card("Información / documentos · 10 días", `<p class="tx3">La persona pide algo que la entidad tiene o puede identificar como información existente.</p><p class="ej3">«Solicito copia del contrato 025».</p><p class="ej3">«¿Cuál es el estado actual del contrato?»</p>`)) +
+  A(1, card("Consulta · 30 días", `<p class="tx3">La persona pide el concepto, opinión o pronunciamiento de la autoridad sobre materias relacionadas con sus atribuciones.</p><p class="ej3">«¿Cuál es el criterio de la entidad sobre la posibilidad de modificar el contrato en estas circunstancias?»</p>`)) +
+  `</div>` + A(2, idea("Ojo", "La palabra usada por el ciudadano no decide por sí sola: importa la finalidad real de la solicitud.")), "--paso:1.2s");
 
-/* ---- clasificador: arrastra o toca; cada solicitud va a su bus ---- */
-const BUSES = [{ k: "10", n: "Información y documentos", bc: "var(--t10)", bt: "#fff" }, { k: "15", n: "Regla general", bc: "var(--t15)", bt: "#fff" }, { k: "30", n: "Consultas", bc: "var(--t30)", bt: "#fff" }];
-function clasificador(el, cfg) {
-  const st = { i: 0, ok: 0, fallos: 0, primero: true, bloq: false };
-  const raiz = $(".cls", el); raiz.style.gridTemplateRows = "minmax(0,1fr) auto";
-  const dibuja = () => {
-    if (st.i >= cfg.cards.length) {
-      raiz.innerHTML = `<div class="cls-fin"><h3>Clasificación completa</h3><p>${st.ok} de ${cfg.cards.length} a la primera. ${cfg.fin}</p><button class="btn2 y">Repetir</button></div><div class="cls-buses" style="grid-template-columns:repeat(3,1fr)">${BUSES.map(b => `<div class="cls-bus" style="--bc:${b.bc};--bt:${b.bt}"><b>${b.k}</b><span>${b.n}</span></div>`).join("")}</div>`;
-      $(".btn2", raiz).addEventListener("click", () => { st.i = 0; st.ok = 0; dibuja(); });
-      Guia.react(st.ok >= cfg.cards.length - 1 ? "win" : "ok"); return;
-    }
-    const c = cfg.cards[st.i]; st.fallos = 0; st.primero = true; st.bloq = false;
-    raiz.innerHTML = `<div class="cls-carta" tabindex="0"><span class="cls-n">${st.i + 1} / ${cfg.cards.length}</span><p class="cls-t">${esc(c.t)}</p><div class="cls-fb">${cfg.ayuda}</div></div>
-      <div class="cls-buses" style="grid-template-columns:repeat(3,1fr)">${BUSES.map(b => `<button class="cls-bus" data-k="${b.k}" style="--bc:${b.bc};--bt:${b.bt}"><b>${b.k}</b><span>${b.n}</span></button>`).join("")}</div>`;
-    const carta = $(".cls-carta", raiz), fb = $(".cls-fb", raiz);
-    const elegir = bus => {
-      if (st.bloq) return; const k = bus.dataset.k;
-      if (k === c.a) {
-        st.bloq = true; if (st.primero) st.ok++; fb.className = "cls-fb bien"; fb.textContent = c.why; bus.classList.add("ok");
-        const rc = carta.getBoundingClientRect(), rb = bus.getBoundingClientRect(), tx = (+carta.dataset.tx || 0) + (rb.left + rb.width / 2 - (rc.left + rc.width / 2)), ty = (+carta.dataset.ty || 0) + (rb.top + rb.height / 2 - (rc.top + rc.height / 2));
-        Guia.react("ok");
-        setTimeout(() => { carta.style.animation = "none"; carta.style.transition = "transform .55s var(--ease), opacity .45s var(--ease)"; carta.style.transform = `translate(${tx}px,${ty}px) scale(.3)`; carta.style.opacity = 0; }, 700);
-        setTimeout(() => { st.i++; dibuja(); }, 1500);
-      } else {
-        st.primero = false; st.fallos++; fb.className = "cls-fb mal"; fb.textContent = st.fallos > 1 ? "Mira el bus que brilla. " + c.why : "Casi. " + c.hint;
-        carta.classList.remove("mal"); void carta.offsetWidth; carta.classList.add("mal"); bus.classList.remove("no"); void bus.offsetWidth; bus.classList.add("no"); Guia.react("no");
-        if (st.fallos > 1) $$(".cls-bus", raiz).find(b => b.dataset.k === c.a).classList.add("pista");
-        carta.style.transform = ""; carta.dataset.tx = 0; carta.dataset.ty = 0;
-      }
-    };
-    $$(".cls-bus", raiz).forEach(b => b.addEventListener("click", () => elegir(b)));
-    /* arrastrar la solicitud hasta un bus */
-    let arr = null;
-    carta.style.touchAction = "none"; carta.style.cursor = "grab"; carta.dataset.tx = 0; carta.dataset.ty = 0;
-    carta.addEventListener("pointerdown", e => { if (st.bloq) return; arr = { x: e.clientX, y: e.clientY, tx: +carta.dataset.tx, ty: +carta.dataset.ty }; carta.setPointerCapture(e.pointerId); carta.style.cursor = "grabbing"; carta.style.animation = "none"; carta.style.transition = "none"; });
-    carta.addEventListener("pointermove", e => { if (!arr) return; const tx = arr.tx + e.clientX - arr.x, ty = arr.ty + e.clientY - arr.y; carta.dataset.tx = tx; carta.dataset.ty = ty; carta.style.transform = `translate(${tx}px,${ty}px)`; const b = busBajo(e); $$(".cls-bus", raiz).forEach(x => x.style.transform = x === b ? "translateY(-1vh)" : ""); });
-    const busBajo = e => { const bs = $$(".cls-bus", raiz); return bs.find(b => { const r = b.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top - 20 && e.clientY <= r.bottom; }); };
-    const suelta = e => { if (!arr) return; const b = busBajo(e); arr = null; carta.style.cursor = "grab"; $$(".cls-bus", raiz).forEach(x => x.style.transform = ""); if (b) elegir(b); else { carta.style.transition = "transform .35s var(--ease)"; carta.style.transform = ""; carta.dataset.tx = 0; carta.dataset.ty = 0; } };
-    carta.addEventListener("pointerup", suelta); carta.addEventListener("pointercancel", suelta);
-  };
-  dibuja();
-}
-M("clasificar", 1, "Información o consulta", `<div class="cls" id="cls1"></div>`);
-INIT.clasificar = el => { el._cfg = { ayuda: "Arrastra la solicitud al bus o toca el bus. Consulta = concepto sobre «materias a su cargo» (art. 14.2).", fin: "Importa la finalidad real de la solicitud, no la palabra que use el ciudadano.", cards: [
-  { t: "«Solicito copia del contrato 025.»", a: "10", why: "Pide algo que la entidad tiene: información o documentos.", hint: "¿La entidad ya tiene eso o hay que opinar?" },
-  { t: "«¿Cuál es el estado actual del contrato?»", a: "10", why: "Información sobre el estado: en principio, 10 días.", hint: "Pide un dato existente, no un concepto." },
-  { t: "«¿Cuál es el criterio de la entidad sobre la posibilidad de modificar el contrato en estas circunstancias?»", a: "30", why: "Pide un pronunciamiento sobre una materia a su cargo: es consulta.", hint: "Pide opinión o concepto de la entidad." },
-  { t: "Pedir un concepto de la entidad sobre un asunto técnico, administrativo o jurídico de sus funciones.", a: "30", why: "Sí podría ser consulta: es una materia de sus funciones.", hint: "Es un concepto sobre sus funciones." },
-  { t: "Pedir copia de un concepto que ya existe.", a: "10", why: "No es consulta: es pedir un documento que ya existe.", hint: "El concepto ya existe: solo se pide copia." },
-  { t: "Solicitar que se adopte una decisión concreta.", a: "15", why: "No es automáticamente consulta: es una solicitud general de actuación.", hint: "No pide información ni concepto: pide actuar." }] }; clasificador(el, el._cfg); };
-ENTER.clasificar = el => { clasificador(el, el._cfg); };
+/* ---------- 5. materias a su cargo ---------- */
+C("materias", "¿Qué significa «materias a su cargo»?", "Consultas · artículo 14.2",
+  A(0, `<p class="tx3"><b>Se refiere a asuntos que están dentro de las funciones y competencias legales de la entidad.</b></p>`) +
+  `<div class="g2">` +
+  A(1, card("Sí podría ser consulta", `<p class="tx3">Pedir un concepto de la entidad sobre un asunto técnico, administrativo o jurídico que corresponda a sus funciones.</p>`)) +
+  A(2, card("No es automáticamente consulta", `<p class="tx3">Pedir copia de un concepto que ya existe, consultar el estado de un trámite o solicitar que se adopte una decisión concreta.</p>`)) +
+  `</div>` + A(3, idea("Recuerda", "La consulta no es cualquier pregunta: debe buscar un pronunciamiento sobre una materia de competencia de la autoridad.")));
 
-M("caso", 1, "Caso práctico", `<div class="cls" id="cls2"></div>`);
-INIT.caso = el => { el._cfg = { ayuda: "Un solo escrito, cinco solicitudes. Arrastra cada una al bus de su término.", fin: "El artículo 14 no fija un único término para toda petición mixta: analiza cada pretensión.", cards: [
-  { t: "1. Copia del contrato 025 de 2026.", a: "10", why: "Documentos: 10 días.", hint: "Es pedir un documento." },
-  { t: "2. Copia de los estudios previos.", a: "10", why: "Documentos: 10 días.", hint: "Es pedir un documento." },
-  { t: "3. El estado actual del contrato.", a: "10", why: "Información sobre el estado: en principio, 10 días.", hint: "Es información existente." },
-  { t: "4. Un concepto sobre la posibilidad de modificarlo.", a: "30", why: "Podría ser consulta: 30 días.", hint: "Pide concepto u opinión." },
-  { t: "5. Que la entidad efectúe la modificación.", a: "15", why: "Solicitud de actuación o decisión: regla general de 15 días, salvo norma especial.", hint: "Pide actuar, no informar ni opinar." }] }; clasificador(el, el._cfg); };
-ENTER.caso = el => { clasificador(el, el._cfg); };
+/* ---------- 6. caso práctico ---------- */
+const caso = (i, n, q, d, w) => A(i + 1, `<div class="caso"><b class="n">${n}</b><span class="q">${q}</span><span class="d">${d}</span><span class="w">${w}</span></div>`);
+C("caso", "Caso práctico: una petición con varios puntos", "Aplicación de términos",
+  A(0, `<p class="tx3"><b>Una persona presenta un único escrito y solicita:</b></p>`) +
+  `<div class="casos">` + caso(0, 1, "Copia del contrato 025 de 2026.", "10 días", "Información / documentos") + caso(1, 2, "Copia de los estudios previos.", "10 días", "Información / documentos") + caso(2, 3, "El estado actual del contrato.", "10 días", "En principio, información") + caso(3, 4, "Un concepto sobre la posibilidad de modificarlo.", "30 días", "Podría ser consulta") + caso(4, 5, "Que la entidad efectúe la modificación.", "15 días", "Regla general, salvo norma especial") + `</div>` +
+  A(6, idea("Ojo", "No hay una regla expresa en el artículo 14 que asigne un único término a toda petición mixta: analiza cada pretensión.")), "--paso:1.6s");
 
-M("fondo", 2, "Respuesta de fondo", `
-  <div class="fondo">
-    <div class="fondo-q"><button data-i="0"><b>1</b>Clara</button><button data-i="1"><b>2</b>Precisa y congruente</button><button data-i="2"><b>3</b>Oportuna</button><p class="fondo-def">Toca un sello. Una respuesta de fondo no tiene que ser favorable.</p></div>
-    <div class="fondo-r"><p class="fondo-p">«¿Cuál es el estado del contrato X?»</p><div class="fondo-op"></div><p class="fondo-fb">Elige la respuesta que sí es de fondo.</p></div>
-  </div>`);
-INIT.fondo = el => {
-  const D = ["Se entiende sin ambigüedades y explica la decisión o información entregada.", "Responde los puntos planteados, sin desviarse ni dejar solicitudes sin abordar.", "Se comunica dentro del término legal aplicable."];
-  $$(".fondo-q button", el).forEach(b => b.addEventListener("click", () => { $$(".fondo-q button", el).forEach(x => x.classList.remove("on")); b.classList.add("on"); $(".fondo-def", el).textContent = D[+b.dataset.i]; Guia.react("tablet"); }));
-  el._duelo = () => {
-    const A = [{ t: "«La entidad se encuentra comprometida con el cumplimiento de sus funciones…»", ok: false, why: "Es cierta, pero no dice nada sobre el contrato." }, { t: "«Su solicitud se encuentra en ejecución. A la fecha: […]. El estado de las obligaciones es […].»", ok: true, why: "Informa estado, fechas, soportes y obligaciones pendientes." }];
-    if (Math.random() < .5) A.reverse(); const box = $(".fondo-op", el), fb = $(".fondo-fb", el); fb.textContent = "Elige la respuesta que sí es de fondo.";
-    box.innerHTML = A.map((a, i) => `<button data-i="${i}">${esc(a.t)}</button>`).join("");
-    $$("button", box).forEach(b => b.addEventListener("click", () => {
-      const a = A[+b.dataset.i]; $$("button", box).forEach((x, k) => { x.classList.add(A[k].ok ? "ok" : "no"); x.insertAdjacentHTML("beforeend", `<em>${A[k].ok ? "Sí es de fondo" : "No es de fondo"}</em>`); x.disabled = true; });
-      fb.textContent = a.ok ? "¡Eso! " + a.why : "Esa no: " + a.why; Guia.react(a.ok ? "ok" : "no"); Guia.di(a.ok ? "Resuelve lo que se preguntó." : "Contestó, pero no resolvió.", 3200);
-    }));
-  };
-};
-ENTER.fondo = el => { el._duelo(); };
+/* ---------- 7. respuesta de fondo ---------- */
+C("fondo", "¿Qué significa responder «de fondo»?", "Calidad de la respuesta",
+  `<div class="g3">${[["Clara", "Se entiende sin ambigüedades y explica la decisión o información entregada."], ["Precisa y congruente", "Responde los puntos planteados, sin desviarse ni dejar solicitudes sin abordar."], ["Oportuna", "Se comunica dentro del término legal aplicable."]].map((c, i) => A(i, `<div class="card3 col3"><b class="num3">${i + 1}</b><h3 class="h3x" style="font-size:clamp(26px,2.9vw,62px)">${c[0]}</h3><p class="tx3 m">${c[1]}</p></div>`)).join("")}</div>` +
+  A(3, `<div class="card3"><p class="tx3"><b>Una respuesta de fondo no tiene que ser favorable.</b> Sí debe abordar realmente lo solicitado y explicar lo que corresponda.</p></div>`) +
+  A(4, idea("Ojo", "Responder a tiempo, pero sin contestar la pregunta, puede vulnerar el derecho de petición.")));
 
-M("ampliacion", 2, "Ampliar el término", `
-  <div class="amp">
-    <div class="amp-c">
-      <button><i>${ICO_OK}</i>Informar antes de que venza el término inicial</button>
-      <button><i>${ICO_OK}</i>Explicar las razones concretas de la demora</button>
-      <button><i>${ICO_OK}</i>Señalar un plazo razonable para responder</button>
-      <button><i>${ICO_OK}</i>No exceder el doble del término inicial</button>
-    </div>
-    <div class="amp-r"><div class="amp-b"></div><div class="amp-v"><span class="amp-vt">Faltan 4 condiciones</span></div></div>
-  </div>`);
-INIT.ampliacion = el => {
-  const T = [[10, "var(--t10)"], [15, "var(--t15)"], [30, "var(--t30)"]];
-  $(".amp-b", el).innerHTML = T.map(t => `<div class="amp-f"><b class="ins2" style="background:${t[1]};color:#fff">${t[0]}</b><div class="amp-pista"><span class="b1" style="width:${t[0] / 60 * 100}%;background:${t[1]};color:#fff">${t[0]}</span><span class="b2" style="left:${t[0] / 60 * 100}%;width:${t[0] / 60 * 100}%;color:${t[1]}">hasta ${t[0] * 2}</span></div></div>`).join("");
-  const bs = $$(".amp-c button", el), act = () => { const n = bs.filter(b => b.classList.contains("on")).length; el.querySelector(".amp").classList.toggle("listo", n === 4); $(".amp-vt", el).textContent = n === 4 ? "Ampliación válida: hasta el doble del término" : "Faltan " + (4 - n) + (4 - n === 1 ? " condición" : " condiciones"); return n; };
-  bs.forEach(b => b.addEventListener("click", () => { b.classList.toggle("on"); const n = act(); if (n === 4) Guia.react("win"); else if (b.classList.contains("on")) Guia.react("ok"); }));
-};
-ENTER.ampliacion = el => { $$(".amp-c button", el).forEach(b => b.classList.remove("on")); $(".amp", el).classList.remove("listo"); $(".amp-vt", el).textContent = "Faltan 4 condiciones"; };
+/* ---------- 8. ampliación del término ---------- */
+const cond = (i, n, t) => A(i, `<div class="cond"><b>${n}</b><p>${t}</p></div>`, "", "display:flex");
+C("ampliacion", "¿Se puede ampliar el término?", "Artículo 14 · parágrafo",
+  A(0, `<p class="tx3"><b>Sí, excepcionalmente; no basta con decir que hay mucho trabajo.</b></p>`) +
+  `<div class="amp3"><div class="conds">` + cond(1, 1, "Debe informarse antes de que venza el término inicial.") + cond(2, 2, "Se deben explicar las razones concretas de la demora.") + cond(3, 3, "Debe señalarse un plazo razonable para responder.") + cond(4, 4, "El nuevo plazo no puede exceder el doble del término inicialmente previsto.") + `</div>` +
+  `<div class="vis-amp"><div class="pista"><span class="b1">15 días</span><span class="b2">hasta 30</span></div><div class="eje"><span>0</span><span>15</span><span>30 · tope: el doble</span></div>` + A(7, `<p class="tx3 m"><b>Ejemplo.</b> Si el término inicial es de 15 días, el plazo adicional no puede llevar el total más allá del doble del término inicial.</p>`) + `</div></div>`);
 
-M("documentos", 2, "Si no responden", `
-  <div class="doc">
-    <div class="doc-pista"><div class="doc-dias"></div><div class="doc-leyenda"><span>10 días sin respuesta a una petición de información o documentos</span><span>Copias</span></div>
-      <input type="range" class="doc-r" min="0" max="13" value="0" aria-label="Días transcurridos" style="width:100%;height:4.6vh;accent-color:var(--s-blue)"></div>
-    <div class="doc-estado"><span class="sello2">Solicitud aceptada</span><p class="doc-txt">Corre los días con el control o el botón.</p></div>
-    <div class="doc-acc"><button class="btn2 y doc-play">Correr los días</button><button class="btn2 g doc-reset">Reiniciar</button><div class="chip-reserva">Verifica si existe restricción legal de acceso o una reserva aplicable al documento.</div></div>
-  </div>`);
-INIT.documentos = el => {
-  const dias = $(".doc-dias", el), r = $(".doc-r", el); let timer = 0;
-  dias.innerHTML = Array.from({ length: 13 }, (_, i) => `<i class="${i >= 10 ? "ent" : ""}">${i < 10 ? i + 1 : "+" + (i - 9)}</i>`).join("");
-  const pon = n => {
-    r.value = n; $$("i", dias).forEach((d, i) => d.classList.toggle("on", i < n));
-    const s = $(".sello2", el), t = $(".doc-txt", el);
-    if (n < 10) { s.classList.remove("on"); t.textContent = n === 0 ? "Corre los días con el control o el botón." : "Van " + n + " días hábiles sin respuesta."; }
-    else if (n < 13) { if (!s.classList.contains("on")) { s.classList.add("on"); Guia.react("alert"); } t.textContent = "La solicitud se entiende aceptada y la administración no puede negar la entrega por esa razón."; }
-    else { t.textContent = "Las copias deben entregarse dentro de los tres días siguientes, conforme al texto legal."; }
-  };
-  r.addEventListener("input", () => { clearInterval(timer); pon(+r.value); });
-  $(".doc-play", el).addEventListener("click", () => { clearInterval(timer); pon(0); let n = 0; timer = setInterval(() => { n++; pon(n); if (n >= 13) { clearInterval(timer); Guia.react("think"); } }, 420); });
-  $(".doc-reset", el).addEventListener("click", () => { clearInterval(timer); pon(0); });
-  el._pon = pon;
-};
-ENTER.documentos = el => { el._pon(0); };
+/* ---------- 9. documentos sin respuesta ---------- */
+C("documentos", "¿Qué pasa si no responden una solicitud de documentos?", "Artículo 14.1 · consecuencia especial",
+  A(0, `<p class="tx3"><b>Si transcurren 10 días sin respuesta</b> a una petición de información o documentos, opera la consecuencia prevista en el artículo 14.1.</p>`) +
+  A(0, `<div class="dias">${Array.from({ length: 13 }, (_, k) => `<div class="dd${k >= 10 ? " cp" : ""}" style="--k:${k}">${k < 10 ? k + 1 : "+" + (k - 9)}</div>`).join("")}</div><div class="dleg" style="margin-top:1vh"><span>10 días sin respuesta</span><span>Copias</span></div>`) +
+  `<div class="efecto">` + A(4, `<div class="card3"><h4>Efecto legal</h4><p class="tx3 m">La solicitud se entiende aceptada para efectos legales y la administración no puede negar la entrega por esa razón.</p></div>`, "", "display:flex") +
+  A(5, `<div class="card3"><h4>Entrega de copias</h4><p class="tx3 m">Las copias deben entregarse dentro de los tres días siguientes, conforme al texto legal.</p></div>`, "", "display:flex") + `</div>` +
+  A(6, `<p class="nota3"><b>Siempre verifica</b> si existe una restricción legal de acceso o una reserva aplicable al documento solicitado.</p>`));
 
-M("recursos", 2, "¿Hay recurso?", `
-  <div class="rec">
-    <div class="rec-q"><button data-i="0"><b>1</b>No estoy de acuerdo con la respuesta</button><button data-i="1"><b>2</b>La respuesta es una decisión definitiva</button><button data-i="2"><b>3</b>No me contestaron de fondo, o no me respondieron</button></div>
-    <div class="rec-r"><p class="vacio">Toca una situación y mira qué procede.</p></div>
-  </div>`);
-INIT.recursos = el => {
-  const R = [["No", "var(--s-navy)", "No contra el derecho de petición como tal. El desacuerdo con una respuesta no genera automáticamente un recurso administrativo."], ["Depende", "var(--s-blue)", "Depende del contenido. Si es una decisión definitiva que constituye acto administrativo, analiza si proceden reposición, apelación u otros mecanismos según la ley."], ["Tutela", "#8B2A24", "Puede haber vulneración del derecho de petición. Según el caso, puede acudirse a la acción de tutela."]];
-  $$(".rec-q button", el).forEach(b => b.addEventListener("click", () => { $$(".rec-q button", el).forEach(x => x.classList.remove("on")); b.classList.add("on"); const r = R[+b.dataset.i]; $(".rec-r", el).innerHTML = `<span class="rec-tag" style="background:${r[1]}">${r[0]}</span><p class="rec-txt">${r[2]}</p>`; Guia.react(+b.dataset.i === 2 ? "alert" : "think"); }));
-};
-ENTER.recursos = el => { $$(".rec-q button", el).forEach(x => x.classList.remove("on")); $(".rec-r", el).innerHTML = `<p class="vacio">Toca una situación y mira qué procede.</p>`; };
+/* ---------- 10. recursos ---------- */
+C("recursos", "¿Procede un recurso contra la respuesta?", "Distinción importante",
+  `<div class="g2">` +
+  A(0, card("No contra el derecho de petición como tal", `<p class="tx3">El desacuerdo con una respuesta no genera automáticamente un recurso administrativo.</p>`)) +
+  A(1, card("Depende del contenido", `<p class="tx3">Si la respuesta contiene una decisión definitiva que constituye acto administrativo, analiza si proceden reposición, apelación u otros mecanismos según la ley.</p>`)) +
+  `</div>` + A(2, idea("Tutela", "Si no contestaron de fondo o no respondieron, el problema puede ser una vulneración del derecho de petición; según el caso, puede acudirse a la acción de tutela.")));
 
-M("tutelas", 3, "Tutelas", `
-  <div class="tut">
-    <div class="mito"><span class="sello3">MITO</span><q>Toda tutela tiene 48 horas para contestarse</q><p class="mito-p">¿Verdad o mito? Toca para ver.</p><button class="btn2 y mito-b">Revelar</button></div>
-    <div class="tut-d">
-      <div class="tut-ruta"><div class="tut-nodos"><div class="tut-nodo n-rec"><i></i>Llega la tutela</div><div class="tut-dest"><div class="tut-nodo n-jur"><i></i>Jurídica</div><div class="tut-nodo n-area"><i></i>Área con la información</div></div></div><button class="btn2 tut-go">Llegó una tutela</button></div>
-      <div class="hechos"><span>Máximo 10 días para resolver</span><span>El juez fija el plazo del informe</span></div>
-    </div>
-  </div>`);
-INIT.tutelas = el => {
-  const mito = $(".mito", el);
-  $(".mito-b", el).addEventListener("click", () => { mito.classList.add("revela"); $(".mito-p", el).textContent = "El juez fija el término para rendir informe; el plazo concreto depende de la orden judicial y del trámite. Una respuesta tardía o incompleta aumenta el riesgo de desacato."; Guia.react("alert"); });
-  const go = $(".tut-go", el); let vol = false;
-  go.addEventListener("click", () => {
-    if (vol) return; vol = true; $$(".tut-nodo", el).forEach(n => n.classList.remove("on")); const caja = $(".tut-ruta", el), cb = caja.getBoundingClientRect(), o = $(".n-rec i", el).getBoundingClientRect();
-    [".n-jur i", ".n-area i"].forEach((s, k) => { const d = $(s, el).getBoundingClientRect(), e = document.createElement("div"); e.className = "tut-sobre"; e.textContent = "TUTELA"; e.style.left = (o.left - cb.left) + "px"; e.style.top = (o.top - cb.top) + "px"; e.style.width = "7vw"; e.style.height = "4.6vh"; caja.appendChild(e);
-      const a = e.animate([{ transform: "translate(0,0) scale(.8)", opacity: 0 }, { transform: "translate(0,0) scale(1)", opacity: 1, offset: .15 }, { transform: `translate(${d.left - o.left}px,${d.top - o.top}px) scale(.9)`, opacity: 1 }], { duration: 1300 + k * 250, easing: "cubic-bezier(.23,1,.32,1)", fill: "forwards" });
-      a.onfinish = () => { $(k ? ".n-area" : ".n-jur", el).classList.add("on"); setTimeout(() => e.remove(), 500); if (k) { vol = false; Guia.di("Remitir de inmediato a Jurídica y al área.", 4200); Guia.react("alert"); } }; });
-    $(".n-rec", el).classList.add("on");
-  });
-};
-ENTER.tutelas = el => { $(".mito", el).classList.remove("revela"); $(".mito-p", el).textContent = "¿Verdad o mito? Toca para ver."; $$(".tut-nodo", el).forEach(n => n.classList.remove("on")); };
+/* ---------- 11. tutelas ---------- */
+C("tutelas", "¿Por qué también hay que priorizar las tutelas?", "Coordinación interna",
+  `<div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:1.2vh">` +
+  cond(0, 1, "El juez fija el término para rendir informe o aportar la información requerida; debe revisarse de inmediato la notificación.") +
+  cond(1, 2, "La Constitución prevé que la tutela se resuelva en un término máximo de 10 días desde su presentación.") +
+  cond(2, 3, "No debe afirmarse que toda tutela tiene automáticamente 48 horas para contestarse: el plazo concreto depende de la orden judicial y del trámite.") +
+  cond(3, 4, "Una respuesta tardía o incompleta puede aumentar el riesgo de órdenes judiciales e incidentes de desacato.") + `</div>` +
+  A(4, idea("Regla operativa", "Al recibir una tutela, remitir de inmediato a Jurídica y al área que tenga la información o los soportes.")));
 
-M("comparativa", 3, "Petición y tutela", `
-  <div class="cmp2"><div class="seg"><button data-k="p" class="on">Derecho de petición</button><button data-k="t">Acción de tutela</button></div>
-    <div class="cmp2-tabla"></div></div>`);
-INIT.comparativa = el => {
-  const D = { p: [["Qué es", "Derecho fundamental (Constitución, art. 23)"], ["Ante quién", "Las autoridades; aquí, la entidad"], ["Término", "15 días hábiles. Documentos: 10. Consultas: 30"], ["Si no se responde", "Puede acudirse a la acción de tutela"]], t: [["Qué es", "Mecanismo judicial de protección de derechos fundamentales (art. 86)"], ["Ante quién", "Un juez"], ["Término", "Máximo 10 días para resolver; el juez fija el plazo del informe"], ["Si no se responde", "Órdenes judiciales e incidentes de desacato"]] };
-  const tab = $(".cmp2-tabla", el), caja = $(".cmp2", el);
-  const pinta = k => { tab.innerHTML = D[k].map(f => `<div class="cmp2-f"><b>${f[0]}</b><span>${f[1]}</span></div>`).join(""); };
-  pinta("p");
-  $$(".seg button", el).forEach(b => b.addEventListener("click", () => { if (b.classList.contains("on")) return; $$(".seg button", el).forEach(x => x.classList.remove("on")); b.classList.add("on"); caja.classList.add("cambia"); setTimeout(() => { pinta(b.dataset.k); caja.classList.remove("cambia"); }, 220); Guia.react(b.dataset.k === "t" ? "alert" : "tablet"); }));
-};
+/* ---------- 12. gestión de términos ---------- */
+const BUS = '<svg viewBox="0 0 62 28" aria-hidden="true">' + busG("#0B1F5C") + '</svg>';
+const paso3 = (i, n, t, d) => A(i, `<div class="paso3"><b class="c">${n}</b><h4>${t}</h4><p>${d}</p></div>`);
+C("gestion", "¿Por qué Jurídica puede pedir respuesta interna inmediata?", "Gestión de términos",
+  `<div class="via"><div class="pasos"><div class="linea"></div><div class="bus-run">${BUS}</div>` +
+  paso3(0, 1, "Recepción", "Registrar fecha y anexos.") + paso3(1, 2, "Clasificación", "Identificar tipo de petición y término.") + paso3(2, 3, "Área competente", "Recopilar información y soportes.") + paso3(3, 4, "Jurídica", "Analizar, redactar y revisar.") + paso3(4, 5, "Firma y envío", "Aprobar y comunicar antes del vencimiento.") +
+  `</div></div>` + A(6, idea("Plazo interno", "Puede ser más corto que el plazo legal para permitir análisis, revisión, firma y notificación. No cambia el término legal: organiza el trabajo para cumplirlo.")));
 
-M("gestion", 3, "Gestión del plazo", `
-  <div class="ges">
-    <div class="ges-via"><div class="ges-linea"><i></i></div><div class="ges-paradas"></div><div class="ges-bus"><svg viewBox="0 0 62 28" aria-hidden="true">${busG("#1767B8")}</svg></div></div>
-    <div class="ges-det"><div><h3 class="g-t"></h3><p class="g-d"></p></div><button class="btn2 y g-sig">Avanzar el bus ▸</button></div>
-    <div class="ges-plz A"><span class="a">Plazo interno: el área entrega insumos</span><span class="b">Análisis, revisión, firma, notificación</span></div>
-  </div>`);
-INIT.gestion = el => {
-  const P = [["Recepción", "Registrar fecha y anexos."], ["Clasificación", "Identificar tipo de petición y término."], ["Área competente", "Recopilar información y soportes."], ["Jurídica", "Analizar, redactar y revisar."], ["Firma y envío", "Aprobar y comunicar antes del vencimiento."]];
-  const cont = $(".ges-paradas", el), bus = $(".ges-bus", el), via = $(".ges-via", el); let cur = 0;
-  cont.innerHTML = P.map((p, i) => `<button class="ges-p"><b>${i + 1}</b>${p[0]}</button>`).join("");
-  const pon = i => {
-    cur = i; $$(".ges-p", el).forEach((b, k) => { b.classList.toggle("on", k <= i); b.classList.toggle("ya", k === i); });
-    $(".g-t", el).textContent = P[i][0]; $(".g-d", el).textContent = P[i][1]; $(".ges-linea i", el).style.width = (i / 4 * 100) + "%";
-    const bs = $$(".ges-p b", el), r0 = bs[0].getBoundingClientRect(), r = bs[i].getBoundingClientRect(), vr = via.getBoundingClientRect(), bw = bus.getBoundingClientRect().width;
-    bus.style.transform = `translateX(${r.left + r.width / 2 - vr.left - bw / 2}px)`;
-    $(".ges-plz", el).className = "ges-plz " + (i <= 2 ? "A" : "B");
-    $(".g-sig", el).textContent = i === 4 ? "Volver a empezar" : "Avanzar el bus ▸";
-  };
-  $$(".ges-p", el).forEach((b, i) => b.addEventListener("click", () => { pon(i); Guia.react("think"); }));
-  $(".g-sig", el).addEventListener("click", () => { if (cur === 4) pon(0); else { pon(cur + 1); Guia.react(cur === 4 ? "ok" : "point"); } });
-  el._pon = pon;
-};
-ENTER.gestion = el => setTimeout(() => el._pon(0), 50);
+/* ---------- Terminal Jurídica ---------- */
+C("terminal", "La Terminal Jurídica", "Herramienta del Área Jurídica",
+  `<div class="ter3">` +
+  A(0, `<div class="card3 antes3 col3" style="height:100%"><span class="tag3">Antes</span><p class="tx3">Los plazos vivían en la cabeza de cada persona. Nadie más sabía qué estaba por vencer.</p><div><span class="nota-p">¿Cuándo vence?</span><span class="nota-p">¿Quién lo tiene?</span><span class="nota-p">Se me pasó el plazo</span></div></div>`, "", "display:flex") +
+  A(1, `<div class="card3 board3 col3" style="height:100%"><span class="tag3">Ahora</span><p class="tx3">Semáforo, fecha límite y responsable visibles para todo el equipo, con aviso automático.</p><div><div class="fila3" style="--c:#B83A2E"><i class="luz3"></i><div><b>Solicitud de documentos</b></div><em>Vence hoy</em></div><div class="fila3" style="--c:#E6A800"><i class="luz3"></i><div><b>Consulta sobre un contrato</b></div><em>3 días</em></div><div class="fila3" style="--c:#2E8B57"><i class="luz3"></i><div><b>Solicitud de información</b></div><em>8 días</em></div><p class="nota3" style="margin-top:.8vh">Datos de ejemplo.</p></div></div>`, "", "display:flex") +
+  `</div><div class="chips3">` + [["Mesa de casos", "Cada quien registra y edita lo suyo."], ["Vista general", "Todos consultan el equipo, con filtros."], ["Recordatorios", "Automáticos, días hábiles, 8:00 a.m."], ["Normativa", "Las normas a la mano."]].map((c, i) => A(2 + i * .5, `<div class="chip3">${c[0]}<small>${c[1]}</small></div>`)).join("") + `</div>`, "--paso:1.3s");
 
-M("demora", 3, "Demora interna", `
-  <div class="dem">
-    <div class="dem-fichas"><div class="ficha" style="--k:0"><b>El área demora</b><span>No entrega la información a tiempo.</span></div><div class="ficha" style="--k:1"><b>Jurídica sin insumos</b><span>No alcanza a analizar y revisar.</span></div><div class="ficha" style="--k:2"><b>Respuesta tardía</b><span>No es oportuna ni de fondo.</span></div><div class="ficha" style="--k:3"><b>Problema institucional</b><span>Riesgo de tutela y desacato.</span></div></div>
-    <div class="dem-ctl"><label class="sim-opt"><input type="checkbox" class="dem-ok"> El área entrega a tiempo</label><button class="btn2 y dem-push">Empujar la primera ficha</button><button class="btn2 g dem-reset">Reiniciar</button><span class="dem-fb"></span></div>
-  </div>`);
-INIT.demora = el => {
-  const d = $(".dem", el), fb = $(".dem-fb", el);
-  const reset = () => { d.classList.remove("cae", "tiempo"); fb.textContent = ""; };
-  $(".dem-push", el).addEventListener("click", () => { reset(); void d.offsetWidth; if ($(".dem-ok", el).checked) { d.classList.add("tiempo"); fb.textContent = "Respuesta oportuna: la cadena no se rompe."; Guia.react("win"); } else { d.classList.add("cae"); fb.textContent = "Cada área aporta una parte: una demora se vuelve problema institucional."; setTimeout(() => Guia.react("alert"), 1500); } });
-  $(".dem-reset", el).addEventListener("click", reset);
-  $(".dem-ok", el).addEventListener("change", reset);
-  el._reset = reset;
-};
-ENTER.demora = el => { el._reset(); };
+C("demoqr", "Pruébala ahora", "Terminal Jurídica",
+  `<div class="qr3">` + A(0, `<div class="qc"><img src="qr_herramienta.png" alt="Código QR de acceso a la Terminal Jurídica"><span class="url">mtricasfrias.github.io/terminal-juridica-web</span></div>`) +
+  `<div style="display:flex;flex-direction:column;gap:1.6vh">` + [["1", "Escanea el código", "Con la cámara de tu celular."], ["2", "Elige «Entrar solo a consultar»", "No necesitas usuario ni clave."], ["3", "Recorre la Vista general", "Y revisa la pestaña Normativa."]].map((c, i) => A(i + 1, `<div class="paso4"><b>${c[0]}</b><p>${c[1]}<small>${c[2]}</small></p></div>`)).join("") + `</div></div>`);
 
-M("terminal", 4, "Terminal Jurídica", `
-  <div class="ter antes">
-    <div class="ter-izq"><div class="seg"><button data-k="a" class="on">Antes</button><button data-k="n">Ahora</button></div>
-      <div class="ter-pan">
-        <div class="ter-antes"><div class="nota-pegada" style="left:4%;top:8%;--r:-4deg">¿Cuándo vence?</div><div class="nota-pegada" style="left:30%;top:30%;--r:3deg">Estaba en el correo…</div><div class="nota-pegada" style="left:56%;top:6%;--r:5deg">¿Quién lo tiene?</div><div class="nota-pegada" style="left:68%;top:46%;--r:-3deg">Se me pasó el plazo</div><div class="nota-pegada" style="left:8%;top:58%;--r:2deg">Nadie más sabe qué vence</div></div>
-        <div class="ter-ahora"><button class="ter-fila" style="--c:#D6432C"><i class="luz"></i><div><b>Solicitud de documentos</b><span>Área Operativa</span></div><em>Vence hoy</em></button><button class="ter-fila" style="--c:#E6A800"><i class="luz"></i><div><b>Consulta sobre un contrato</b><span>Área Administrativa</span></div><em>3 días hábiles</em></button><button class="ter-fila" style="--c:#1FA35C"><i class="luz"></i><div><b>Solicitud de información</b><span>Área Financiera</span></div><em>8 días hábiles</em></button><div class="ter-sobre"><span>Recordatorio enviado a las 8:00 a.m.</span></div></div>
-      </div>
-    </div>
-    <div class="ter-der"><div class="chip"><i>1</i><div>Mesa de casos<small>Cada quien registra y edita lo suyo.</small></div></div><div class="chip"><i>2</i><div>Vista general<small>Todos consultan el equipo, con filtros.</small></div></div><div class="chip"><i>3</i><div>Recordatorios<small>Automáticos, días hábiles, 8:00 a.m.</small></div></div><div class="chip"><i>4</i><div>Normativa<small>Las normas a la mano.</small></div></div></div>
-  </div>`);
-INIT.terminal = el => {
-  const t = $(".ter", el); let sob = 0;
-  $$(".seg button", el).forEach(b => b.addEventListener("click", () => { $$(".seg button", el).forEach(x => x.classList.remove("on")); b.classList.add("on"); t.classList.toggle("antes", b.dataset.k === "a"); Guia.react(b.dataset.k === "n" ? "ok" : "shrug"); }));
-  $$(".ter-fila", el).forEach(f => f.addEventListener("click", () => { const s = $(".ter-sobre", el); $("span", s).textContent = "Recordatorio enviado a las 8:00 a.m.: " + $("b", f).textContent; s.classList.add("on"); clearTimeout(sob); sob = setTimeout(() => s.classList.remove("on"), 2800); Guia.react("tablet"); }));
-  el._reset = () => { t.classList.add("antes"); $$(".seg button", el).forEach((x, i) => x.classList.toggle("on", i === 0)); $(".ter-sobre", el).classList.remove("on"); };
-};
-ENTER.terminal = el => { el._reset(); };
+/* ---------- normativa de referencia ---------- */
+C("normativa", "Normativa de referencia", "Fuentes para consulta",
+  `<div class="nor3">` + [["C. P.", "Constitución Política de Colombia", "Artículos 23 y 86."], ["1755", "Ley 1755 de 2015", "Artículos 13, 14, 15 y 16."], ["1437", "Ley 1437 de 2011 (CPACA)", "Especialmente las disposiciones aplicables a actuaciones y recursos administrativos."], ["2591", "Decreto 2591 de 1991", "Trámite y cumplimiento de las decisiones de tutela."]].map((c, i) => A(i, `<div class="r" style="height:100%"><b>${c[0]}</b><div><h3>${c[1]}</h3><p>${c[2]}</p></div></div>`, "", "display:flex;flex:1")).join("") + `</div>` +
+  A(4, `<p class="nota3">Antes de usar el material, verificar el texto vigente y cualquier régimen especial aplicable al asunto concreto. Material de apoyo para capacitación interna; no reemplaza el análisis jurídico de cada caso.</p>`));
 
-M("demoqr", 4, "Pruébala", `
-  <div class="qr2"><div class="qr2-c"><img src="qr_herramienta.png" alt="Código QR de acceso a la Terminal Jurídica"><span class="qr2-u">mtricasfrias.github.io/terminal-juridica-web</span></div>
-    <div class="pasos"><div class="paso" style="--k:0"><b>1</b><p>Escanea el código<small>Con la cámara de tu celular.</small></p></div><div class="paso" style="--k:1"><b>2</b><p>Elige «Entrar solo a consultar»<small>No necesitas usuario ni clave.</small></p></div><div class="paso" style="--k:2"><b>3</b><p>Recorre la Vista general<small>Y revisa la pestaña Normativa.</small></p></div></div></div>`);
-ENTER.demoqr = el => { const p = $$(".paso", el); p.forEach(x => { x.style.animation = "none"; void x.offsetWidth; x.style.animation = ""; }); };
-
-M("cierre", 5, "Para terminar", `
-  <div class="cie">
-    <div class="cie-q"><p>Una respuesta oportuna <em>no empieza</em> cuando Jurídica escribe</p><small>Empieza cuando cada área atiende oportunamente la solicitud de información. Cumplir el término es garantizarle al ciudadano una respuesta real, clara y de fondo.</small></div>
-    <div class="cie-d"><span>Repasa lo que quieras</span>
-      <div class="cie-r"><button data-ir="clasificar"><b>1</b>Primero identifica el tipo de solicitud</button><button data-ir="terminos"><b>2</b>El término legal es el máximo</button><button data-ir="fondo"><b>3</b>De fondo no es favorable</button><button data-ir="demora"><b>4</b>Sin insumos del área no se responde bien</button><button data-ir="tutelas"><b>5</b>En tutelas el término lo fija el juez</button><button data-ir="terminal"><b>6</b>Usa la Terminal Jurídica</button></div>
-      <div class="cie-go"><button class="btn2 g" data-ir="mapa">Volver al mapa</button><button class="btn2 y" data-ir="cuestionario">Ir al reto en vivo ▸</button></div></div>
-  </div>`);
-
-M("normativa", 5, "Normativa", `
-  <div class="nor">
-    <button class="nor-c" data-ir="fundamento" style="--k:0;text-align:left;border:0;cursor:pointer"><b>C. P.</b><div><h3>Constitución Política</h3><p>Artículos 23 y 86.</p></div></button>
-    <button class="nor-c" data-ir="terminos" style="--k:1;text-align:left;border:0;cursor:pointer"><b>1755</b><div><h3>Ley 1755 de 2015</h3><p>Artículos 13, 14, 15 y 16.</p></div></button>
-    <button class="nor-c" data-ir="recursos" style="--k:2;text-align:left;border:0;cursor:pointer"><b>1437</b><div><h3>Ley 1437 de 2011 (CPACA)</h3><p>Actuaciones y recursos administrativos.</p></div></button>
-    <button class="nor-c" data-ir="tutelas" style="--k:3;text-align:left;border:0;cursor:pointer"><b>2591</b><div><h3>Decreto 2591 de 1991</h3><p>Trámite y cumplimiento de las decisiones de tutela.</p></div></button>
-  </div>
-  <p style="margin:0;font:600 clamp(15px,1.5vw,32px)/1.3 'Public Sans',sans-serif;color:var(--s-navy);background:#fff;border-radius:1.1vw;padding:1.4vh 1.4vw">Antes de usar el material, verifica el texto vigente y cualquier régimen especial aplicable. Material de apoyo para capacitación interna; no reemplaza el análisis jurídico de cada caso.</p>`);
-ENTER.normativa = el => { $$(".nor-c", el).forEach(x => { x.style.animation = "none"; void x.offsetWidth; x.style.animation = ""; }); };
-
-/* ===================== el mundo del SETP (fondo vivo) ===================== */
+/* ===================== fondo de la calle del SETP (quieto) ===================== */
 function crearMundo() {
   const m = document.createElement("div"); m.id = "mundo"; m.setAttribute("aria-hidden", "true");
-  const nube = (y, w, dur, dl, op) => `<div class="mu-nube" style="top:${y}vh;width:${w}vw;animation-duration:${dur}s;animation-delay:${dl}s;opacity:${op}"><svg viewBox="0 0 120 50"><path d="M18 42 Q2 42 5 29 Q8 18 22 21 Q26 6 43 8 Q55 1 66 12 Q80 8 88 21 Q106 18 108 33 Q110 43 94 43 Z" fill="#fff"/></svg></div>`;
   const edif = [[18, 74, 96, 0], [104, 54, 134, 1], [168, 90, 82, 2], [266, 62, 152, 0], [336, 92, 108, 1], [438, 58, 128, 2], [506, 104, 90, 0], [640, 50, 118, 1], [930, 70, 110, 2], [1010, 60, 150, 0], [1170, 66, 122, 2], [1244, 84, 98, 0], [1338, 58, 142, 1], [1404, 98, 86, 2], [1514, 72, 114, 0]], col = ["#BCC9DD", "#B0BFD6", "#C6D1E2"]; let v = "";
   edif.forEach(([x, w, h, c], i) => { const y = 300 - h; v += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${col[c]}"/>`; for (let r = 0; r < Math.floor((h - 10) / 24); r++) for (let k = 0; k < Math.floor((w - 8) / 22); k++) v += `<rect x="${x + 8 + k * 22}" y="${y + 10 + r * 24}" width="10" height="12" rx="1" fill="${((i * 7 + r * 3 + k * 5) % 4) === 0 ? "#F4F7FB" : "#E2E9F3"}" opacity=".85"/>`; });
-  const ciudad = `<svg class="mu-ciudad" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMax slice"><polygon points="0,170 190,126 380,160 580,108 790,150 1000,118 1200,156 1410,114 1600,148 1600,300 0,300" fill="#CFD9E8"/>${v}<rect x="716" y="268" width="196" height="9" fill="#EFE4C8"/>${[0, 1, 2, 3, 4].map(k => `<rect x="${732 + k * 30}" y="206" width="11" height="64" fill="#E4D6B4"/>`).join("")}<polygon points="712,206 922,206 817,168" fill="#F3E9CF"/></svg>`;
-  const rueda = (a, b, y, r) => `<circle cx="${a}" cy="${y}" r="${r}" fill="#141E2C"/><circle cx="${b}" cy="${y}" r="${r}" fill="#141E2C"/><circle cx="${a}" cy="${y}" r="${r * .4}" fill="#96A0AF"/><circle cx="${b}" cy="${y}" r="${r * .4}" fill="#96A0AF"/>`;
-  const auto = c => `<svg viewBox="0 0 44 22"><path d="M2 16 Q2 12 6 11 L12 5 Q13.5 3.5 16 3.5 L29 3.5 Q31.5 3.5 33 5 L38 11 Q42 12 42 16 L42 18 L2 18Z" fill="${c}"/><path d="M14.5 5.6 L22 5.2 L22 11 L10.8 11 Z" fill="#CDE5F7"/><path d="M24 5.2 L29 5.4 L34 11 L24 11 Z" fill="#CDE5F7"/>${rueda(11, 33, 18.2, 3.6)}</svg>`;
-  const bus = c => `<svg viewBox="0 0 62 28">${busG(c)}</svg>`;
-  const veh = (svg, w, bottom, dur, dl, izq) => `<div class="mu-veh${izq ? " izq" : ""}" style="width:${w}vw;top:calc(${bottom}vh - ${(w * (svg.includes("62 28") ? 28 / 62 : 22 / 44)).toFixed(2)}vw);animation-duration:${dur}s;animation-delay:${dl}s">${svg}</div>`;
-  m.innerHTML = `${ciudad}<div class="mu-av"><i></i></div><div class="mu-acera"></div><div class="mu-calle"><i></i></div>` +
-    veh(bus("#34548C"), 7, 77.6, 34, -4, false) + veh(auto("#9AA6BA"), 4.6, 77.6, 26, -14, false) + veh(auto("#5B6B88"), 4.6, 79, 30, -6, true) + veh(bus("#0B1F5C"), 7, 79, 38, -20, true);
+  m.innerHTML = `<svg class="mu-ciudad" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMax slice"><polygon points="0,170 190,126 380,160 580,108 790,150 1000,118 1200,156 1410,114 1600,148 1600,300 0,300" fill="#CFD9E8"/>${v}</svg><div class="mu-av"></div><div class="mu-acera"></div><div class="mu-calle"></div>`;
   deck.prepend(m);
 }
 
-/* ===================== arranque y cambio de diapositiva ===================== */
+/* ===================== SETPI: presencia discreta ===================== */
+const Guia = (() => {
+  let A_ = null, ok = false, activo = true, raf = 0, last = 0, tim = 0; const cola = [];
+  const H = () => innerHeight, W = () => innerWidth, cuando = f => ok ? f() : cola.push(f);
+  function init() {
+    if (!(window.Setpi && Setpi.Frames && Setpi.Actor)) return; Setpi.base = "setpi/";
+    Setpi.Frames.load("setpi/").then(() => { A_ = new Setpi.Actor(document.getElementById("guia-stage")); A_.setCap(Math.max(240, H() * .4)); ok = true; A_.show(true); A_.rest("F"); const f = ts => { raf = requestAnimationFrame(f); if (!activo || document.hidden) { last = 0; return; } const dt = Math.min(.05, (ts - (last || ts)) / 1000); last = ts; A_.update(dt); }; raf = requestAnimationFrame(f); cola.splice(0).forEach(g => g()); }).catch(() => { });
+  }
+  async function clip(fr) { if (!ok) return; try { A_.cancel(); await A_.play(fr); } catch (e) { return; } A_.rest("F"); }
+  function poner(x, y, s) { cuando(() => { A_.cancel(); A_.setS(s); A_.place(x, y); A_.face(1); A_.rest("F"); }); }
+  return {
+    init, activo(v) { activo = v; clearTimeout(tim); if (!v) cuando(() => A_.cancel()); },
+    portada() { poner(W() * .915, H() * .925, H() * .36); clearTimeout(tim); const ciclo = () => { clip(Setpi.C.lupa()); tim = setTimeout(ciclo, 11000); }; tim = setTimeout(ciclo, 2200); },
+    casa() { poner(W() * .955, H() * .91, H() * .125); clearTimeout(tim); tim = setTimeout(() => cuando(() => clip(Setpi.C.present())), 1600); }
+  };
+})();
+
+/* ===================== arranque ===================== */
 function montar() {
-  crearMundo(); HUD.init();
-  const gs = document.createElement("div"); gs.id = "guia-stage"; gs.setAttribute("aria-hidden", "true"); document.body.appendChild(gs); Guia.init();
-  SLIDES.forEach((s, k) => { if (INIT[s.id]) INIT[s.id](els[k]); });
-  document.addEventListener("click", e => { const g = e.target.closest("[data-ir]"); if (g) { e.preventDefault(); irId(g.dataset.ir); } });
-  window.addEventListener("keydown", e => { if (e.key === "m" || e.key === "M") { if (!/INPUT|TEXTAREA/.test((e.target || {}).tagName || "")) irId("mapa"); } });
-  window.addEventListener("resize", () => { const id = SLIDES[IDX] && SLIDES[IDX].id; if (id) posiciona(id); });
-}
-function posiciona(id) {
-  if (id === "cover") Guia.portada(); else if (id === "mapa") { const e = els[IDX]; ENTER.mapa && ENTER.mapa(e); } else if (id !== "cuestionario") Guia.casa();
+  crearMundo();
+  const gs = document.createElement("div"); gs.id = "guia-stage"; gs.className = "setpi-stage"; gs.setAttribute("aria-hidden", "true"); document.body.appendChild(gs); Guia.init();
+  const n = document.createElement("div"); n.className = "lado-n"; n.id = "lado-n"; document.body.appendChild(n);
+  [["izq", "‹", "Diapositiva anterior"], ["der", "›", "Diapositiva siguiente"]].forEach(([c, t, a]) => { const b = document.createElement("button"); b.className = "borde " + c; b.textContent = t; b.setAttribute("aria-label", a); b.addEventListener("click", () => c === "izq" ? ir(IDX - 1, true) : ir(IDX + 1)); document.body.appendChild(b); });
+  window.addEventListener("keydown", e => { if (/INPUT|TEXTAREA/.test((e.target || {}).tagName || "")) return; if (e.key === "f" || e.key === "F") { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => { }); else document.exitFullscreen(); } });
+  window.addEventListener("resize", () => { const id = SLIDES[IDX] && SLIDES[IDX].id; if (id === "cover") Guia.portada(); else if (id && id !== "cuestionario") Guia.casa(); });
 }
 window.onSlide = function (i) {
-  const s = SLIDES[i], el = els[i], id = s.id, b = document.body.classList;
-  b.toggle("en-m", el.classList.contains("m")); b.toggle("en-cover", id === "cover"); b.toggle("en-quiz", id === "cuestionario");
-  Guia.activo(id !== "cuestionario"); const primera = !VIS.has(id); VIS.add(id);
-  if (id !== "cuestionario" && id !== "cover") HUD.set(id);
-  if (id !== "mapa") posiciona(id);
-  if (ENTER[id]) ENTER[id](el);
-  Guia.habla(id === "cover");
-  if (id === "cover") { Guia.di("Bienvenidos. Soy SETPI y los acompaño en esta ruta.", 5200, .12); Guia.react("wave"); }
+  const id = SLIDES[i].id, b = document.body.classList;
+  b.toggle("en-cover", id === "cover"); b.toggle("en-quiz", id === "cuestionario");
+  const n = document.getElementById("lado-n"); if (n) n.textContent = String(i + 1).padStart(2, "0") + " / " + SLIDES.length;
+  Guia.activo(id !== "cuestionario");
+  if (id === "cover") Guia.portada(); else if (id !== "cuestionario") Guia.casa();
 };
 
 slide("cuestionario","dia",`
@@ -1138,7 +620,7 @@ slide("cuestionario","dia",`
       <div id="mh-login" class="mh-sec">
         <h3 class="mh-t">Panel del anfitrión</h3>
         <p class="mh-p">Pon el PIN del juego para abrir la parada: se revela el QR y se habilita la sala.</p>
-        <input id="mh-pin" class="mh-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-label="PIN del juego">
+        <input id="mh-pin" class="mh-pin" type="password" autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-label="PIN del juego">
         <button id="mh-btn-entrar" class="mh-btn mh-btn-navy">Abrir la parada</button>
         <div id="mh-err" class="mh-err"></div>
       </div>
@@ -1168,23 +650,23 @@ const els = [...document.querySelectorAll(".slide")];
 montar();
 document.getElementById("btn-full").innerHTML = Ico("pantalla", {s:16});
 const navCont = document.getElementById("nav-cont"), btnPrev=document.getElementById("btn-prev"), btnNext=document.getElementById("btn-next"), btnFull=document.getElementById("btn-full"), progreso=document.getElementById("progreso");
-function ir(i){
+function ir(i, atras){
   IDX = Math.max(0, Math.min(SLIDES.length-1, i));
-  els.forEach((el,k)=>el.classList.toggle("activa", k===IDX));
+  els.forEach((el,k)=>{ el.classList.toggle("activa", k===IDX); if(k===IDX) el.classList.toggle("final", !!atras || /[?&]todo/.test(location.search)); });
   navCont.textContent = (IDX+1)+" / "+SLIDES.length;
   progreso.style.width = (((IDX+1)/SLIDES.length)*100)+"%";
   btnPrev.disabled = IDX===0; btnNext.disabled = IDX===SLIDES.length-1;
   history.replaceState(null,"","#"+(IDX+1));
   if(window.onSlide) onSlide(IDX);
 }
-btnPrev.addEventListener("click", ()=>ir(IDX-1));
+btnPrev.addEventListener("click", ()=>ir(IDX-1,true));
 btnNext.addEventListener("click", ()=>ir(IDX+1));
 btnFull.addEventListener("click", ()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); });
 window.addEventListener("keydown", e=>{
   if(["ArrowRight","PageDown"," "].includes(e.key)){ e.preventDefault(); ir(IDX+1); }
-  else if(["ArrowLeft","PageUp"].includes(e.key)){ e.preventDefault(); ir(IDX-1); }
+  else if(["ArrowLeft","PageUp"].includes(e.key)){ e.preventDefault(); ir(IDX-1,true); }
   else if(e.key==="Home") ir(0);
-  else if(e.key==="End") ir(SLIDES.length-1);
+  else if(e.key==="End") ir(SLIDES.length-1,true);
 });
 window.addEventListener("hashchange", ()=>{
   const n = parseInt((location.hash||"").replace("#",""),10);
@@ -1195,11 +677,9 @@ deck.addEventListener("touchstart", e=>{ touchX=e.touches[0].clientX; }, {passiv
 deck.addEventListener("touchend", e=>{
   if(touchX===null) return;
   const dx = e.changedTouches[0].clientX - touchX;
-  if(Math.abs(dx) > 60) ir(IDX + (dx<0?1:-1));
+  if(Math.abs(dx) > 60) ir(IDX + (dx<0?1:-1), dx>0);
   touchX=null;
 }, {passive:true});
-{ const navEl=document.getElementById("nav"); let navT; const despertar=()=>{ navEl.classList.add("despierto"); clearTimeout(navT); navT=setTimeout(()=>navEl.classList.remove("despierto"),2800); };
-  ["mousemove","touchstart","keydown","click"].forEach(ev=>addEventListener(ev,despertar,{passive:true})); despertar(); }
 ir(IDX);
 
 /* ===================== panel del anfitrión (en vivo, dentro de la presentación) ===================== */

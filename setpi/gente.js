@@ -72,7 +72,7 @@
     }
     function mk(o) {
       const p = Object.assign({ id: ++nid, o: look(), setpi: false, x: 0, y: 0, dir: 1, st: '', ph: 0, vel: rnd(.88, 1.14), k: rnd(.94, 1.08), off: 0, delay: 0, fade: 0, v: 'l' }, o);
-      p.setpi = !o.sinSetpi && Math.random() < .12 && setpiOK() && !G.list.some(q => q.setpi);      // como mucho un mini SETPI a la vez
+      p.setpi = false;      // sin mini SETPI: en la escena solo hay personas chicas y el SETPI grande
       p.el = document.createElement('div'); p.el.className = 'e-pers ' + p.v; p.el.style.setProperty('--gp', (.62 / p.vel).toFixed(2) + 's'); p.el.style.visibility = 'hidden';
       if (p.setpi) { p.el.classList.add('mini'); p.cv = document.createElement('canvas'); p.cv.width = Math.ceil(1.3 * h0 * dpr * 1.3); p.cv.height = Math.ceil(1.25 * h0 * dpr * 1.3); p.ctx = p.cv.getContext('2d'); p.el.appendChild(p.cv); }
       (p.capa).appendChild(p.el); medidas(p); vista(p, p.v); G.list.push(p); pon(p); return p;
