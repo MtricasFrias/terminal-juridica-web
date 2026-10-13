@@ -181,7 +181,7 @@ button{font-family:inherit; cursor:pointer;}
   <button id="btn-full" aria-label="Pantalla completa" title="Pantalla completa" style="margin-left:10px"></button>
 </div>
 <script src="setpi/ico.js"></script>
-<script src="setpi/net.js"></script>
+<script src="setpi/net.js?v=16"></script>
 <script src="setpi/engine.js"></script>
 <script src="setpi/fx.js"></script>
 <script src="setpi/bus.js"></script>
@@ -678,12 +678,7 @@ ir(IDX);
 (function(){
   "use strict";
   const API_URL = "https://script.google.com/macros/s/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg/exec";
-  async function api(fn, ...args){
-    const resp = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({fn, args}), redirect:"follow"});
-    const r = await resp.json();
-    if(r && r.ok===false) throw new Error(r.error || "No se pudo conectar con el servidor.");
-    return r;
-  }
+  function api(fn, ...args){ return llamar(API_URL, fn, args); }
   function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
   const CANVAS_W = 640, CANVAS_H = 880;
   const CARAS_OK = ["confundido","emocionado","enojado","feliz","feliz_ojo_cerrado","muy_feliz_ojo_cerrado","preocupado","sorprendido","triste"];
@@ -781,7 +776,7 @@ ir(IDX);
       mhPodio.style.setProperty("--ps", k.toFixed(3));
       mhPodio.innerHTML = orden.map((f,i)=>{
         if(!f) return `<div class="mh-ped" style="opacity:.45"><div class="mh-bloque" style="height:${alturas[i]}px; background:#E8EDF5"><span class="mh-num">${nums[i]}</span></div></div>`;
-        const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "podio");
+        const muneco = avatarSVG(f.avatar, tamanos[i], "podio");        // el personaje tal como lo armó cada quien: su cara, su camisa y su sombrero
         return `<div class="mh-ped${i===1?" p1":""}" style="${entrada(i)}">
           <div class="mh-nom">${esc(f.jugador)}</div>
           <div style="margin-bottom:-4px; line-height:0">${muneco}</div>
@@ -818,6 +813,7 @@ ir(IDX);
   /* mismo reloj compartido que usan los celulares: todos calculan la MISMA pregunta actual
      a partir del mismo "inicio", así que este panel nunca se desincroniza de lo que la gente ve. */
   function iniciarCurso(inicioMs){
+    if(iniciarCurso.desde === inicioMs) return; iniciarCurso.desde = inicioMs;       // la misma tanda no se arranca dos veces (botón + sondeo)
     fase("curso");
     limpiarPodio(); mhJugandoAhora.textContent = ""; mhJugandoAhora.dataset.t = ""; mhAnilloWrap.hidden = false; rutaIdx = -2;
     setpiFase("quiz");
@@ -825,7 +821,12 @@ ir(IDX);
     clearInterval(tickAnillo);
     tickAnillo = setInterval(()=>{
       const ciclo = (DURACION+TRANSICION)*1000;
-      const transcurrido = Date.now() - inicioMs;
+      const transcurrido = Reloj.now() - inicioMs;                          // hora del servidor (igual que los celulares)
+      if(transcurrido < 0){                                                 // cuenta regresiva del inicio
+        mhPreguntaNum.textContent = "¡Prepárense! Empezamos en " + Math.ceil(-transcurrido/1000);
+        mhAnilloNum.textContent = Math.ceil(-transcurrido/1000); mhAnillo.style.strokeDashoffset = "0"; mhAnillo.style.stroke = "var(--blue)";
+        return;
+      }
       const idx = Math.floor(transcurrido / ciclo);
       const restante = Math.max(0, DURACION - (transcurrido - idx*ciclo)/1000);
       if(SetpiDir && idx < TOTAL_PREGUNTAS) SetpiDir.quizTick({ idx, inTrans: restante<=0, total: TOTAL_PREGUNTAS });
@@ -843,7 +844,7 @@ ir(IDX);
     }, 200);
     actualizarPodio().catch(()=>{});
     if(pollClasif) pollClasif.stop();
-    pollClasif = Poller(actualizarPodio, 3000).start();
+    pollClasif = Poller(actualizarPodio, 3000, {hidden:true}).start();       // sigue consultando aunque otra ventana tape la presentación
   }
 
   async function sondearLobby(){
@@ -855,6 +856,7 @@ ir(IDX);
   }
 
   function mostrarLobby(){
+    iniciarCurso.desde = 0;
     fase("lobby");
     ROSTER.clear(); limpiarPodio(); rutaPon(-1); mhN.textContent = "0";
     clearInterval(tickAnillo); if(pollClasif) pollClasif.stop();
@@ -862,7 +864,7 @@ ir(IDX);
     mhAnilloWrap.hidden = false; mhJugandoAhora.textContent = ""; podioPintado = false;
     setpiFase("lobby");
     if(pollLobby) pollLobby.stop();
-    pollLobby = Poller(sondearLobby, 1800).start(true);
+    pollLobby = Poller(sondearLobby, 2000, {hidden:true}).start(true);
   }
 
   mhBtnEntrar.addEventListener("click", ()=>{
@@ -893,6 +895,7 @@ ir(IDX);
     try{
       const r = await api("quizIniciar", TOKEN);
       if(!r.ok){ avisoPin(mhBtnIniciar, textoNormal); return; }
+      if(r.inicio) iniciarCurso(parseInt(r.inicio,10));                    // arranca ya en esta pantalla (no depende de que el siguiente sondeo llegue)
     }catch(e){ avisoPin(mhBtnIniciar, textoNormal); }
   });
 

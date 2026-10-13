@@ -301,7 +301,7 @@ button{font:inherit; cursor:pointer;}
 
 </div>
 <script src="setpi/ico.js"></script>
-<script src="setpi/net.js"></script>
+<script src="setpi/net.js?v=16"></script>
 <button class="host-badge" id="btn-modo-host" title="Modo anfitrión" data-ico="llave" data-s="22"></button>
 <script>
 /* iconos: sin emojis, imágenes vectoriales (setpi/ico.js) */
@@ -309,12 +309,7 @@ document.querySelectorAll("[data-ico]").forEach(e=>{ e.insertAdjacentHTML("after
 (function(){
 "use strict";
 const API_URL = "https://script.google.com/macros/s/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg/exec";
-async function api(fn, ...args){
-  const resp = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({fn, args}), redirect:"follow"});
-  const r = await resp.json();
-  if(r && r.ok===false) throw new Error(r.error || "No se pudo conectar con el servidor.");
-  return r;
-}
+function api(fn, ...args){ return llamar(API_URL, fn, args); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 function mem(k,v){ try{ if(v===undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k,v); }catch(e){} }
 
@@ -428,27 +423,25 @@ async function empezar(){
     document.getElementById("lobby-yo-nombre").textContent = NOMBRE;
     pintarRoster(r.jugadores);
     if(r.estado === "en_curso"){ await cargarYArrancar(parseInt(r.inicio,10)); return; }
-    stopP(POLL_LOBBY); POLL_LOBBY = Poller(sondearLobby, 2200).start();
-    stopP(POLL_LATIDO); POLL_LATIDO = Poller(()=>api("quizUnirse", NOMBRE, MI_AVATAR), 5500).start();
+    stopP(POLL_LOBBY); POLL_LOBBY = Poller(sondearLobby, 4000).start();
   }catch(e){
     errIntro.textContent = e.message; btnEmpezar.disabled = false; btnEmpezar.textContent = "Entrar a la sala →";
   }
 }
 async function sondearLobby(){
-  const r = await api("quizEstadoSesion");
+  const r = await api("quizUnirse", NOMBRE, MI_AVATAR);                  // latido + estado + lista en UN solo viaje
   pintarRoster(r.jugadores);
   if(r.estado === "en_curso"){
-    stopP(POLL_LOBBY); stopP(POLL_LATIDO);
+    stopP(POLL_LOBBY);
     try{ await cargarYArrancar(parseInt(r.inicio,10)); }
-    catch(e){ POLL_LOBBY.start(); POLL_LATIDO.start(); throw e; }      // si no bajaron las preguntas, sigue intentando (antes quedaba colgado)
+    catch(e){ POLL_LOBBY.start(); throw e; }                              // si no bajaron las preguntas, sigue intentando (antes quedaba colgado)
   }
 }
 async function cargarYArrancar(inicioMs){
-  const r = await retry(()=>api("quizPreguntas"), 4, 600);
+  const r = await retry(()=>api("quizPreguntas"), 6, 700);
   PREGUNTAS = r.preguntas; DURACION = r.duracion; TOTAL = PREGUNTAS.length; PUNTAJE = 0; IDX_MOSTRADO = -1; RESPONDIDA = {};
-  INICIO = inicioMs || Date.now();
-  mostrarSolo(pPregunta);
-  stopP(POLL_LATIDO); POLL_LATIDO = Poller(()=>api("quizUnirse", NOMBRE, MI_AVATAR), 8000).start();
+  INICIO = inicioMs || Reloj.now();
+  stopP(POLL_LATIDO);
   clearInterval(TICK); TICK = setInterval(tickReloj, 200);
   tickReloj();
 }
@@ -469,7 +462,13 @@ function barajaEstable(n, semilla){
 }
 function tickReloj(){
   const ciclo = (DURACION+TRANSICION)*1000;
-  const transcurrido = Date.now() - INICIO;
+  const transcurrido = Reloj.now() - INICIO;                                  // hora del servidor: todos ven la misma pregunta al mismo tiempo
+  if(transcurrido < 0){                                                       // cuenta regresiva: todos alcanzan a cargar las preguntas
+    if(pLobby.hidden) mostrarSolo(pLobby);
+    elCuentaSala.textContent = "¡Prepárate! Empezamos en " + Math.ceil(-transcurrido/1000) + "…";
+    return;
+  }
+  if(pPregunta.hidden) mostrarSolo(pPregunta);
   const idx = Math.floor(transcurrido / ciclo);
   const dentro = transcurrido - idx*ciclo;
   const restante = Math.max(0, DURACION - dentro/1000);
@@ -532,7 +531,7 @@ function mostrarPregunta(idx){
   elOpciones.hidden = false;
   elOpciones.innerHTML = ORDEN.map((origIdx,pos)=>`<button type="button" class="opcion op-${pos}" data-orig="${origIdx}"><span>${MARCAS[pos]}</span><span>${esc(q.opciones[origIdx])}</span></button>`).join("");
   elOpciones.querySelectorAll(".opcion").forEach(b=>b.addEventListener("click", ()=>{
-    if(!RESPONDIDA[idx]){ RESPONDIDA[idx]=true; responder(idx, +b.dataset.orig, Date.now()-INICIO_PREGUNTA); }
+    if(!RESPONDIDA[idx]){ RESPONDIDA[idx]=true; responder(idx, +b.dataset.orig, Reloj.now()-INICIO_PREGUNTA); }
   }));
 }
 /* idx/opcionIdx quedan fijos al momento del clic, pero la respuesta del servidor puede tardar
@@ -547,7 +546,8 @@ async function responder(idx, opcionIdx, tiempoMs){
   const q = PREGUNTAS[idx];
   let r = null;
   /* se reintenta si falla la red (el servidor ya ignora repetidas); antes un fallo se contaba como respuesta mala */
-  try{ r = await retry(()=>api("quizResponder", NOMBRE, q.id, opcionIdx, tiempoMs), 4, 700); }
+  if(opcionIdx < 0) r = {ok:true, correcta:false, puntos:0};              // sin respuesta: 0 puntos, no hace falta molestar al servidor (todos terminan a la vez)
+  else try{ r = await retry(()=>api("quizResponder", NOMBRE, q.id, opcionIdx, tiempoMs, MI_AVATAR), 6, 700); }
   catch(e){ r = null; }
   if(!r){
     if(idx === IDX_MOSTRADO && opcionIdx >= 0){          // no se pudo enviar: que lo intente de nuevo mientras haya tiempo
@@ -576,12 +576,12 @@ async function responder(idx, opcionIdx, tiempoMs){
 /* ---------- podio ---------- */
 const elMiFila = document.getElementById("mi-puntaje-fila"), elCuenta = document.getElementById("cuenta-jugadores"),
       elTabla = document.getElementById("tabla-pos"), elEscenario = document.getElementById("podio-escenario");
-let POLL_PODIO = null, PODIO_PINTADO = false;
+let POLL_PODIO = null, PODIO_PINTADO = false, PODIO_SIG = "";
 function mostrarPodio(){
   mostrarSolo(pPodio);
   elMiFila.textContent = "Tu puntaje: " + PUNTAJE + " pts";
   confeti(28);
-  actualizarClasificacion().catch(()=>{}); stopP(POLL_PODIO); POLL_PODIO = Poller(actualizarClasificacion, 4000).start();
+  actualizarClasificacion().catch(()=>{}); stopP(POLL_PODIO); POLL_PODIO = Poller(actualizarClasificacion, 5000).start();
 }
 function caraFeliz(avatar){
   const partes = String(avatar||"").split(":");
@@ -602,7 +602,7 @@ function pintarEscenario(tabla){
   const pedClases = ["ped-2","ped-1","ped-3"], num = ["2","1","3"], tamanos = [64,92,56];
   elEscenario.innerHTML = orden.map((f,i)=>{
     if(!f) return `<div class="pedestal ${pedClases[i]}" style="opacity:.25"><div class="bloque"><span class="num">${num[i]}°</span></div></div>`;
-    const muneco = avatarSVG(caraFeliz(f.avatar), tamanos[i], "cuerpo");
+    const muneco = avatarSVG(f.avatar, tamanos[i], "cuerpo");           // el personaje tal como lo armó cada quien (cara, camisa y sombrero)
     return `<div class="pedestal ${pedClases[i]}" style="animation-delay:${i===1?0:(i===0?.4:.7)}s"><span class="nom">${esc(f.jugador)}</span><span class="muneco">${muneco}</span><div class="bloque"><span class="num">${num[i]}°</span><span class="pts-ticker" data-pts="${f.puntos}">0 pts</span></div></div>`;
   }).join("");
   elEscenario.querySelectorAll(".pts-ticker").forEach((el,i)=>setTimeout(()=>animarConteo(el, +el.dataset.pts, 900), 500+i*200));
@@ -611,7 +611,8 @@ let TABLA_SIG = "";
 async function actualizarClasificacion(){
   const r = await api("quizClasificacion");
   elCuenta.textContent = r.jugadores + (r.jugadores===1 ? " persona" : " personas");
-  if(!PODIO_PINTADO && r.tabla.length){ pintarEscenario(r.tabla.slice(0,3)); PODIO_PINTADO = true; }
+  const sigTop = JSON.stringify(r.tabla.slice(0,3).map(f=>[f.jugador, f.puntos, f.avatar]));
+  if(r.tabla.length && sigTop !== PODIO_SIG){ pintarEscenario(r.tabla.slice(0,3)); PODIO_SIG = sigTop; PODIO_PINTADO = true; }   // se repinta si llegan respuestas tardías
   const sig = JSON.stringify(r.tabla);
   if(sig === TABLA_SIG) return;                    // sin cambios: no se repinta (evita parpadeo de los avatares)
   TABLA_SIG = sig;
@@ -640,7 +641,7 @@ function desbloquearHost(){
   if(pin.length !== 4){ hostErr.textContent = "El PIN tiene 4 dígitos."; return; }
   HOST_PIN = pin;
   hostLogin.hidden = true; hostPanel.hidden = false;
-  stopP(POLL_HOST); POLL_HOST = Poller(sondearHost, 2200).start(true);
+  stopP(POLL_HOST); POLL_HOST = Poller(sondearHost, 2500, {hidden:true}).start(true);
 }
 document.getElementById("host-btn-entrar").addEventListener("click", desbloquearHost);
 hostPin.addEventListener("keydown", e=>{ if(e.key==="Enter") desbloquearHost(); });
