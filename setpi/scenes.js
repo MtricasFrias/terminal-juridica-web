@@ -294,8 +294,9 @@
           await a.play(J.crouch);                                                                                 // se agacha para bajar
           bus.front = false; bus.apply();                                                                         // sale de la puerta: ya va por delante de todo el bus
           fire(J.air);
-          const arco = (async () => { await a.tween('lift', h0 + .16 * g.s, .17, 'out'); await a.tween('lift', 0, .26, 'in'); })();
-          await Promise.all([a.tween('x', x0 - .55 * g.s, .43, 'lin'), a.tween('y', g.y + .035 * g.s, .43, 'io'), arco]);   // arco: sube, avanza y cae
+          /* baja HACIA la cámara: cae delante del bus (más abajo en pantalla y algo más grande), nunca sobre su carrocería */
+          const yB = Math.min(l.yL, g.y + .22 * g.s), arco = (async () => { await a.tween('lift', h0 + .16 * g.s, .2, 'out'); await a.tween('lift', 0, .3, 'in'); })();
+          await Promise.all([a.tween('x', x0 - .62 * g.s, .5, 'lin'), a.tween('y', yB, .5, 'io'), arco]);   // arco: sube, avanza y cae
           a.fx('dust', { n: 3 });
           await a.play(J.land);
         } else { const sp = P.spot({ lane: 'L', minDist: 0 }); a.cancel(); await P.enter(sp.x, sp.y, 1.9); }

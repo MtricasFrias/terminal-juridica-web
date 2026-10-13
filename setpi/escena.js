@@ -49,7 +49,7 @@
       <div class="e-avenida"><i class="e-av-linea"></i></div><div class="e-trafico" id="e-trafico"></div>
       <div class="e-acera"></div><div class="e-calle"></div><div class="e-linea"></div><div class="e-gente" id="e-gente-a"></div>
       ${poste("e-poste")}${poste("e-poste2")}${paradero}${semaforo}
-      <svg class="e-cebra" id="e-cebra" aria-hidden="true"></svg><div class="e-gente" id="e-gente-z"></div><div class="e-podo"></div>
+      <svg class="e-cebra" id="e-cebra" aria-hidden="true"></svg><div class="e-podo"></div><div class="e-gente" id="e-gente-z"></div>
     </div>`;
   };
   /* la llama el director cada vez que mide el escenario */

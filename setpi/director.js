@@ -30,8 +30,8 @@
     function layout() {
       const sr = stage.getBoundingClientRect(); if (!sr.width || !sr.height) return false;
       const pr = rel(cfg.panel().getBoundingClientRect(), sr);
-      const nav = document.getElementById('nav'), navTop = nav ? rel(nav.getBoundingClientRect(), sr).top : sr.height;   // la barra inferior nunca tapa sus pies
-      const floor = Math.min(sr.height * 0.875, navTop - 8);
+      const nav = document.getElementById('nav'), navVis = nav && getComputedStyle(nav).opacity !== '0', navTop = navVis ? rel(nav.getBoundingClientRect(), sr).top : sr.height;   // la barra inferior (si se ve) nunca tapa sus pies
+      const floor = Math.min(sr.height * (navVis ? 0.875 : 0.925), navTop - 8);
       const qr = rel(cfg.qr.getBoundingClientRect(), sr);
       let textB = 0; const obs = [];
       cfg.content.querySelectorAll(cfg.text).forEach(e => {

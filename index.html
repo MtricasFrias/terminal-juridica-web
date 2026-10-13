@@ -320,7 +320,8 @@ tr.vg-filters th{padding:5px 6px 9px; text-transform:none; letter-spacing:0; fon
 @keyframes growx{ from{ transform:scaleX(0); } }
 
 /* Ruta de plazos: cada bus avanza hacia la bandera (fecha límite) */
-.ruta-row{ display:grid; grid-template-columns:40px 1fr; gap:12px; align-items:center; padding:9px 0; border-bottom:1px dashed var(--line); }
+.ruta-row > *{ min-width:0; }
+.ruta-row{ display:grid; grid-template-columns:40px minmax(0,1fr); gap:12px; align-items:center; padding:9px 0; border-bottom:1px dashed var(--line); }
 .ruta-row:last-child{ border-bottom:0; }
 .ruta-top{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-size:.78rem; margin-bottom:2px; }
 .ruta-name{ font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
