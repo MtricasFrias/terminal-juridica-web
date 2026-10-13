@@ -98,6 +98,27 @@
       const rr = Math.random(); if (rr < .35) await P.thumbs(); else if (rr < .65) await P.clap(2); else { await P.toR(-1); await P.jump('R', .26); }
       await hold(.3); const s = P.spot({ minDist: 1 }); await P.goTo(s.x, s.y);
     });
+    /* el premio ya no es una pastilla fija: SETPI abraza el trofeo, aparece una nube que lo dice y al final lo levanta */
+    const premioBag = shuffleBag(['¡Los 3 primeros puestos se llevan premio!', 'Premio para el 1.º, 2.º y 3.er puesto. ¡A jugársela!', '¡Hay premio para el podio! Responde rápido']);
+    def('premio', 'info', 100, c => c.ph === 'lobby' ? (D.premios ? 1.6 : 4.5) : c.ph === 'pin' ? .5 : 0, async () => {
+      P.setState('QR_INTERACTION'); D.premios = (D.premios || 0) + 1;
+      await fit('trophy'); await P.front();
+      await a.play(C.hold('trophy_1', .6, { fade: .1 }));
+      await P.sayNow(premioBag()); D.lastSayT = D.t;
+      await a.play([{ f: 'trophy_1', t: 2.6, sway: { a: 1.1, p: 1.6 } }]);
+      S.sayClear(a); a.fx('spark', { n: 12 });
+      await a.play([{ f: 'trophy_2', t: .45, fade: .06 }, { f: 'trophy_3', t: 1.1, fade: .06, sway: { a: 1.4, p: 1.4 } }, { f: 'trophy_4', t: .55, fade: .06 }, { f: 'idle_a', t: .06, fade: .08 }]); fin();
+    }, ['trophy']);
+    /* cruza la calle por la cebra: mira a los dos lados y camina (de frente hacia la cámara, de espaldas al volver) */
+    def('cruzar', 'move', 45, c => c.l.zebra ? (c.ph === 'quiz' ? .5 : 2.2) : 0, async () => {
+      const l = L(), z = l.zebra; if (!z || !P.valid(z.x, l.yU) || !P.valid(z.x, l.yL)) return SC.wander.run();
+      const down = Math.abs(a.y - l.yU) < Math.abs(a.y - l.yL), y0 = down ? l.yU : l.yL, y1 = down ? l.yL : l.yU;
+      P.setState('WALKING'); await P.goTo(z.x, y0); await P.front(); await hold(.3);
+      await a.play(C.around()); fin();
+      if (Math.random() < .45) await chat(down ? 'Siempre por la cebra' : 'Primero miro a los dos lados', 45);
+      await P.goTo(z.x, y1); await P.front();
+      if (Math.random() < .4) { await hold(.4); await a.play(C.lookUser()); fin(); }
+    });
     /* antes del PIN: se acerca al candado, niega con la cabeza y señala el campo del PIN */
     def('lookLock', 'qr', 35, c => c.ph === 'pin' ? (c.idle > 10 ? 3.4 : 1.2) : 0, async () => {
       const q = P.nearQR(); P.setState('LOOKING');
@@ -178,12 +199,12 @@
     /* viaje en bus: espera en la parada, llega el bus (detrás del panel), sube por la puerta y se despide por la ventanilla; vuelve en otro bus y baja por la puerta */
     def('ride', 'bus', 100, c => (c.ph === 'pin' || c.ph === 'lobby') && c.idle > 8 && D.energy > .12 && D.t - D.lastJoin > 12 && P.rideGeo() ? ((c.ph === 'lobby' && c.n === 0 ? 3 : 1.8) + (D.busTarget ? 1 : 0)) * (D.rides ? (D.t - D.lastRideT > 150 ? 2.5 : 1) : 4) : 0, async () => {
       const g = P.rideGeo(), bus = P.bus, RIDE = P.RIDE, VBW = P.VBW; if (!g) return; const l = L();
-      const apply0 = bus.apply; let inWin = false;
+      const apply0 = bus.apply;
       P.setState('RIDING'); D.riding = true; D.rides = (D.rides || 0) + 1; D.lastRideT = D.t;      // la primera vez pesa x4: que se vea pronto
       try {
         if (D.busTarget && Math.random() < .5) await SC.busWave.run();
         await P.goTo(g.xn - g.wait * g.s, g.y); P.setState('RIDING');
-        await P.toR(1); await hold(.35); a.fx('alert');
+        await P.toR(1); await hold(.35); a.fx('alert'); await P.sayNow('¡Ahí viene mi bus!'); await hold(1); S.sayClear(a); D.lastSayT = D.t;
         bus.clipX = l.pr.left; bus.place(l.pr.left + 26, g.y, g.k); bus.show(true, false);
         const arrive = a.tween('x', g.xn, 1.9, 'out', bus);
         fire(C.waveR(1)); await arrive; a.fx('dust', { n: 2 }); bus.front = true;
@@ -196,23 +217,7 @@
         fire([{ f: 'bus_4', t: .6, fade: .04 }]); await Promise.all([a.tween('x', g.xn + RIDE.f4 * g.s, .5, 'io'), a.tween('lift', RIDE.l4 * g.s, .5, 'io'), a.tween('a', 0, .45, 'in', a.mod), a.tween('br', .35, .45, 'lin', a.mod)]);
         a.show(false); a.cancel(); a.lift = 0; D.away = true; P.setState('AWAY'); bus.front = false; bus.apply();
         await hold(.4);
-        /* se asoma por la ventanilla y saluda mientras el bus arranca; desaparece al pasar tras el QR / texto */
-        const win = g.win && have('wavew');
-        const departure = a.tween('x', -(VBW * g.k) - 80, win ? 3.4 : 3.3, win ? 'acc' : 'in3', bus);
-        if (win) {
-          const xL = P.xMinAt(g.y) - P.WID * g.s, wx = () => bus.x + 144 * g.k;
-          let started = false;
-          a.scaleAt = null; a.setS(g.s); a.stance = 'F'; a.autoIdle = false; a.face(1); a.lift = 0; a.clipL = xL; a.noShadow = true; a._setPose({ f: 'wavew_2', sx: g.ws, sy: g.ws });
-          const follow = () => {
-            const sill = bus.y - 64 * g.k; a.clipB = sill; a.place(wx(), sill + .64 * g.s * g.ws);      // pies muy por debajo: solo se ve de la barbilla hacia arriba
-            if (!started && wx() < l.pr.left - .3 * g.s) { started = true; fire(C.bwin(3, g.ws)); }          // empieza a saludar cuando la ventanilla sale de detrás del panel
-            if (wx() < xL - .5 * g.s && a.visible) a.show(false);
-          };
-          bus.apply = function () { apply0.call(bus); follow(); };
-          follow(); a.show(true); inWin = true;
-        }
-        await departure; bus.apply = apply0; bus.show(false);
-        if (win) { a.cancel(); a.show(false); inWin = false; a.noShadow = false; a.scaleAt = y => L().sAt(y); a.clipL = -1e9; }
+        await a.tween('x', -(VBW * g.k) - 80, 3.3, 'in3', bus); bus.apply = apply0; bus.show(false);
         await hold(rnd(13, 22));                                                      // paseo
         /* regreso: otro bus llega, SETPI aparece en la puerta y baja */
         D.away = false; D.active = D.t;
@@ -233,8 +238,8 @@
         bus.front = false; bus.apply();
         a.tween('x', -(VBW * g.k) - 80, 3.1, 'in3', bus).then(() => bus.show(false)).catch(() => { });     // el bus se va por detrás del contenido
         const sp = P.spot({ lane: 'L', minDist: 0 }); await P.goTo(sp.x, sp.y, { speed: 1.4 });           // SETPI se aparta a la carretera (más cerca de la cámara)
-        await P.front(); await hold(.3); await P.wave(2, { force: true });
-      } finally { bus.apply = apply0; if (inWin) a.show(false); a.lift = 0; D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; a.clipL = -1e9; a.noShadow = false; if (!a.scaleAt) a.scaleAt = y => L().sAt(y); }
+        await P.front(); await hold(.3); await P.sayNow('¡Ya volví! ¿Listos?'); await P.wave(2, { force: true }); await hold(.5); S.sayClear(a); D.lastSayT = D.t;
+      } finally { bus.apply = apply0; a.lift = 0; D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; a.clipL = -1e9; a.noShadow = false; if (!a.scaleAt) a.scaleAt = y => L().sAt(y); }
     });
 
     /* ================= programador ================= */
@@ -275,7 +280,8 @@
 
     /* ================= reacciones a eventos de la página ================= */
     /* nuevos jugadores: se agrupan los que llegan juntos y se reacciona con una variante de la bolsa (no siempre igual) */
-    let joinAcc = null, joinAt = 0;
+    let joinAcc = null, joinAt = 0; D.joinLog = [];
+    D.resetJoins = () => { joinAcc = null; joinAt = 0; D.joinLog = []; D.crowdUntil = 0; D.names = []; };      // para pruebas y para reiniciar la sala
     D.onTick = () => { if (joinAt && D.t >= joinAt) flushJoin(); };
     function queueJoin(k, names) {
       if (!joinAcc) joinAcc = { n: 0, names: [], prev: D.players - k };
@@ -289,30 +295,35 @@
     }
     const joinBag = shuffleBag(['hello', 'thumb', 'clap', 'selfie', 'cheer', 'hop', 'nod']);
     const hiOne = shuffleBag(['¡Hola, @!', '¡Llegó @!', '¡@ ya está dentro!']);
+    const crowdBag = shuffleBag(['¡Cuánta gente llegando! Bienvenidos a todos', '¡Se llena la sala! Bienvenidos', '¡Qué buen grupo! Ya casi empezamos']);
     async function reactJoin(acc) {
-      const first = acc.prev <= 0, big = first || acc.n >= 3, names = acc.names.map(firstName).filter(Boolean);
+      D.joinLog = D.joinLog.filter(t => D.t - t < 20);
+      const crowd = acc.n >= 3 || D.joinLog.length >= 4, first = acc.prev <= 0 && !crowd, names = acc.names.map(firstName).filter(Boolean);
       P.markActive(); D.energy = clamp(D.energy + .25, 0, 1); await P.emerge(); P.setState('REACTING');
       let greeted = false;
-      if (big) {
-        await P.surprised(); D.lastBigJoin = D.t; await hold(.1);
-        if (first) { await P.jump(have('leap') ? 'L' : 'F', .34); a.fx('spark'); await P.celebrate(1); }
-        else if (have('cheer')) { await fit('cheer'); await a.play(C.cheer()); fin(); a.fx('spark', { n: 8 }); }
-        else await P.celebrate(1);
-      } else {
+      if (crowd) {
+        /* llegan muchas personas juntas o seguidas: una sola reacción general, sin nombres (y sin repetir mientras siga la oleada) */
+        const quiet = D.t < (D.crowdUntil || 0); D.crowdUntil = D.t + 14; D.lastBigJoin = D.t;
+        if (!quiet) { await P.surprised(); await hold(.1); if (have('cheer')) { await fit('cheer'); await a.play(C.cheer()); fin(); a.fx('spark', { n: 8 }); } else await P.celebrate(1); }
+        else await P.thumbs();
+        if (!quiet && D.t - D.lastSayT > 10) { await P.front(); D.lastSayT = D.t; await P.sayNow(crowdBag()); await hold(2.1); S.sayClear(a); }
+        return;
+      }
+      if (first) { await P.surprised(); D.lastBigJoin = D.t; await hold(.1); await P.jump(have('leap') ? 'L' : 'F', .34); a.fx('spark'); await P.celebrate(1); }
+      else {
         let v = joinBag(); if (v === 'selfie' && (!have('selfie') || D.players < 2)) v = 'thumb'; if ((v === 'cheer' && !have('cheer')) || (v === 'nod' && !have('nod'))) v = 'clap';
         if (v === 'hello' && !(D.t - (D.lastHello || -99) > 25)) v = 'thumb';
         if (v === 'hello') { D.lastHello = D.t; await P.front(); await P.wave(1, { force: true }); greeted = true; }
         else if (v === 'thumb') await P.thumbs();
         else if (v === 'clap') { if (have('applaud') && Math.random() < .5) { await fit('applaud'); await P.front(); await a.play(C.applaud(3)); fin(); } else await P.clap(2); }
-        else if (v === 'selfie') { await fit('selfie'); await P.front(); const p = a.play(C.selfie()); await hold(1); a.fx('flash'); await p; fin(); }
+        else if (v === 'selfie') { await fit('selfie'); await P.front(); const pl = a.play(C.selfie()); await hold(1); a.fx('flash'); await pl; fin(); }
         else if (v === 'cheer') { await fit('cheer'); await P.front(); await a.play(C.cheer()); fin(); }
         else if (v === 'hop') { await P.front(); await P.jump('F', .28); }
         else { await P.front(); await a.play(C.lookUser()); fin(); }
       }
-      /* bienvenida con el nombre: escasa (nunca dos seguidas con menos de 14 s) y solo si el nombre llegó */
-      if (names.length && D.t - D.lastSayT > 14) {
-        const txt = names.length === 1 ? hiOne().replace('@', names[0]) : names.length === 2 ? '¡Hola, ' + names[0] + ' y ' + names[1] + '!' : '¡Hola, ' + names[0] + ', ' + names[1] + ' y ' + (names.length - 2) + ' más!';
-        await P.front(); D.lastSayT = D.t; await P.sayNow(txt);
+      /* bienvenida con el nombre: solo si llegó UNA persona sola y nadie más entró en los últimos segundos */
+      if (names.length === 1 && D.joinLog.length <= 1 && D.t - D.lastSayT > 12) {
+        await P.front(); D.lastSayT = D.t; await P.sayNow(hiOne().replace('@', names[0]));
         if (!greeted && Math.random() < .5) await P.wave(1, { force: true }); else await hold(1.9);
         await hold(.5); S.sayClear(a);
       }
@@ -320,7 +331,7 @@
     D.onPlayers = function (n, names) {
       const prev = D.players; D.players = n; let fresh = [];
       if (Array.isArray(names)) { fresh = names.filter(x => D.names.indexOf(x) < 0); D.names = names.slice(); }
-      if (n > prev) { if (D.phase === 'lobby' && (a.visible || D.away)) queueJoin(n - prev, fresh); D.lastJoin = D.t; }
+      if (n > prev) { for (let i = 0; i < n - prev; i++) D.joinLog.push(D.t); if (D.phase === 'lobby' && (a.visible || D.away)) queueJoin(n - prev, fresh); D.lastJoin = D.t; }
     };
     D.pinError = (function () {
       const bag = shuffleBag(['shake', 'uy', 'shrug']);

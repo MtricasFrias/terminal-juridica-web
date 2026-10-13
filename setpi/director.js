@@ -27,9 +27,8 @@
     function layout() {
       const sr = stage.getBoundingClientRect(); if (!sr.width || !sr.height) return false;
       const pr = rel(cfg.panel().getBoundingClientRect(), sr);
-      const road = slide.querySelector('.escena-viva line[stroke-dasharray]');
       const nav = document.getElementById('nav'), navTop = nav ? rel(nav.getBoundingClientRect(), sr).top : sr.height;   // la barra inferior nunca tapa sus pies
-      const floor = Math.min(road ? rel(road.getBoundingClientRect(), sr).top + 8 : sr.height * 0.88, navTop - 6);
+      const floor = Math.min(sr.height * 0.875, navTop - 8);
       const qr = rel(cfg.qr.getBoundingClientRect(), sr);
       let textB = 0; const obs = [];
       cfg.content.querySelectorAll(cfg.text).forEach(e => {
@@ -53,10 +52,13 @@
       l.xMaxAt = y => Math.max(l.xMin + 10, (side ? pr.left : sr.width) - WID * l.sAt(y) - 8);
       l.hideX = () => (side ? pr.left : sr.width) + .62 * l.sAt(l.yL);        // detrás del panel / fuera de pantalla
       l.canHide = side && (l.xMaxAt(l.yL) - xMinAt(l.yL)) >= 0;
+      /* cebra: entre el tótem y la parada; por ahí cruza SETPI de la acera a la calle */
+      if (side && !oneLane) { const gl = qr.right + 16, gr = pr.left - 8, zw = Math.min(clamp(SL * .85, 100, 200), (gr - gl) * .45); l.zebra = (gr - gl) > 280 ? { x: gl + (gr - gl) * .3, w: zw } : null; } else l.zebra = null;
       if (cfg.pin) { const p = rel(cfg.pin().getBoundingClientRect(), sr); l.pinc = [p.left + p.w / 2, p.top + p.h / 2]; }
       a.clipR = side ? pr.left : 1e9;                                 // el panel va por delante: SETPI no se transparenta detrás de él
       a.setCap(Math.max(SU, SL, 120));
       a.scaleAt = y => l.sAt(y);
+      if (cfg.onLayout) { try { cfg.onLayout(l); } catch (e) { } }
       const ny = onY != null ? clamp(l.yU + onY * (l.yL - l.yU), l.yU, l.yL) : (a.y || l.yL);
       a.setS(l.sAt(ny)); a.place(a.x, ny);
       if (a.x < l.hideX() - 1) a.place(clamp(a.x, xMinAt(ny), Math.max(xMinAt(ny), l.xMaxAt(ny))), ny);   // nunca queda sobre el QR/texto tras un cambio de tamaño
@@ -134,6 +136,15 @@
       if (o.free) { await runLeg(x, y, o); return; }
       y = clamp(y, l.yU, l.yL); x = clamp(x, l.xMin, Math.max(l.xMin, l.xMaxAt(y)));
       if (Math.hypot(x - a.x, y - a.y) < 6) return;
+      /* para pasar de la acera a la calle (o al revés) cruza por la cebra: va hasta ella, la atraviesa y sigue */
+      const z = l.zebra;
+      if (z && !o.noZebra && Math.abs(y - a.y) > .6 * (l.yL - l.yU) && valid(z.x, l.yU) && valid(z.x, l.yL)) {
+        const ya = a.y, ys = ya < (l.yU + l.yL) / 2 ? l.yU : l.yL, ye = y < (l.yU + l.yL) / 2 ? l.yU : l.yL;
+        if (Math.abs(a.x - z.x) > 8) await leg(z.x, ya, o);
+        await leg(z.x, ye, o);
+        if (Math.abs(x - z.x) > 6) await leg(x, y, o);
+        return;
+      }
       for (const w of plan(x, y)) { if (Math.hypot(w.x - a.x, w.y - a.y) > 6) await leg(w.x, w.y, o); }
     }
     /* los gestos con brazos abiertos necesitan más ancho: si hay QR/texto pegado, se corre a un sitio libre antes de empezar */
