@@ -22,6 +22,7 @@
     const L = () => D.L;
     const setState = s => { D.state = s; };
     const bus = S.Bus ? S.Bus(slide, stage, a) : null;
+    D.paleta = S.Paleta ? S.Paleta(stage, a) : null;       // la paleta PARE / SIGA del paletero (va por detrás de SETPI)
     const fire = (c, o) => a.play(c, o).catch(() => { });          // clip que corre en paralelo (no se espera)
 
     /* ================= escenario: todo derivado del layout real (nunca px fijos) ================= */
@@ -52,6 +53,7 @@
       l.sAt = y => l.oneLane ? l.SU : l.SU + (l.SL - l.SU) * clamp((y - l.yU) / ((l.yL - l.yU) || 1), 0, 1);
       l.xMaxAt = y => Math.max(l.xMin + 10, (side ? pr.left : sr.width) - WID * l.sAt(y) - 8);
       l.hideX = () => (side ? pr.left : sr.width) + .62 * l.sAt(l.yL);        // detrás del panel / fuera de pantalla
+      l.hideYMax = side ? Math.max(l.yU, pr.bottom - .12 * l.sAt(l.yL)) : l.yL;      // por debajo de esta altura los pies/sombra asomarían bajo el panel
       l.canHide = side && (l.xMaxAt(l.yL) - xMinAt(l.yL)) >= 0;
       /* cebra: entre el tótem y la parada; por ahí cruza SETPI de la acera a la calle */
       if (side && !oneLane) { const gl = qr.right + 16, gr = pr.left - 8, zw = Math.min(clamp(SL * .85, 100, 200), (gr - gl) * .45); l.zebra = (gr - gl) > 280 ? { x: gl + (gr - gl) * .3, w: zw } : null; } else l.zebra = null;
@@ -293,7 +295,7 @@
     async function emerge() { const l = L(); if (a.x > l.xMaxAt(a.y) + 4) { a.face(-1); a.stance = 'R'; await runLeg(l.xMaxAt(a.y) - .1 * a.S, a.y, { speed: 1.2 }); } }
     /* entra corriendo desde detrás del panel (o por el borde derecho si el panel está apilado) */
     async function enter(tx, ty, speed) {
-      const l = L(); a.cancel(); a.stance = 'R'; a.face(-1); a.setS(l.sAt(ty)); a.place(l.hideX(), ty); a.rest('R'); a.show(true);
+      const l = L(), hy = Math.min(ty, l.hideYMax); a.cancel(); a.stance = 'R'; a.face(-1); a.setS(l.sAt(hy)); a.place(l.hideX(), hy); a.rest('R'); a.show(true);
       await runLeg(tx, ty, { speed: speed || 1.7 });
     }
     /* el anfitrión enfoca / escribe en el campo del PIN: SETPI se vuelve hacia el panel y mira con atención */
@@ -325,7 +327,7 @@
     let last = 0, chain = 0, wall = 0, sense = 0;
     const reduced = g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isActive = () => !document.hidden && slide.classList.contains('activa');
-    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); if (D.mundo) { const pl = D.luz; D.mundo.step(dt); if (D.luz !== pl && D.onLuz) D.onLuz(D.luz, pl); } D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
+    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); if (D.mundo) { const pl = D.luz; D.mundo.step(dt); if (D.luz !== pl && D.onLuz) D.onLuz(D.luz, pl); } D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); if (D.paleta) D.paleta.sync(); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
     function kick() {
       const my = ++chain; last = 0;
       const f = ts => {

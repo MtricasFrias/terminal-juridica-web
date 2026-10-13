@@ -21,14 +21,14 @@
     const lane = i => M.l && (i === 0 ? { dir: 1, y: M.l.yU - 50 } : { dir: -1, y: M.l.yU - 29 });
     function mk(tipo, i, x) {
       const sp = tipo === "bus" ? SPR.bus(pick(["#3D85C6", "#D6488E", "#2A62B8"])) : tipo === "taxi" ? SPR.taxi() : SPR.auto(pick(["#EEF2F7", "#C9302C", "#2F6F9F", "#56637A", "#F6F8FB"]));
-      const el = document.createElement("div"); el.className = "e-veh"; el.innerHTML = sp.svg; box.appendChild(el);
+      const el = document.createElement("div"); el.className = "e-veh"; el.style.zIndex = i; el.style.visibility = "hidden"; el.innerHTML = sp.svg; box.appendChild(el);
       const v = { el, tipo, lane: i, r: sp.r, x, vx: 0, sc: tipo === "bus" ? .46 : .26, vel: (i === 0 ? .8 : 1) * rnd(.85, 1.15), seen: -99, was: false };
-      M.veh.push(v); size(v); return v;
+      M.veh.push(v); size(v); put(v); return v;
     }
-    function size(v) { const h = M.l.SU * v.sc; v.h = h; v.w = h * v.r; v.el.style.width = v.w + "px"; }
+    function size(v) { const h = M.l.SU * v.sc * (v.lane === 0 ? .86 : 1); v.h = h; v.w = h * v.r; v.el.style.width = v.w + "px"; }
     function put(v) {
       const L = lane(v.lane), top = L.y - v.h;
-      v.el.style.transform = L.dir > 0 ? `translate3d(${v.x.toFixed(1)}px,${top.toFixed(1)}px,0)` : `translate3d(${(v.x + v.w).toFixed(1)}px,${top.toFixed(1)}px,0) scaleX(-1)`;
+      v.el.style.visibility = ""; v.el.style.transform = L.dir > 0 ? `translate3d(${v.x.toFixed(1)}px,${top.toFixed(1)}px,0)` : `translate3d(${(v.x + v.w).toFixed(1)}px,${top.toFixed(1)}px,0) scaleX(-1)`;
     }
     function zona() { const l = M.l, z = l.zebra; if (!z) return null; return { a: z.x - z.w / 2 - 34, b: z.x + z.w / 2 + 34 }; }
     function spawn() {
@@ -42,7 +42,7 @@
     M.layout = function (l) {
       const first = !M.l; M.l = l; M.veh.forEach(size);
       if (first) for (let k = 0; k < 7; k++) { const i = k % 2, tipo = Math.random() < .3 ? "bus" : Math.random() < .3 ? "taxi" : "auto"; const v = mk(tipo, i, rnd(.05, .95) * l.sr.width); if (M.veh.some(o => o !== v && o.lane === i && Math.abs(o.x - v.x) < (o.w + v.w) * .8 + 40)) { v.el.remove(); M.veh.pop(); } }
-      M.veh.forEach(put);
+      M.veh.forEach(put); if (M.gente) M.gente.layout(l);
     };
     M.buses = () => M.veh.filter(v => v.tipo === "bus").map(v => { const l = M.l; v.cx = v.x + v.w / 2; v.dir = lane(v.lane).dir; v.vis = v.cx > 30 && v.cx < (l.side ? l.pr.left - 20 : l.sr.width - 20); return v; });
     M.fase = ph => { const h = ph === "quiz" || ph === "podium"; if (h === M.hold) return; M.hold = h; if (h) { M.luz = "verde"; D.luz = "verde"; root.dataset.luz = "verde"; num.textContent = "--"; } else { M.luz = "rojo"; M.rest = 7; } };
@@ -71,7 +71,9 @@
       M.veh = M.veh.filter(v => { const d = lane(v.lane).dir, out = d > 0 ? v.x > W + 40 : v.x + v.w < -40; if (out) v.el.remove(); return !out; });
       M.veh.forEach(put);
       M.spawnT[0] -= dt; if (!M.hold && M.spawnT[0] <= 0) { if (spawn()) M.spawnT[0] = rnd(1.4, 4.2); else M.spawnT[0] = .6; }
+      if (M.gente) M.gente.step(dt);
     };
+    M.gente = S.Gente ? S.Gente(D, M, root) : null;       // gente chica: pasea por la acera y cruza por la cebra con el verde
     return M;
   };
 })(window);

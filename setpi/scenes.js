@@ -140,6 +140,34 @@
       await P.goTo(z.x, l.yU, { noZebra: true }); await P.front();         // de vuelta a la acera
       if (Math.random() < .4) { await hold(.4); await a.play(C.lookUser()); fin(); }
     });
+    /* paletero: junto a la cebra levanta la paleta (PARE para los carros, SIGA para la gente) mientras cruzan las personas chicas del entorno */
+    def('paletero', 'work', 100, c => {
+      const gt = D.mundo && D.mundo.gente; if (!gt || !D.paleta || !c.l.zebra || D.mundo.hold) return 0;
+      if (c.ph !== 'lobby' && c.ph !== 'pin') return 0; if (!(F.ok.wave_f1 && F.ok.wave_f2 && F.ok.wave_f3 && F.ok.wave_f4)) return 0;
+      if (!gt.esperando()) return 0;
+      return (D.luz === 'rojo' && D.luzRest > 3 && D.luzRest < 10) || (D.luz === 'verde' && D.luzRest > 9) ? (D.t - (D.last.paletero || -999) > 130 ? 7 : 3.5) : 0;
+    }, async () => {
+      const l = L(), z = l.zebra, gt = D.mundo && D.mundo.gente, pa = D.paleta; if (!z || !gt || !pa) return;
+      const xr = Math.min(z.x + z.w / 2 + .6 * l.SU, l.xMaxAt(l.yU) - 4), xl = Math.max(z.x - z.w / 2 - .6 * l.SU, P.xMinAt(l.yU) + 4);      // a un lado de la cebra, con la mano de la paleta hacia ella
+      const lados = [{ x: xr, f: 'wave_f2', s: -1, ok: xr >= z.x + z.w / 2 + .22 * l.SU }, { x: xl, f: 'wave_f3', s: 1, ok: xl <= z.x - z.w / 2 - .22 * l.SU }].filter(o => o.ok && P.valid(o.x, l.yU) && P.clear(a.x, a.y, o.x, l.yU));
+      const px = l.paradero ? l.paradero.x : -1e9; lados.sort((u, v) => Math.abs(v.x - px) - Math.abs(u.x - px));      // el lado que menos tapa el paradero
+      const sd = lados[0]; if (!sd) return SC.wander.run();
+      P.setState('WORKING');
+      try {
+        await P.goTo(sd.x, l.yU, { noZebra: true }); await P.front(); await hold(.2);
+        await chat('¡Yo los ayudo a cruzar!', 25, 2.2);
+        await a.play([{ f: 'wave_f1', t: .22, fade: .08 }, { f: sd.f, t: .26, fade: .08 }]);                        // levanta la mano
+        pa.toma(sd.s, D.luz === 'verde' ? 'siga' : 'pare');
+        a.loop([{ f: sd.f, t: 1.6, sway: { a: 1.4, p: 1.8 } }]);
+        for (let i = 0; i < 45 && D.luz !== 'verde'; i++) await hold(.4);                                         // con el rojo muestra PARE y espera el verde
+        if (D.luz === 'verde') {
+          await pa.pon('siga'); gt.rafaga();
+          while (D.luz === 'verde' && D.luzRest > 3.2) await hold(.4);
+          await pa.pon('pare'); await hold(.9);
+        }
+        await a.play([{ f: 'wave_f4', t: .22, fade: .08 }, { f: 'idle_a', t: .1, fade: .08 }]); fin();
+      } finally { pa.suelta(); }
+    });
     /* antes del PIN: se acerca al candado, niega con la cabeza y señala el campo del PIN */
     def('lookLock', 'qr', 35, c => c.ph === 'pin' ? (c.idle > 10 ? 3.4 : 1.2) : 0, async () => {
       const q = P.nearQR(); P.setState('LOOKING');
@@ -151,7 +179,7 @@
     /* esconderse detrás del panel de la sala y asomarse (capas reales: el panel va por delante) */
     def('peekaboo', 'hide', 60, c => (c.ph === 'pin' || c.ph === 'lobby') && c.l.canHide ? (c.n <= 3 ? 2.6 : 1.2) : 0, async () => {
       const l = L(); if (!l.canHide) return SC.lookAround.run();
-      const y = l.oneLane ? l.yU : Math.min(P.maxY(), Math.random() < .5 ? l.yL : rnd(l.yU, l.yL)); P.setState('HIDING');
+      const y = l.oneLane || !P.roadFree() ? l.yU : Math.min(P.maxY(), l.hideYMax, Math.random() < .5 ? l.yL : rnd(l.yU, l.yL)); P.setState('HIDING');   // con calle restringida se esconde por la acera; nunca más abajo del panel
       await P.goTo(l.xMaxAt(y) - .08 * a.S, y); await P.toR(1); await hold(.35);
       const hideX = l.hideX(); await P.runLeg(hideX, y, { speed: .95 });
       await hold(rnd(.9, 1.6));

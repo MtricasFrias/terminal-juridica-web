@@ -96,6 +96,29 @@
 .s19-brillo{position:absolute; inset:0; pointer-events:none; background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.12) 50%,transparent 62%); transform:translateX(-120%);}
 .s19-pantalla::after{content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(circle at 50% 50%, rgba(11,18,32,.32) 0 1.1px, transparent 1.6px); background-size:4px 4px;}
 .s19-ring{position:absolute; inset:-5px; border:3px solid #FFC21A; border-radius:22px; opacity:0; pointer-events:none; z-index:2;}
+/* ---- gente chica del entorno (≈30 % del alto de SETPI: que el protagonista siga siendo él) y la paleta del paletero ---- */
+.esc19 .e-gente{position:absolute; inset:0; pointer-events:none;}
+.esc19 .e-pers{position:absolute; left:0; top:0; will-change:transform;}
+.esc19 .e-pers svg{display:block; width:100%; height:100%; overflow:visible;}
+.esc19 .e-pers canvas{display:block;}
+.esc19 .g-pie,.esc19 .g-br{transform-box:fill-box; transform-origin:50% 6%;}
+.esc19 .e-pers .g-cuerpo{animation:gRebote var(--gp,.62s) ease-in-out infinite alternate;}
+.esc19 .e-pers.l .g-p1,.esc19 .e-pers.l .g-b2{animation:gPieA var(--gp,.62s) ease-in-out infinite alternate;}
+.esc19 .e-pers.l .g-p2,.esc19 .e-pers.l .g-b1{animation:gPieB var(--gp,.62s) ease-in-out infinite alternate;}
+.esc19 .e-pers.f .g-p1,.esc19 .e-pers.b .g-p1,.esc19 .e-pers.f .g-b2,.esc19 .e-pers.b .g-b2{animation:gZancA var(--gp,.62s) ease-in-out infinite alternate;}
+.esc19 .e-pers.f .g-p2,.esc19 .e-pers.b .g-p2,.esc19 .e-pers.f .g-b1,.esc19 .e-pers.b .g-b1{animation:gZancB var(--gp,.62s) ease-in-out infinite alternate;}
+.esc19 .e-pers.espera .g-pie,.esc19 .e-pers.espera .g-br{animation:none;}
+.esc19 .e-pers.espera .g-cuerpo{animation:gRespira 2.6s ease-in-out infinite alternate;}
+@keyframes gPieA{from{transform:rotate(-27deg);} to{transform:rotate(27deg);}}
+@keyframes gPieB{from{transform:rotate(27deg);} to{transform:rotate(-27deg);}}
+@keyframes gZancA{from{transform:translateY(0);} to{transform:translateY(-2.6px);}}
+@keyframes gZancB{from{transform:translateY(-2.6px);} to{transform:translateY(0);}}
+@keyframes gRebote{from{transform:translateY(0);} to{transform:translateY(-.9px);}}
+@keyframes gRespira{from{transform:translateY(0);} to{transform:translateY(-.6px);}}
+.sp-paleta{position:absolute; left:0; top:0; width:0; height:0; opacity:0; transition:opacity .14s ease-out; pointer-events:none; will-change:transform;}
+.sp-paleta .pa-giro{position:absolute; left:0; top:0; width:0; height:0;}
+.sp-paleta svg{position:absolute; display:block; overflow:visible;}
+.sp-paleta .pa-disco{transform-box:fill-box; transform-origin:center;}
 @media (prefers-reduced-motion:reduce){.esc19 *{animation:none!important;} .qr-scan{display:none;} .s19-ring{display:none;}}
 ::selection{background:#159BD6; color:#fff;}
 :focus-visible{outline:3px solid #159BD6; outline-offset:2px;}
