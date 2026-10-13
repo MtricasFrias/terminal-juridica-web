@@ -17,6 +17,7 @@
     S.base = cfg.base || 'setpi/';
     const a = new S.Actor(stage);
     const D = S.dir = { a, state: 'AWAY', phase: 'pin', players: 0, t: 0, last: {}, active: 0, L: null, lastRun: '', energy: .55, attentive: false, hostT: -99, lastJoin: -99, lastBigJoin: -99, prio: 0, ready: false, hist: [], busTarget: null };
+    D.mundo = (S.Mundo && cfg.mundo !== false) ? S.Mundo(D) : null;      // semáforo peatonal con cuenta regresiva y tráfico de la avenida lejana
     const rel = (r, sr) => ({ left: r.left - sr.left, right: r.right - sr.left, top: r.top - sr.top, bottom: r.bottom - sr.top, w: r.width, h: r.height });
     const L = () => D.L;
     const setState = s => { D.state = s; };
@@ -58,7 +59,9 @@
       a.clipR = side ? pr.left : 1e9;                                 // el panel va por delante: SETPI no se transparenta detrás de él
       a.setCap(Math.max(SU, SL, 120));
       a.scaleAt = y => l.sAt(y);
+      l.paradero = side && !oneLane ? { x: pr.left - 8 - 1.06 * SU + .3 * SU } : null;      // poste del paradero tipo III: junto a la puerta donde para el bus
       if (cfg.onLayout) { try { cfg.onLayout(l); } catch (e) { } }
+      if (D.mundo) D.mundo.layout(l);
       const ny = onY != null ? clamp(l.yU + onY * (l.yL - l.yU), l.yU, l.yL) : (a.y || l.yL);
       a.setS(l.sAt(ny)); a.place(a.x, ny);
       if (a.x < l.hideX() - 1) a.place(clamp(a.x, xMinAt(ny), Math.max(xMinAt(ny), l.xMaxAt(ny))), ny);   // nunca queda sobre el QR/texto tras un cambio de tamaño
@@ -68,18 +71,22 @@
     /* zona libre: borde izquierdo permitido a la altura y (obstáculos que tocan la silueta de SETPI ahí) */
     const box = (x, y, k) => { const s = D.L.sAt(y), w = (k || WID) * s; return { left: x - w, right: x + w, top: y - D.L.K * s, bottom: y }; };
     const hits = (b, m) => D.L.obs.some(o => b.left < o.right + (m || 4) && b.right > o.left - (m || 4) && b.top < o.bottom + (m || 4) && b.bottom > o.top - (m || 4));
-    const valid = (x, y) => { const l = D.L; return y >= l.yU - 1 && y <= l.yL + 1 && x >= l.xMin && x <= l.xMaxAt(y) && !hits(box(x, y)); };
+    /* la calle del frente solo se pisa por la cebra y con el semáforo peatonal en verde (durante el juego la calle queda libre) */
+    const roadFree = () => !D.mundo || D.mundo.hold || !D.L.zebra || D.L.oneLane;
+    const maxY = () => roadFree() || (D.luz === 'verde' && D.luzRest > 9) ? D.L.yL : D.L.yU;      // las escenas largas solo eligen la calle al empezar el verde
+    const roadX = x => { const z = D.L.zebra; return x >= z.x - z.w / 2 + 24 && x <= z.x + z.w / 2 - 24; };
+    const valid = (x, y) => { const l = D.L; if (!roadFree() && y > l.yU + 8 && (D.luz !== 'verde' || !roadX(x))) return false; return y >= l.yU - 1 && y <= l.yL + 1 && x >= l.xMin && x <= l.xMaxAt(y) && !hits(box(x, y)); };
     const clear = (x1, y1, x2, y2) => { const N = Math.max(24, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 10)); for (let i = 0; i <= N; i++) { const t = i / N, x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t; if (hits(box(x, y), 2)) return false; } return true; };
     const xMinAt = y => { const l = D.L; let v = l.xMin; for (let x = l.xMin; x <= l.xMaxAt(y); x += 6) { if (!hits(box(x, y))) { v = x; break; } v = x + 6; } return v; };
     function spot(o) {                                                // punto libre al azar (pesa los carriles: arriba / carretera / en medio)
-      o = o || {}; const l = D.L;
+      o = o || {}; const l = D.L, ym = maxY();
       for (let i = 0; i < 60; i++) {
-        const r = Math.random(); const y = l.oneLane ? l.yU : (o.lane === 'U' ? l.yU : o.lane === 'L' ? l.yL : r < .3 ? l.yU : r < .62 ? l.yL : rnd(l.yU, l.yL));
+        const r = Math.random(); const y = l.oneLane ? l.yU : Math.min(ym, (o.lane === 'U' ? l.yU : o.lane === 'L' ? l.yL : r < .3 ? l.yU : r < .62 ? l.yL : rnd(l.yU, l.yL)));
         const x0 = xMinAt(y), x1 = l.xMaxAt(y); if (x1 - x0 < 4) continue;
-        const x = rnd(x0, x1); if (Math.hypot(x - a.x, y - a.y) < (o.minDist == null ? .6 : o.minDist) * a.S) continue;
+        const x = (!roadFree() && y > l.yU + 8) ? rnd(l.zebra.x - l.zebra.w / 2 + 24, l.zebra.x + l.zebra.w / 2 - 24) : rnd(x0, x1); if (Math.hypot(x - a.x, y - a.y) < (o.minDist == null ? .6 : o.minDist) * a.S) continue;
         if (valid(x, y) && clear(a.x, a.y, x, y)) return { x, y };
       }
-      const y = o.lane === 'U' || l.oneLane ? l.yU : l.yL; return { x: clamp(a.x, xMinAt(y), l.xMaxAt(y)), y };
+      const y = o.lane === 'U' || l.oneLane ? l.yU : Math.min(ym, l.yL); return { x: clamp(a.x, xMinAt(y), l.xMaxAt(y)), y };
     }
     const nearQR = () => { const l = D.L, y = l.yU, x = clamp(l.qr.right + WID * l.sAt(y) + 10, l.xMin, l.xMaxAt(y)); return { x, y }; };
 
@@ -134,7 +141,8 @@
     async function goTo(x, y, o) {
       o = o || {}; const l = L();
       if (o.free) { await runLeg(x, y, o); return; }
-      y = clamp(y, l.yU, l.yL); x = clamp(x, l.xMin, Math.max(l.xMin, l.xMaxAt(y)));
+      y = clamp(y, l.yU, maxY()); x = clamp(x, l.xMin, Math.max(l.xMin, l.xMaxAt(y)));
+      if (!roadFree() && y > l.yU + 8) x = clamp(x, l.zebra.x - l.zebra.w / 2 + 24, l.zebra.x + l.zebra.w / 2 - 24);
       if (Math.hypot(x - a.x, y - a.y) < 6) return;
       /* para pasar de la acera a la calle (o al revés) cruza por la cebra: va hasta ella, la atraviesa y sigue */
       const z = l.zebra;
@@ -235,7 +243,7 @@
     async function wakeIfAsleep() { if (asleep()) { a.fx('alert'); await a.play(C.wake()); a.rest('R'); a.face(1); } }
 
     /* ---- geometría del viaje: la parada está en el carril alto, pegada al borde del panel (la puerta cabe entera a la vista) ---- */
-    const RIDE = { wait: .62, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12, e1: .62, e2: .5, e3: .3, el1: .12, el2: .06 };   // e*/el*: bajada por la puerta (x y altura del escalón)   // fracciones de S respecto a la trompa del bus
+    const RIDE = { wait: .26, f1: .06, f2: .5, f3: .7, f4: .9, l2: .07, l3: .12, l4: .12, door: .73, e3: .3, el1: .12, el2: .06 };   // e*/el*: bajada por la puerta (x y altura del escalón)   // fracciones de S respecto a la trompa del bus
     const VBW = 356;
     function rideGeo() {
       const l = L(); if (!bus || !l.side || l.oneLane) return null;
@@ -244,11 +252,11 @@
       /* la ventanilla (SETPI asomado, más alto que de pie) pasa de largo bajo el texto: se mide el aire a todo lo largo del recorrido */
       const wantW = S.Frames.has('wavew_3'), hrW = () => { let h = 1e9; for (let x = xMinAt(y); x <= xn + 1.44 * s; x += .25 * s) h = Math.min(h, headroom(x, y)); return h; };
       /* el escalón sube a SETPI: si arriba no hay aire hasta el texto, la parada baja un poco (más cerca de la cámara = más espacio) */
-      for (let i = 0; i < 9 && y < l.yL && hr(xn) < (RIDE.l3 + .06) * s; i++) { y = Math.min(l.yL, y + 14); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; }
+      for (let i = 0; i < 9 && y < maxY() && hr(xn) < (RIDE.l3 + .06) * s; i++) { y = Math.min(maxY(), y + 14); s = l.sAt(y); xn = l.pr.left - 8 - 1.06 * s; }
       if (hr(xn) < (RIDE.l3 + .03) * s) return null;
       const k = s / 100;
       /* dónde espera SETPI antes de que llegue el bus: lo más atrás posible; en pantallas angostas se pega más a la puerta */
-      let wait = null; for (const w of [RIDE.wait, .45, .3, .15]) { const wx = xn - w * s; if (wx >= xMinAt(y) && valid(wx, y)) { wait = w; break; } }
+      let wait = null; for (const w of [RIDE.wait, .15]) { const wx = xn - w * s; if (wx >= xMinAt(y) && valid(wx, y)) { wait = w; break; } }
       if (wait == null) return null;
       const ws = Math.min(1, ((wantW ? hrW() : -1e9) + .335 * s - 6) / (.38 * s));       // escala con la que SETPI cabe en la ventanilla sin tocar el texto de arriba
       return { y, s, k, xn, wait, win: wantW && ws >= .7, ws };
@@ -304,8 +312,9 @@
     D.buses = busEls;
     function senseBuses() {
       const l = D.L; if (!l) return; const sr = l.sr; let best = null;
-      busEls.forEach(b => {
-        const r = b.el.getBoundingClientRect(); const cx = r.left + r.width / 2 - sr.left; b.cx = cx; b.vis = cx > 30 && cx < (l.side ? l.pr.left - 20 : sr.width - 20);
+      (D.mundo ? D.mundo.buses() : busEls).forEach(b => {
+        if (!D.mundo) { const r = b.el.getBoundingClientRect(); const cx = r.left + r.width / 2 - sr.left; b.cx = cx; b.vis = cx > 30 && cx < (l.side ? l.pr.left - 20 : sr.width - 20); }
+        const cx = b.cx;
         if (b.vis && !b.was) { b.was = true; b.seen = D.t; } if (!b.vis) b.was = false;
         if (b.vis && Math.abs(cx - a.x) > .8 * a.S && D.t - b.seen < 14) { if (!best || Math.abs(cx - a.x) < Math.abs(best.cx - a.x)) best = { cx, dir: cx > a.x ? 1 : -1, b }; }
       });
@@ -316,7 +325,7 @@
     let last = 0, chain = 0, wall = 0, sense = 0;
     const reduced = g.matchMedia && g.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isActive = () => !document.hidden && slide.classList.contains('activa');
-    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
+    D.step = dt => { D.t += dt; if (D.onTick) D.onTick(dt); if (D.mundo) { const pl = D.luz; D.mundo.step(dt); if (D.luz !== pl && D.onLuz) D.onLuz(D.luz, pl); } D.energy = clamp(D.energy + (.5 - D.energy) * dt * .004, 0, 1); a.update(dt); sense += dt; if (sense > .25) { sense = 0; senseBuses(); } };   // avance determinista (también para pruebas)
     function kick() {
       const my = ++chain; last = 0;
       const f = ts => {
@@ -352,7 +361,7 @@
       setTimeout(layout, 1500);                                       // tras las animaciones de entrada de la diapositiva
       if (slide.classList.contains('activa')) setTimeout(() => { if (!D.reaction) D.intro(); }, 350);
     }
-    const P = { a, D, L, C, CANCEL, rnd, clamp, WID, bus, setState, fire, front, toR, runLeg, leg, backLeg, goTo, room, space, headroom, hits, box, valid, clear, xMinAt, spot, nearQR, idle, hop, jump, wave, thumbs, clap, surprised, shake, celebrate, point, say, sayNow, bubbleBox, rideGeo, RIDE, VBW, enter, emerge, wakeUp, wakeIfAsleep, asleep, markActive, settle, layout };
+    const P = { a, D, L, C, CANCEL, rnd, clamp, WID, bus, maxY, roadFree, setState, fire, front, toR, runLeg, leg, backLeg, goTo, room, space, headroom, hits, box, valid, clear, xMinAt, spot, nearQR, idle, hop, jump, wave, thumbs, clap, surprised, shake, celebrate, point, say, sayNow, bubbleBox, rideGeo, RIDE, VBW, enter, emerge, wakeUp, wakeIfAsleep, asleep, markActive, settle, layout };
     D.P = P; if (S.Scenes) S.Scenes(D, P);
     S.Frames.load(S.base).then(boot);
     return D;

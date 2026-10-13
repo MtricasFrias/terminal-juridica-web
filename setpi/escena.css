@@ -1,0 +1,101 @@
+/* ================= diapositiva 19: la calle del SETP de día =================
+   Se ancla a la altura REAL de los carriles de SETPI (variables --yU, --yF, --su, --pl, --zx, --zw, --px que pone esc19Layout):
+   el tótem del QR está parado en la acera, SETPI espera el bus en el paradero tipo III, cruza por la cebra cuando el semáforo
+   peatonal está en verde y el tráfico de la avenida pasa DETRÁS de él (lejos, más pequeño). */
+.slide.dia{background:linear-gradient(180deg,#46A2E4 0%,#7FC4F0 34%,#BFE4F9 62%,#E6F4FC 100%); color:var(--navy);}
+.esc19{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; --yU:640px; --yF:740px; --su:200px; --pl:900px; --zx:560px; --zw:170px; --px:760px;}
+/* cielo vivo: sol, nubes, pájaros y un avión (todo chico y lento; nada tapa el contenido) */
+.esc19 .e-sol{position:absolute; top:6vh; left:44vw; width:4.6vw; height:4.6vw; min-width:42px; min-height:42px; border-radius:50%; background:#FFF1B8; border:.5vw solid rgba(255,255,255,.55);}
+.esc19 .e-nube{position:absolute; left:0; will-change:transform; opacity:.92; animation:evNube linear infinite;}
+.esc19 .e-nube svg{display:block; width:100%; height:auto;}
+@keyframes evNube{from{transform:translateX(-24vw);} to{transform:translateX(124vw);}}
+.esc19 .e-ave{position:absolute; left:0; width:clamp(16px,1.5vw,30px); will-change:transform; animation:evVuelo linear infinite;}
+.esc19 .e-ave svg{display:block; width:100%; height:auto; overflow:visible;}
+.esc19 .e-ave path{fill:none; stroke:#1F3A5C; stroke-width:1.9; stroke-linecap:round; transform-box:fill-box; transform-origin:50% 100%; animation:evAla .5s ease-in-out infinite alternate;}
+.esc19 .e-ave path+path{animation-delay:-.02s;}
+@keyframes evAla{from{transform:scaleY(1);} to{transform:scaleY(.2);}}
+@keyframes evVuelo{from{transform:translate3d(-8vw,0,0);} 50%{transform:translate3d(50vw,-2.2vh,0);} to{transform:translate3d(112vw,0,0);}}
+.esc19 .e-ave.inv{animation-name:evVueloInv;} .esc19 .e-ave.inv svg{transform:scaleX(-1);}
+@keyframes evVueloInv{from{transform:translate3d(112vw,0,0);} 50%{transform:translate3d(46vw,-2.6vh,0);} to{transform:translate3d(-8vw,0,0);}}
+.esc19 .e-avion{position:absolute; top:11vh; left:0; width:clamp(70px,7vw,140px); opacity:0; will-change:transform,opacity; animation:evAvion 96s linear infinite; animation-delay:-20s;}
+.esc19 .e-avion svg{display:block; width:100%; height:auto; overflow:visible;}
+.esc19 .e-estela{position:absolute; right:92%; top:42%; width:40vw; height:3px; background:linear-gradient(270deg,rgba(255,255,255,.85),rgba(255,255,255,0)); border-radius:2px; transform-origin:right center;}
+@keyframes evAvion{0%{transform:translate3d(-18vw,2vh,0); opacity:0;} 2%{opacity:1;} 26%{transform:translate3d(108vw,-3vh,0); opacity:1;} 28%,100%{transform:translate3d(108vw,-3vh,0); opacity:0;}}
+.esc19 .e-ciudad{position:absolute; left:0; right:0; bottom:calc(100% - var(--yU) + 76px); width:100%; height:min(32vh, 300px); display:block;}
+.esc19 .ev-arbol{transform-box:fill-box; transform-origin:50% 100%; animation:meceKF 5s ease-in-out infinite;}
+/* avenida lejana (detrás de la acera): por aquí pasan los carros, más pequeños por la distancia */
+.esc19 .e-avenida{position:absolute; left:0; right:0; top:calc(var(--yU) - 76px); height:56px; background:linear-gradient(180deg,#6A768B,#5A667A); border-top:3px solid #B4C0D2;}
+.esc19 .e-av-linea{position:absolute; left:0; right:0; top:26px; border-top:2px dashed rgba(255,255,255,.55);}
+.esc19 .e-trafico{position:absolute; inset:0;}
+.esc19 .e-veh{position:absolute; left:0; top:0; will-change:transform; transform-origin:0 0;}
+.esc19 .e-veh svg{display:block; width:100%; height:auto;}
+/* acera con el borde pintado como en los paraderos del SETP (rojo y amarillo) y calle del frente */
+.esc19 .e-acera{position:absolute; left:0; right:0; top:calc(var(--yU) - 22px); height:36px; background:linear-gradient(180deg,#DCE4EE 0%, #C4D0DF 100%); border-top:3px solid #EEF3F9; box-shadow:0 -6px 14px rgba(11,31,92,.12);}
+.esc19 .e-acera::after{content:""; position:absolute; left:0; right:0; bottom:-8px; height:8px; background:linear-gradient(180deg,#F2B01E 0 3px,#D6432C 3px 8px);}
+.esc19 .e-calle{position:absolute; left:0; right:0; top:calc(var(--yU) + 14px); bottom:0; background:linear-gradient(180deg,#505C74 0%, #3C465C 100%);}
+.esc19 .e-linea{position:absolute; left:0; right:0; top:calc(var(--yU) + (var(--yF) - var(--yU)) * .5 + 30px); height:0; border-top:3px dashed rgba(255,255,255,.5);}
+.esc19 .e-cebra{position:absolute; left:calc(var(--zx) - var(--zw) / 2); width:var(--zw); top:calc(var(--yU) + 14px); height:calc(var(--yF) - var(--yU) + 24px); overflow:visible;}
+.esc19 .e-podo{position:absolute; left:calc(var(--zx) - var(--zw) / 2 - 4px); width:calc(var(--zw) + 8px); top:calc(var(--yU) + 4px); height:9px; background:repeating-linear-gradient(90deg,#F2B01E 0 7px,#C98A00 7px 9px); border-radius:2px;}
+.esc19.sin-cebra .e-cebra,.esc19.sin-cebra .e-podo,.esc19.sin-cebra .e-semaforo{display:none;}
+/* farolas, paradero tipo III (banderín) y semáforo peatonal con cuenta regresiva */
+.esc19 .e-prop{position:absolute; display:block;}
+.esc19 .e-poste{left:calc(var(--zx) - var(--zw) / 2 - var(--su) * .62); bottom:calc(100% - var(--yU) + 4px); width:calc(var(--su) * .26); height:calc(var(--su) * 1.2);}
+.esc19 .e-poste2{left:calc(var(--px) + var(--su) * .42); bottom:calc(100% - var(--yU) + 4px); width:calc(var(--su) * .26); height:calc(var(--su) * 1.2);}
+.esc19 .e-paradero{left:calc(var(--px) - var(--su) * .17); bottom:calc(100% - var(--yU) + 4px); width:calc(var(--su) * .34); height:var(--ph,calc(var(--su) * 1.9));}
+.esc19 .e-semaforo{position:absolute; left:calc(var(--zx) - var(--zw) / 2 - var(--su) * .3); bottom:calc(100% - var(--yU) + 4px); width:calc(var(--su) * .26); height:calc(var(--su) * .86);}
+.e-semaforo .s-caja{position:absolute; left:50%; top:0; width:76%; transform:translateX(-50%); background:#10161F; border-radius:7px; padding:5% 0 7%; display:flex; flex-direction:column; align-items:center; gap:7%;}
+.e-semaforo .s-lente{width:78%; aspect-ratio:1; border-radius:50%; background:#1B2431; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.e-semaforo .s-n{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:calc(var(--su) * .095); color:#E5483B; letter-spacing:-.04em; line-height:1;}
+.e-semaforo svg{width:70%; height:70%; display:block;}
+.e-semaforo .s-rojo{fill:#E5483B; opacity:.2;} .e-semaforo .s-verde{fill:#2FD07D; opacity:.2;}
+.esc19[data-luz="rojo"] .s-rojo{opacity:1;} .esc19[data-luz="verde"] .s-verde{opacity:1;}
+.esc19[data-luz="verde"] .s-n{color:#2FD07D;} .esc19[data-luz="parpadeo"] .s-n{color:#2FD07D; animation:evParp .5s steps(1) infinite;}
+.esc19[data-luz="parpadeo"] .s-verde{animation:evParp .5s steps(1) infinite;}
+@keyframes evParp{0%{opacity:1;} 50%{opacity:.15;}}
+.e-semaforo .s-poste{position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:9%; top:62%; background:#9AA7BF; border-radius:2px;}
+
+
+.esc19 .e-v{animation:evBrilla 6s ease-in-out infinite;} .esc19 .e-v:nth-of-type(3n){animation-delay:-2.3s;} .esc19 .e-v:nth-of-type(5n){animation-delay:-4.1s;}
+@keyframes evBrilla{0%,100%{opacity:.8;} 50%{opacity:.25;}}
+/* ---- el QR como señal de parada (tótem sobre la acera) ---- */
+.qr-hero{position:relative; margin:.6vh 0 0; align-self:flex-start; margin-bottom:clamp(64px,13vh,150px);}
+.qr-senal{position:relative; width:clamp(150px,14.6vw,300px); z-index:1; filter:drop-shadow(0 12px 14px rgba(11,31,92,.28));}
+.sn-placa{background:#fff; border-radius:14px 14px 0 0; padding:10px 14px; display:flex; align-items:center; justify-content:center;}
+.sn-placa img{height:clamp(30px,3.3vw,72px); width:auto; display:block;}
+.sn-tablero{position:relative; background:#1767B8; border-radius:0 0 16px 16px; padding:7px; box-shadow:inset 0 0 0 3px #fff;}
+.sn-cab{display:flex; align-items:center; gap:8px; padding:5px 8px 7px; color:#fff; line-height:1;}
+.sn-cab svg{flex:none; width:clamp(20px,2vw,32px); height:auto;}
+.sn-cab b{font-family:Barlow,sans-serif; font-weight:800; white-space:nowrap; font-size:clamp(10px,1vw,22px); letter-spacing:.02em; text-transform:uppercase; display:block;}
+.sn-qr{position:relative; background:#fff; border-radius:10px; padding:7px; aspect-ratio:1;}
+.sn-qr img{width:100%; height:100%; object-fit:contain; display:block; border-radius:6px; transition:filter .3s ease, opacity .3s ease;}
+.sn-pie{padding:8px 6px 5px; color:#fff; text-align:center; line-height:1.15;}
+.sn-pie b{font-family:Barlow,sans-serif; font-weight:800; font-size:clamp(11px,1.05vw,24px); display:block;}
+.sn-base{height:9px; width:112%; margin-left:-6%; background:linear-gradient(180deg,#8895AD,#5C6A85); border-radius:3px 3px 5px 5px;}
+.qr-candado{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(11,31,92,.9); border-radius:10px; color:#fff; text-align:center; padding:8px;}
+.qr-candado-ico{font-size:1.6rem; animation:flotarKF 2.2s ease-in-out infinite;}
+.qr-candado span:last-child{font-size:clamp(8px,.72vw,13px); font-weight:700; line-height:1.3;}
+.qr-hero.bloqueado .sn-qr img{filter:blur(7px); opacity:.45;}
+.qr-hero.bloqueado .qr-candado{display:flex;}
+.qr-escanea{position:absolute; right:-10px; top:-16px; background:var(--green,#26B67A); color:#fff; font-size:clamp(9px,.78vw,14px); font-weight:800; padding:4px 10px; border-radius:999px; box-shadow:var(--shadow); opacity:0; transform:scale(.7) rotate(4deg); transition:opacity .3s, transform .3s; z-index:3;}
+.qr-hero:not(.bloqueado) .qr-escanea{opacity:1; transform:scale(1) rotate(4deg);}
+.qr-scan{position:absolute; left:7px; right:7px; top:7px; height:3px; border-radius:2px; background:linear-gradient(90deg,rgba(21,155,214,0),#159BD6 20%,#159BD6 80%,rgba(21,155,214,0)); opacity:0; pointer-events:none;}
+.qr-hero:not(.bloqueado) .qr-scan{opacity:.9; animation:qrBarrido 3.4s cubic-bezier(.23,1,.32,1) infinite;}
+@keyframes qrBarrido{0%{transform:translateY(0); opacity:0;} 12%{opacity:.9;} 70%{transform:translateY(calc(var(--qrh,150px) - 14px)); opacity:.9;} 100%{transform:translateY(calc(var(--qrh,150px) - 14px)); opacity:0;}}
+
+/* ---- el titular como pantalla LED de bus: destino + testigo de la parada (verde = abierta) + aro que se enciende cuando entra alguien ---- */
+.s19-cab{position:relative; z-index:2;}
+.s19-led{position:relative; display:inline-block; background:#0B1220; border-radius:18px; padding:clamp(14px,1.7vw,36px) clamp(18px,2vw,40px); box-shadow:0 16px 28px -10px rgba(11,31,92,.55), inset 0 0 0 2px #26324A; max-width:min(100%,49vw);}
+.s19-ruta{display:flex; align-items:center; gap:clamp(12px,1.3vw,26px);}
+.s19-num{flex:none; width:clamp(46px,5vw,96px); aspect-ratio:1; border-radius:50%; background:#F6B91D; color:#0B1220; display:flex; align-items:center; justify-content:center; font-family:Barlow,sans-serif; font-weight:800; font-size:clamp(22px,2.5vw,50px); line-height:1;}
+.s19-tit{margin:0; font-size:clamp(28px,3.2vw,70px); line-height:1.04; letter-spacing:-.01em; color:#FFC21A; text-transform:uppercase;}
+.s19-tit span{display:block;}
+.s19-lamp{flex:none; align-self:flex-start; width:clamp(12px,1.05vw,22px); aspect-ratio:1; border-radius:50%; background:#E5484D; margin-left:clamp(2px,.4vw,8px);}
+.s19-led[data-abierto="1"] .s19-lamp{background:#2FD07F; animation:ledTestigo 1.8s ease-in-out infinite;}
+@keyframes ledTestigo{0%,100%{opacity:1;} 50%{opacity:.35;}}
+.s19-pantalla{position:absolute; inset:0; border-radius:18px; overflow:hidden; pointer-events:none; z-index:1;}
+.s19-brillo{position:absolute; inset:0; pointer-events:none; background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.12) 50%,transparent 62%); transform:translateX(-120%);}
+.s19-pantalla::after{content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(circle at 50% 50%, rgba(11,18,32,.32) 0 1.1px, transparent 1.6px); background-size:4px 4px;}
+.s19-ring{position:absolute; inset:-5px; border:3px solid #FFC21A; border-radius:22px; opacity:0; pointer-events:none; z-index:2;}
+@media (prefers-reduced-motion:reduce){.esc19 *{animation:none!important;} .qr-scan{display:none;} .s19-ring{display:none;}}
+::selection{background:#159BD6; color:#fff;}
+:focus-visible{outline:3px solid #159BD6; outline-offset:2px;}

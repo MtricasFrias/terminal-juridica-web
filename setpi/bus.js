@@ -11,6 +11,11 @@
   const VB = { x: -12, y: 0, w: 356, h: 172 };         // el suelo está en y=156
   const BODY = '#2A62B8', BODY2 = '#1F4E97', PINK = '#D6488E', GLASS = '#86B6E6', DARK = '#0D1623';
   const wheel = cx => '<circle cx="' + cx + '" cy="142" r="15" fill="#141E2C"/><circle cx="' + cx + '" cy="142" r="6.4" fill="#96A0AF"/><circle cx="' + cx + '" cy="142" r="2.4" fill="#141E2C"/>';
+  const DOOR =
+    '<rect x="34" y="20" width="78" height="8" rx="3" fill="' + BODY2 + '"/>' +
+    '<rect x="34" y="24" width="8" height="122" rx="3" fill="' + BODY + '"/><rect x="104" y="24" width="8" height="122" rx="3" fill="' + BODY + '"/>' +
+    '<rect x="47" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="95" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/>' +
+    '<rect x="40" y="142" width="66" height="4" fill="#F2B01E"/>';
   const BACK =
     '<ellipse cx="170" cy="157" rx="176" ry="6" fill="rgba(3,10,32,.45)"/>' +
     '<rect x="0" y="2" width="332" height="142" rx="16" fill="' + BODY + '"/>' +
@@ -22,18 +27,14 @@
     '<rect x="40" y="24" width="66" height="120" rx="6" fill="' + DARK + '"/>' +
     '<rect x="40" y="24" width="66" height="120" rx="6" fill="url(#spbi)"/>' +
     '<rect x="40" y="130" width="66" height="14" fill="#2c3a4d"/>' +
-    '<rect x="47" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="95" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="40" y="142" width="66" height="4" fill="#F2B01E"/>' +
+    DOOR +
     '<rect x="116" y="28" width="56" height="64" rx="6" fill="' + GLASS + '"/>' +                     /* ventanilla grande tras la puerta (SETPI se asoma aquí) */
     [0, 1, 2, 3].map(i => '<rect x="' + (180 + i * 38) + '" y="28" width="32" height="64" rx="5" fill="' + GLASS + '"/>').join('') +
     wheel(142) + wheel(262) +
     '<path d="M121 140 a21 21 0 0 1 42 0 Z" fill="' + BODY2 + '" opacity=".0"/>' +
     '<rect x="-2" y="108" width="8" height="14" rx="3" fill="#FFE282"/>' +
     '<rect x="-9" y="44" width="9" height="16" rx="3" fill="#233447"/>';
-  const FRONT =
-    '<rect x="34" y="20" width="78" height="8" rx="3" fill="' + BODY2 + '"/>' +
-    '<rect x="34" y="24" width="8" height="122" rx="3" fill="' + BODY + '"/><rect x="104" y="24" width="8" height="122" rx="3" fill="' + BODY + '"/>' +
-    '<rect x="47" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/><rect x="95" y="30" width="4.5" height="114" rx="2" fill="#F2B01E"/>' +
-    '<rect x="40" y="142" width="66" height="4" fill="#F2B01E"/>';
+  const FRONT = DOOR;
   const DEFS = '<defs><linearGradient id="spbi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1623"/><stop offset="1" stop-color="#26364b"/></linearGradient></defs>';
 
   function mkSvg(inner, cls) {

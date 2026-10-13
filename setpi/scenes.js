@@ -109,14 +109,35 @@
       S.sayClear(a); a.fx('spark', { n: 12 });
       await a.play([{ f: 'trophy_2', t: .45, fade: .06 }, { f: 'trophy_3', t: 1.1, fade: .06, sway: { a: 1.4, p: 1.4 } }, { f: 'trophy_4', t: .55, fade: .06 }, { f: 'idle_a', t: .06, fade: .08 }]); fin();
     }, ['trophy']);
-    /* cruza la calle por la cebra: mira a los dos lados y camina (de frente hacia la cámara, de espaldas al volver) */
-    def('cruzar', 'move', 45, c => c.l.zebra ? (c.ph === 'quiz' ? .5 : 2.2) : 0, async () => {
-      const l = L(), z = l.zebra; if (!z || !P.valid(z.x, l.yU) || !P.valid(z.x, l.yL)) return SC.wander.run();
-      const down = Math.abs(a.y - l.yU) < Math.abs(a.y - l.yL), y0 = down ? l.yU : l.yL, y1 = down ? l.yL : l.yU;
-      P.setState('WALKING'); await P.goTo(z.x, y0); await P.front(); await hold(.3);
-      await a.play(C.around()); fin();
-      if (Math.random() < .45) await chat(down ? 'Siempre por la cebra' : 'Primero miro a los dos lados', 45);
-      await P.goTo(z.x, y1); await P.front();
+    /* cruza la calle por la cebra SOLO con el semáforo peatonal en verde (en rojo pasan los carros y SETPI se queda en la acera);
+       sobre la cebra hace algo (saluda, baila, se toma una selfie...) y vuelve a la acera antes de que parpadee */
+    const cebraBag = shuffleBag(['saludo', 'baile', 'selfie', 'pulgar', 'animo']);
+    def('cruzar', 'move', 40, c => {
+      if (!c.l.zebra) return 0;
+      if (D.mundo && !D.mundo.hold) return (D.luz === 'verde' && D.luzRest > 8) || (D.luz === 'rojo' && D.luzRest < 7) ? (D.t - (D.last.cruzar || -999) > 75 ? 6 : 2.2) : 0;
+      return c.ph === 'quiz' ? .4 : 1.2;
+    }, async () => {
+      const l = L(), z = l.zebra; if (!z) return SC.wander.run();
+      const libre = !D.mundo || D.mundo.hold;
+      P.setState('WALKING'); await P.goTo(z.x, l.yU, { noZebra: true }); await P.front(); await hold(.25);
+      if (!libre && D.luz !== 'verde') {                                   // espera el verde mirando el semáforo
+        await chat('Espero el verde…', 45);
+        if (have('watch')) { await a.play(C.watch(1)); fin(); }
+        for (let i = 0; i < 45 && D.luz !== 'verde'; i++) await a.wait(.4);
+        if (D.luz !== 'verde') return;
+      }
+      await a.play(C.around()); fin();                                     // mira a los dos lados
+      if (!libre && D.luzRest < 6) return;
+      await P.goTo(z.x, l.yL, { noZebra: true }); await P.front();         // baja por la cebra
+      let v = cebraBag(); if (!libre && D.luzRest < 8 && (v === 'baile' || v === 'selfie')) v = 'pulgar';
+      if (v === 'baile' && !have('dance')) v = 'saludo'; if (v === 'selfie' && !have('selfie')) v = 'saludo'; if (v === 'animo' && !have('cheer')) v = 'pulgar';
+      if (!libre && D.luzRest < 3.8) v = '';
+      if (v === 'saludo') { if (have('wavew')) { await a.play(C.waveW(2)); fin(); } else await P.wave(1, { force: true }); }
+      else if (v === 'baile') { await noteWhile(C.dance(1), .55, 3); fin(); }
+      else if (v === 'selfie') { const pl = a.play(C.selfie()); await hold(1); a.fx('flash'); await pl; fin(); }
+      else if (v === 'pulgar') await P.thumbs();
+      else if (v === 'animo') { a.fx('spark', { n: 6 }); await a.play(C.cheer()); fin(); }
+      await P.goTo(z.x, l.yU, { noZebra: true }); await P.front();         // de vuelta a la acera
       if (Math.random() < .4) { await hold(.4); await a.play(C.lookUser()); fin(); }
     });
     /* antes del PIN: se acerca al candado, niega con la cabeza y señala el campo del PIN */
@@ -130,7 +151,7 @@
     /* esconderse detrás del panel de la sala y asomarse (capas reales: el panel va por delante) */
     def('peekaboo', 'hide', 60, c => (c.ph === 'pin' || c.ph === 'lobby') && c.l.canHide ? (c.n <= 3 ? 2.6 : 1.2) : 0, async () => {
       const l = L(); if (!l.canHide) return SC.lookAround.run();
-      const y = l.oneLane ? l.yU : (Math.random() < .5 ? l.yL : rnd(l.yU, l.yL)); P.setState('HIDING');
+      const y = l.oneLane ? l.yU : Math.min(P.maxY(), Math.random() < .5 ? l.yL : rnd(l.yU, l.yL)); P.setState('HIDING');
       await P.goTo(l.xMaxAt(y) - .08 * a.S, y); await P.toR(1); await hold(.35);
       const hideX = l.hideX(); await P.runLeg(hideX, y, { speed: .95 });
       await hold(rnd(.9, 1.6));
@@ -202,6 +223,7 @@
       const apply0 = bus.apply;
       P.setState('RIDING'); D.riding = true; D.rides = (D.rides || 0) + 1; D.lastRideT = D.t;      // la primera vez pesa x4: que se vea pronto
       try {
+        if (l.zebra && a.y > l.yU + 10) { await P.emerge(); await P.goTo(l.zebra.x, l.yU, { noZebra: true, free: false }); }   // viene de la calle: primero a la acera
         if (D.busTarget && Math.random() < .5) await SC.busWave.run();
         await P.goTo(g.xn - g.wait * g.s, g.y); P.setState('RIDING');
         await P.toR(1); await hold(.35); a.fx('alert'); await P.sayNow('¡Ahí viene mi bus!'); await hold(1); S.sayClear(a); D.lastSayT = D.t;
@@ -227,21 +249,31 @@
         await a.tween('x', xe, 1.9, 'out', bus); bus.front = true; bus.apply();
         await a.tween('dy', 3 * g.k, .12, 'out', bus); await a.tween('dy', 0, .22, 'io', bus);
         await hold(.3);
-        if (have('bexit')) {
-          const x0 = xe + RIDE.e1 * g.s; a.autoIdle = false; a.stance = 'R'; a.face(1); a.place(x0, g.y); a.lift = RIDE.el1 * g.s; a.show(true);
-          await a.play([{ f: 'bexit_1', t: .12, a: .35 }, { f: 'bexit_1', t: .1, a: .7 }, { f: 'bexit_1', t: .5 }]);
-          fire([{ f: 'bexit_2', t: .4, fade: .05 }]); await Promise.all([a.tween('x', xe + RIDE.e2 * g.s, .34, 'io'), a.tween('lift', RIDE.el2 * g.s, .34, 'io')]);
-          fire([{ f: 'bexit_4', t: .5, fade: .04 }]); await Promise.all([a.tween('x', xe + RIDE.e3 * g.s, .42, 'out'), a.tween('lift', .2 * g.s, .2, 'out')]); await a.tween('lift', 0, .22, 'in'); a.fx('dust', { n: 3 });
-          await a.play([{ f: 'bexit_3', t: .55, fade: .05 }]);
+        if (have('jumpf')) {
+          const J = C.jumpF, x0 = xe + RIDE.door * g.s, h0 = RIDE.l3 * g.s;
+          a.autoIdle = false; a.stance = 'F'; a.face(1); a.place(x0, g.y); a.lift = h0; a._setPose({ f: 'idle_a', a: 0, br: .4 }); a.show(true);
+          await Promise.all([a.tween('a', 1, .32, 'out', a.mod), a.tween('br', 1, .32, 'lin', a.mod)]);      // sale de la sombra de la puerta
+          await hold(.18);
+          await a.play(J.crouch);                                                                                 // se agacha para bajar
+          bus.front = false; bus.apply();                                                                         // sale de la puerta: ya va por delante de todo el bus
+          fire(J.air);
+          const arco = (async () => { await a.tween('lift', h0 + .16 * g.s, .17, 'out'); await a.tween('lift', 0, .26, 'in'); })();
+          await Promise.all([a.tween('x', x0 - .55 * g.s, .43, 'lin'), a.tween('y', g.y + .035 * g.s, .43, 'io'), arco]);   // arco: sube, avanza y cae
+          a.fx('dust', { n: 3 });
+          await a.play(J.land);
         } else { const sp = P.spot({ lane: 'L', minDist: 0 }); a.cancel(); await P.enter(sp.x, sp.y, 1.9); }
         a.stance = 'F'; a.rest('F');
-        bus.front = false; bus.apply();
         a.tween('x', -(VBW * g.k) - 80, 3.1, 'in3', bus).then(() => bus.show(false)).catch(() => { });     // el bus se va por detrás del contenido
         const sp = P.spot({ lane: 'L', minDist: 0 }); await P.goTo(sp.x, sp.y, { speed: 1.4 });           // SETPI se aparta a la carretera (más cerca de la cámara)
         await P.front(); await hold(.3); await P.sayNow('¡Ya volví! ¿Listos?'); await P.wave(2, { force: true }); await hold(.5); S.sayClear(a); D.lastSayT = D.t;
       } finally { bus.apply = apply0; a.lift = 0; D.riding = false; D.away = false; if (bus) bus.show(false); a.mod.a = 1; a.mod.br = 1; a.clipL = -1e9; a.noShadow = false; if (!a.scaleAt) a.scaleAt = y => L().sAt(y); }
     });
 
+    /* si el semáforo peatonal empieza a parpadear (o se pone en rojo) y SETPI sigue en la calle, vuelve a la acera por la cebra */
+    D.onLuz = (n) => {
+      if ((n !== 'parpadeo' && n !== 'rojo') || !a.visible || D.riding || !L().zebra) return;
+      if (a.y > L().yU + 10) D.interrupt(async () => { P.setState('WALKING'); await P.emerge(); await P.goTo(L().zebra.x, L().yU, { noZebra: true, free: false }); await P.front(); }, 120);
+    };
     /* ================= programador ================= */
     D.note = k => { D.last[k] = D.t; D.lastRun = k; D.hist.push(k); if (D.hist.length > 10) D.hist.shift(); D.famHist.push(SC[k] && SC[k].fam); if (D.famHist.length > 4) D.famHist.shift(); D.uses[k] = (D.uses[k] || 0) + 1; };
     D.pick = () => {
@@ -454,6 +486,7 @@
       if (have('bow')) { await a.play(C.bow()); } fin();
     }
     D.setPhase = function (p) {
+      if (D.mundo) D.mundo.fase(p);
       if (D.phase === p) return; D.phase = p; P.markActive(); D.attentive = false;
       if (p === 'quiz') D.interrupt(quizStart, 3, true);
       else if (p === 'podium') D.interrupt(announce, 3, true);
