@@ -594,7 +594,7 @@ function store(k, v){
    - en la página alojada fuera de Google (GitHub Pages, tu sitio): fetch, que no depende de las cuentas de Google del navegador.
    (Las barras de la dirección van escapadas: Google recorta el código que tenga dos barras seguidas dentro de un texto.) */
 const API_URL = "https:\/\/script.google.com\/macros\/s\/AKfycbwh302sYjlWRCTS20Gxzsj8T_u7Iw7bmPA3d-RcVZ0bCPAmp0thRFHKaX_m3gfFpiTQNg\/exec";
-const MATRIZ_URL = "docs.google.com/spreadsheets/d/1pdnlOT82Rqsldhg4fXwW_5BqsrFC1CTn/edit";   // enlace de la Matriz de procesos en Google Hojas, SIN https:// (se arma abajo)
+const MATRIZ_URL = "";   // enlace de la Matriz de procesos en Google Hojas, SIN https:// (se arma abajo)
 function api(fn, ...args){
   return (window.google && google.script && google.script.run) ? apiGoogle(fn, args) : apiWeb(fn, args);
 }
