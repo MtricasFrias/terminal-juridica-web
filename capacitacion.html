@@ -377,6 +377,21 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 .board3 .nota3{background:none; box-shadow:none; padding:0; font-size:26px;}
 
 .g3 .card3{justify-content:center;}
+
+/* ---- glosario ---- */
+.gl{flex:1; min-height:0; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:24px;}
+.gl>.a{display:flex;}
+.gl-t{flex:1; display:flex; flex-direction:column; gap:16px; background:#fff; border-radius:26px; box-shadow:0 13px 28px -13px rgba(11,31,92,.4); padding:28px 26px;}
+.gl-h{display:flex; align-items:center; gap:14px;}
+.gl-n{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 28px/1 var(--f-cond);}
+.gl-t h3{margin:0; font:700 46px/1.05 var(--f-cond); letter-spacing:0; color:var(--s-navy);}
+.gl-t p{margin:0; font:500 32px/1.35 'Public Sans',sans-serif; color:var(--s-ink);}
+.gl-t p b{color:var(--s-navy);}
+.slide.activa .gl>.a .gl-n{animation:glNum .6s var(--ease) both; animation-delay:calc(.55s + var(--i, 0) * var(--paso, 1s));}
+@keyframes glNum{from{transform:scale(.6);} to{transform:none;}}
+
+.slide.final .gl>.a .gl-n{animation:none;}
+.gl-t{justify-content:flex-start;}
 </style>
 <link rel="stylesheet" href="setpi/setpi.css">
 <link rel="stylesheet" href="setpi/escena.css?v=19">
@@ -553,6 +568,12 @@ C("terminal", "La Terminal Jurídica", "Herramienta del Área Jurídica",
 C("demoqr", "Pruébala ahora", "Terminal Jurídica",
   `<div class="qr3">` + A(0, `<div class="qc"><img src="qr_herramienta.png" alt="Código QR de acceso a la Terminal Jurídica"><span class="url">mtricasfrias.github.io/terminal-juridica-web</span></div>`) +
   `<div style="display:flex;flex-direction:column;gap:17.28px">` + [["1", "Escanea el código", "Con la cámara de tu celular."], ["2", "Elige «Entrar solo a consultar»", "No necesitas usuario ni clave."], ["3", "Recorre la Vista general", "Y revisa la pestaña Normativa."]].map((c, i) => A(i + 1, `<div class="paso4"><b>${c[0]}</b><p>${c[1]}<small>${c[2]}</small></p></div>`)).join("") + `</div></div>`);
+
+/* ---------- glosario: los bloques suben solos, uno por uno ---------- */
+const glTile = (n, t, d) => `<div class="gl-t"><div class="gl-h"><b class="gl-n">${n}</b><h3>${t}</h3></div><p>${d}</p></div>`;
+const glosario = (id, parte, lista) => C(id, "Glosario de términos clave", parte, `<div class="gl">${lista.map((x, i) => A(i, glTile(x[0], x[1], x[2]), "", "--paso:.95s")).join("")}</div>`);
+glosario("glosario1", "Parte 1 de 2", [[1, "Derecho de petición", "Pedir algo a una entidad y recibir una respuesta oportuna y de fondo."], [2, "PQR", "Peticiones, quejas y reclamos: así se clasifican las comunicaciones de las personas."], [3, "Petición", "Solicitud de información, de documentos o de atención a un asunto."], [4, "Queja", "Inconformidad por una situación, conducta o atención recibida."], [5, "Reclamo", "Inconformidad porque algo no se cumplió bien; se pide revisarlo o solucionarlo."], [6, "Consulta", "Pide a la entidad su opinión sobre un tema de sus funciones. Regla general: <b>30 días hábiles</b>."], [7, "Concepto", "Opinión o explicación que da la entidad tras analizar una consulta."], [8, "Competencia", "Asuntos que le corresponde atender a la entidad según sus funciones."]]);
+glosario("glosario2", "Parte 2 de 2", [[9, "Respuesta de fondo", "Contesta realmente lo que la persona solicitó."], [10, "Prórroga", "Más plazo para responder, cuando se cumplen los requisitos legales."], [11, "Acto administrativo", "Decisión oficial de una entidad pública que produce efectos legales."], [12, "Requerimiento", "Solicitud formal para entregar información, documentos o cumplir una actuación."], [13, "Traslado por competencia", "Enviar la solicitud a la entidad que sí debe atenderla."], [14, "Recurso", "Mecanismo para pedir que se revise una decisión, cuando la ley lo permite."], [15, "Tutela", "Mecanismo judicial para proteger derechos fundamentales, si se cumplen los requisitos."], [16, "Trazabilidad", "Conocer el recorrido de una solicitud desde que llega hasta que se responde o se cierra."]]);
 
 /* ---------- normativa de referencia ---------- */
 C("normativa", "Normativa de referencia", "Fuentes para consulta",
