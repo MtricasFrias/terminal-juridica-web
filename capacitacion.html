@@ -334,7 +334,7 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 .slide.cv3{background:linear-gradient(90deg,#0B1F5C 0 calc(var(--ox,0px) + 1036.8px * var(--k,1)),#E8EDF6 calc(var(--ox,0px) + 1036.8px * var(--k,1)) 100%); color:#fff;}
 .cv3 .stage{display:grid; grid-template-columns:1036.8px 1fr;}
 .cv3-izq{display:flex; flex-direction:column; min-height:0; position:relative; z-index:2; background:var(--s-navy);}
-.cv3-cab{padding:64px 57.6px 0; color:var(--s-yellow); font:600 29px/1.15 var(--f-cond); letter-spacing:.14em; text-transform:uppercase;}
+.cv3-cab{display:flex; align-items:center; gap:30px; padding:58px 57.6px 0; color:var(--s-yellow); font:600 36px/1.2 var(--f-cond); letter-spacing:.12em; text-transform:uppercase;}
 .cv3-cuerpo{flex:1; display:flex; flex-direction:column; justify-content:center; gap:36.72px; padding:0 57.6px 110px;}
 .cv3-cuerpo h1{margin:0; font:700 119.04px/.98 var(--f-cond); letter-spacing:0; color:#fff;}
 .cv3-cuerpo h1 em{font-style:normal; color:var(--s-yellow);}
@@ -342,8 +342,7 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 .cv3-cuerpo small{font:600 23.04px/1 var(--f-cond); letter-spacing:.09em; text-transform:uppercase; color:#9FB9E6;}
 .cv3-der{position:relative; background:#E8EDF6; overflow:hidden; color:var(--s-navy);}
 .cv3-der .marca{position:absolute; right:-38.4px; top:-64.8px; font:700 768px/1 var(--f-cond); color:#DCE4F1; pointer-events:none;}
-.cv3-logo{position:absolute; left:46px; top:40px; width:168px; height:auto; z-index:2;}
-.cv3-der .balanza{position:absolute; left:calc(50% + 40px); top:96px; width:520px; transform:translateX(-50%);}
+.cv3-der .balanza{position:absolute; left:calc(50% + 30px); top:190px; width:470px; transform:translateX(-50%);}
 .cv3-der .balanza .beam{transform-origin:200px 74px; animation:balKF 2.6s var(--ease) .5s both;}
 @keyframes balKF{0%{transform:rotate(-7deg);} 35%{transform:rotate(5deg);} 65%{transform:rotate(-2.5deg);} 100%{transform:rotate(0);}}
 .cv3-der .doc{position:absolute; left:46px; bottom:118px; width:440px; background:#fff; border-radius:17.28px; padding:23.76px 26.88px; box-shadow:0 15.12px 32.4px -12.96px rgba(11,31,92,.5);}
@@ -397,6 +396,15 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 .gl-set{flex:1; min-height:0; width:auto; max-width:78%; object-fit:contain; margin-top:6px;}
 .gl-cap{flex:none; margin-top:10px; font:700 30px/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:var(--s-navy);}
 @media (prefers-reduced-motion:reduce){.gl-bal .beam{animation:none;}}
+
+.cv3-logo-b{height:128px; width:auto; flex:none;}
+.cv3-sep{flex:none; width:3px; height:96px; background:rgba(255,255,255,.28);}
+.cv3-tags{position:absolute; left:46px; right:40px; top:58px; display:flex; flex-wrap:wrap; gap:14px; z-index:2;}
+.cv3-tags span{padding:8px 22px; border:3px solid var(--s-navy); border-radius:99px; background:rgba(255,255,255,.6); color:var(--s-navy); font:600 29px/1.2 var(--f-cond); letter-spacing:.07em; text-transform:uppercase; opacity:0; animation:aKF .7s var(--ease) both;}
+.cv3-tags span:nth-child(1){animation-delay:.35s;} .cv3-tags span:nth-child(2){animation-delay:.6s;} .cv3-tags span:nth-child(3){animation-delay:.85s;} .cv3-tags span:nth-child(4){animation-delay:1.1s;}
+.slide.final .cv3-tags span{animation:none; opacity:1;}
+.cv3-tope{position:absolute; left:-4000px; right:-4000px; top:0; height:14px; background:var(--s-yellow); z-index:3;}
+@media (prefers-reduced-motion:reduce){.cv3-tags span{animation:none; opacity:1;}}
 </style>
 <link rel="stylesheet" href="setpi/setpi.css">
 <link rel="stylesheet" href="setpi/escena.css?v=19">
@@ -415,7 +423,7 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 <script src="setpi/engine.js"></script>
 <script src="setpi/fx.js"></script>
 <script src="setpi/bus.js"></script>
-<script src="setpi/clips.js"></script>
+<script src="setpi/clips.js?v=19"></script>
 <script src="setpi/escena.js?v=19"></script>
 <script src="setpi/gente.js?v=18"></script>
 <script src="setpi/mundo.js"></script>
@@ -458,7 +466,7 @@ const card = (tag, cuerpo) => `<div class="card3 col3">${tag ? `<span class="tag
 /* ---------- portada: el tema es jurídico ---------- */
 slide("cover", "cv3", `<div class="stage">
   <div class="cv3-izq">
-    <div class="cv3-cab">Capacitación interna · SETP Ibagué</div>
+    <div class="cv3-cab"><img class="cv3-logo-b" src="img/setp-logo-blanco.png" alt="TransMusical SETP"><span class="cv3-sep"></span><span>Capacitación interna<br>SETP Ibagué</span></div>
     <div class="cv3-cuerpo">
       <h1>Derecho de petición: <em>términos</em> y respuesta de fondo</h1>
       <p>Cómo identificar la solicitud, asignar el término y coordinar una respuesta oportuna.</p>
@@ -466,7 +474,7 @@ slide("cover", "cv3", `<div class="stage">
     </div>
   </div>
   <div class="cv3-der">
-    <img class="cv3-logo" src="img/setp-logo-color.png" alt="TransMusical SETP">
+    <div class="cv3-tags"><span>Constitución · art. 23</span><span>Ley 1755 de 2015</span><span>Ley 1437 de 2011</span><span>Decreto 2591 de 1991</span></div>
     <div class="marca" aria-hidden="true">§</div>
     <svg class="balanza" viewBox="0 0 400 330" aria-hidden="true"><g fill="none" stroke="#0B1F5C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
       <path d="M200 60V284"/><path d="M128 298H272"/>
@@ -474,7 +482,7 @@ slide("cover", "cv3", `<div class="stage">
       <circle cx="200" cy="48" r="16" fill="#F2B418"/></g></svg>
     <div class="doc"><div class="sello">Radicado</div><small>Constitución · artículo 23</small><p>Permite presentar peticiones respetuosas a las autoridades por motivos de interés general o particular y obtener pronta resolución.</p></div>
   </div>
-  <div class="cv3-franja"></div>
+  <div class="cv3-tope"></div><div class="cv3-franja"></div>
 </div>`);
 
 /* ---------- 1. objetivo ---------- */
@@ -578,7 +586,7 @@ C("demoqr", "Pruébala ahora", "Terminal Jurídica",
 const glTile = (n, t, d) => `<div class="gl-t"><div class="gl-h"><b class="gl-n">${n}</b><h3>${t}</h3></div><p>${d}</p></div>`;
 const BAL = '<svg class="gl-bal" viewBox="0 0 400 330" aria-hidden="true"><g fill="none" stroke="#0B1F5C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M200 60V284"/><path d="M128 298H272"/><g class="beam"><path d="M64 74H336"/><path d="M64 74L34 188M64 74L94 188"/><path d="M336 74L306 188M336 74L366 188"/><path d="M18 188H110Q64 244 18 188Z" fill="#F2B418"/><path d="M290 188H382Q336 244 290 188Z" fill="#F2B418"/></g><circle cx="200" cy="48" r="16" fill="#F2B418"/></g></svg>';
 const glosario = (id, parte, rango, lista) => C(id, "Glosario de términos clave", parte, `<div class="gl">` +
-  A(0, `<div class="gl-c">${BAL}<img class="gl-set" src="setpi/f/lupa_2.webp" alt="SETPI con una lupa"><span class="gl-cap">${rango}</span></div>`, "", "grid-column:3;grid-row:1/3") +
+  A(0, `<div class="gl-c">${BAL}<img class="gl-set" src="setpi/f/lupa_3.webp" alt="SETPI con una lupa"><span class="gl-cap">${rango}</span></div>`, "", "grid-column:3;grid-row:1/3") +
   lista.map((x, i) => A(i + 1, glTile(x[0], x[1], x[2]), "", `grid-column:${(i < 4 ? 1 : 4) + (i % 2)};grid-row:${Math.floor((i % 4) / 2) + 1};--paso:.95s`)).join("") + `</div>`);
 glosario("glosario1", "Parte 1 de 2", "Términos 1 a 8", [[1, "Derecho de petición", "Pedir algo a una entidad y recibir una respuesta oportuna y de fondo."], [2, "PQR", "Peticiones, quejas y reclamos: forma de clasificar lo que presentan las personas."], [3, "Petición", "Solicitud de información, de documentos o de atención a un asunto."], [4, "Queja", "Inconformidad por una situación, conducta o atención recibida."], [5, "Reclamo", "Inconformidad porque algo no se cumplió bien; se pide revisarlo o solucionarlo."], [6, "Consulta", "Pide a la entidad su opinión sobre un tema de sus funciones. Regla general: <b>30 días hábiles</b>."], [7, "Concepto", "Opinión o explicación que da la entidad tras analizar una consulta."], [8, "Competencia", "Asuntos que le corresponde atender a la entidad según sus funciones."]]);
 glosario("glosario2", "Parte 2 de 2", "Términos 9 a 16", [[9, "Respuesta de fondo", "Contesta realmente lo que la persona solicitó."], [10, "Prórroga", "Más plazo para responder, cuando se cumplen los requisitos legales."], [11, "Acto administrativo", "Decisión oficial de una entidad pública que produce efectos legales."], [12, "Requerimiento", "Solicitud formal para entregar información, documentos o cumplir una actuación."], [13, "Traslado por competencia", "Enviar la solicitud a la entidad que sí debe atenderla."], [14, "Recurso", "Mecanismo para pedir que se revise una decisión, cuando la ley lo permite."], [15, "Tutela", "Mecanismo judicial para proteger derechos fundamentales, si se cumplen los requisitos."], [16, "Trazabilidad", "Conocer el recorrido de una solicitud desde que llega hasta que se responde o se cierra."]]);

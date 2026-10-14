@@ -67,7 +67,8 @@
     bench: n => { const r = [T('bench_1', .5, { fade: .16 })]; for (let i = 0; i < (n || 3); i++) r.push(T('bench_2', .5), T('bench_1', .45), T('bench_3', .5), T('bench_1', .45)); return r.concat([T('bench_1', .35), END()]); },
     /* analizar / revisar */
     think: () => [T('think_1', .85, { fade: .08 }), T('think_2', 1.05), T('think_3', .95), T('think_2', .75), T('think_1', .6), END()],
-    lupa: () => [T('lupa_1', .75, { fade: .08 }), T('lupa_2', 1.25), T('lupa_1', .5), T('lupa_2', .95), T('lupa_3', 1.15, { fade: .06 }), END()],
+    /* lupa_2 tiene la mano sin mango (corte defectuoso del dibujo): no se usa; se alternan los dos dibujos completos */
+    lupa: () => [T('lupa_1', .8, { fade: .08 }), T('lupa_3', 1.3, { fade: .06 }), T('lupa_1', .6, { fade: .06 }), T('lupa_3', 1.1, { fade: .06 }), END()],
     tablet: () => [T('tablet_1', .75, { fade: .08 }), T('tablet_2', 1.3), T('tablet_1', .5), T('tablet_2', .85), T('tablet_3', 1.05, { fade: .06 }), END()],
     shrug: () => [T('shrug_1', .95, { fade: .08 }), T('shrug_2', .35), T('shrug_1', .85), END()],
     armsx: n => [T('armsx_1', .4, { fade: .08 })].concat(rep([T('armsx_2', .38), T('armsx_1', .38)], n || 3), [END()]),
