@@ -379,19 +379,24 @@ body.en-quiz .lado-n,body.en-quiz .borde,body.en-quiz #guia-stage{display:none;}
 .g3 .card3{justify-content:center;}
 
 /* ---- glosario ---- */
-.gl{flex:1; min-height:0; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:24px;}
+.gl{flex:1; min-height:0; display:grid; grid-template-columns:1fr 1fr 400px 1fr 1fr; grid-template-rows:repeat(2,1fr); gap:24px;}
 .gl>.a{display:flex;}
-.gl-t{flex:1; display:flex; flex-direction:column; gap:16px; background:#fff; border-radius:26px; box-shadow:0 13px 28px -13px rgba(11,31,92,.4); padding:28px 26px;}
-.gl-h{display:flex; align-items:center; gap:14px;}
-.gl-n{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 28px/1 var(--f-cond);}
-.gl-t h3{margin:0; font:700 46px/1.05 var(--f-cond); letter-spacing:0; color:var(--s-navy);}
-.gl-t p{margin:0; font:500 32px/1.35 'Public Sans',sans-serif; color:var(--s-ink);}
+.gl-t{flex:1; display:flex; flex-direction:column; gap:14px; background:#fff; border-radius:26px; box-shadow:0 13px 28px -13px rgba(11,31,92,.4); padding:24px 22px;}
+.gl-h{display:flex; align-items:center; gap:12px;}
+.gl-n{flex:none; width:46px; height:46px; border-radius:50%; display:grid; place-items:center; background:var(--s-navy); color:#fff; font:700 26px/1 var(--f-cond);}
+.gl-t h3{margin:0; font:700 40px/1.05 var(--f-cond); letter-spacing:0; color:var(--s-navy);}
+.gl-t p{margin:0; font:500 28px/1.32 'Public Sans',sans-serif; color:var(--s-ink);}
 .gl-t p b{color:var(--s-navy);}
 .slide.activa .gl>.a .gl-n{animation:glNum .6s var(--ease) both; animation-delay:calc(.55s + var(--i, 0) * var(--paso, 1s));}
 @keyframes glNum{from{transform:scale(.6);} to{transform:none;}}
-
 .slide.final .gl>.a .gl-n{animation:none;}
-.gl-t{justify-content:flex-start;}
+.gl-c{flex:1; position:relative; display:flex; flex-direction:column; align-items:center; background:linear-gradient(180deg,#E8EEF8,#DCE6F4); border-radius:26px; padding:34px 18px 22px; overflow:hidden;}
+.gl-bal{width:330px; height:auto; flex:none;}
+.gl-bal .beam{transform-origin:200px 74px; animation:glSway 3.6s ease-in-out infinite alternate;}
+@keyframes glSway{from{transform:rotate(-3.5deg);} to{transform:rotate(3.5deg);}}
+.gl-set{flex:1; min-height:0; width:auto; max-width:78%; object-fit:contain; margin-top:6px;}
+.gl-cap{flex:none; margin-top:10px; font:700 30px/1 var(--f-cond); letter-spacing:.08em; text-transform:uppercase; color:var(--s-navy);}
+@media (prefers-reduced-motion:reduce){.gl-bal .beam{animation:none;}}
 </style>
 <link rel="stylesheet" href="setpi/setpi.css">
 <link rel="stylesheet" href="setpi/escena.css?v=19">
@@ -569,11 +574,14 @@ C("demoqr", "Pruébala ahora", "Terminal Jurídica",
   `<div class="qr3">` + A(0, `<div class="qc"><img src="qr_herramienta.png" alt="Código QR de acceso a la Terminal Jurídica"><span class="url">mtricasfrias.github.io/terminal-juridica-web</span></div>`) +
   `<div style="display:flex;flex-direction:column;gap:17.28px">` + [["1", "Escanea el código", "Con la cámara de tu celular."], ["2", "Elige «Entrar solo a consultar»", "No necesitas usuario ni clave."], ["3", "Recorre la Vista general", "Y revisa la pestaña Normativa."]].map((c, i) => A(i + 1, `<div class="paso4"><b>${c[0]}</b><p>${c[1]}<small>${c[2]}</small></p></div>`)).join("") + `</div></div>`);
 
-/* ---------- glosario: los bloques suben solos, uno por uno ---------- */
+/* ---------- glosario: tarjetas a los lados y, en el centro, la balanza con SETPI y su lupa; todo sube solo, paso a paso ---------- */
 const glTile = (n, t, d) => `<div class="gl-t"><div class="gl-h"><b class="gl-n">${n}</b><h3>${t}</h3></div><p>${d}</p></div>`;
-const glosario = (id, parte, lista) => C(id, "Glosario de términos clave", parte, `<div class="gl">${lista.map((x, i) => A(i, glTile(x[0], x[1], x[2]), "", "--paso:.95s")).join("")}</div>`);
-glosario("glosario1", "Parte 1 de 2", [[1, "Derecho de petición", "Pedir algo a una entidad y recibir una respuesta oportuna y de fondo."], [2, "PQR", "Peticiones, quejas y reclamos: así se clasifican las comunicaciones de las personas."], [3, "Petición", "Solicitud de información, de documentos o de atención a un asunto."], [4, "Queja", "Inconformidad por una situación, conducta o atención recibida."], [5, "Reclamo", "Inconformidad porque algo no se cumplió bien; se pide revisarlo o solucionarlo."], [6, "Consulta", "Pide a la entidad su opinión sobre un tema de sus funciones. Regla general: <b>30 días hábiles</b>."], [7, "Concepto", "Opinión o explicación que da la entidad tras analizar una consulta."], [8, "Competencia", "Asuntos que le corresponde atender a la entidad según sus funciones."]]);
-glosario("glosario2", "Parte 2 de 2", [[9, "Respuesta de fondo", "Contesta realmente lo que la persona solicitó."], [10, "Prórroga", "Más plazo para responder, cuando se cumplen los requisitos legales."], [11, "Acto administrativo", "Decisión oficial de una entidad pública que produce efectos legales."], [12, "Requerimiento", "Solicitud formal para entregar información, documentos o cumplir una actuación."], [13, "Traslado por competencia", "Enviar la solicitud a la entidad que sí debe atenderla."], [14, "Recurso", "Mecanismo para pedir que se revise una decisión, cuando la ley lo permite."], [15, "Tutela", "Mecanismo judicial para proteger derechos fundamentales, si se cumplen los requisitos."], [16, "Trazabilidad", "Conocer el recorrido de una solicitud desde que llega hasta que se responde o se cierra."]]);
+const BAL = '<svg class="gl-bal" viewBox="0 0 400 330" aria-hidden="true"><g fill="none" stroke="#0B1F5C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M200 60V284"/><path d="M128 298H272"/><g class="beam"><path d="M64 74H336"/><path d="M64 74L34 188M64 74L94 188"/><path d="M336 74L306 188M336 74L366 188"/><path d="M18 188H110Q64 244 18 188Z" fill="#F2B418"/><path d="M290 188H382Q336 244 290 188Z" fill="#F2B418"/></g><circle cx="200" cy="48" r="16" fill="#F2B418"/></g></svg>';
+const glosario = (id, parte, rango, lista) => C(id, "Glosario de términos clave", parte, `<div class="gl">` +
+  A(0, `<div class="gl-c">${BAL}<img class="gl-set" src="setpi/f/lupa_2.webp" alt="SETPI con una lupa"><span class="gl-cap">${rango}</span></div>`, "", "grid-column:3;grid-row:1/3") +
+  lista.map((x, i) => A(i + 1, glTile(x[0], x[1], x[2]), "", `grid-column:${(i < 4 ? 1 : 4) + (i % 2)};grid-row:${Math.floor((i % 4) / 2) + 1};--paso:.95s`)).join("") + `</div>`);
+glosario("glosario1", "Parte 1 de 2", "Términos 1 a 8", [[1, "Derecho de petición", "Pedir algo a una entidad y recibir una respuesta oportuna y de fondo."], [2, "PQR", "Peticiones, quejas y reclamos: forma de clasificar lo que presentan las personas."], [3, "Petición", "Solicitud de información, de documentos o de atención a un asunto."], [4, "Queja", "Inconformidad por una situación, conducta o atención recibida."], [5, "Reclamo", "Inconformidad porque algo no se cumplió bien; se pide revisarlo o solucionarlo."], [6, "Consulta", "Pide a la entidad su opinión sobre un tema de sus funciones. Regla general: <b>30 días hábiles</b>."], [7, "Concepto", "Opinión o explicación que da la entidad tras analizar una consulta."], [8, "Competencia", "Asuntos que le corresponde atender a la entidad según sus funciones."]]);
+glosario("glosario2", "Parte 2 de 2", "Términos 9 a 16", [[9, "Respuesta de fondo", "Contesta realmente lo que la persona solicitó."], [10, "Prórroga", "Más plazo para responder, cuando se cumplen los requisitos legales."], [11, "Acto administrativo", "Decisión oficial de una entidad pública que produce efectos legales."], [12, "Requerimiento", "Solicitud formal para entregar información, documentos o cumplir una actuación."], [13, "Traslado por competencia", "Enviar la solicitud a la entidad que sí debe atenderla."], [14, "Recurso", "Mecanismo para pedir que se revise una decisión, cuando la ley lo permite."], [15, "Tutela", "Mecanismo judicial para proteger derechos fundamentales, si se cumplen los requisitos."], [16, "Trazabilidad", "Conocer el recorrido de una solicitud desde que llega hasta que se responde o se cierra."]]);
 
 /* ---------- normativa de referencia ---------- */
 C("normativa", "Normativa de referencia", "Fuentes para consulta",
@@ -599,10 +607,11 @@ const Guia = (() => {
     Setpi.Frames.load("setpi/").then(() => { A_ = new Setpi.Actor(document.getElementById("guia-stage")); A_.setCap(Math.max(240, H() * .4)); ok = true; A_.show(true); A_.rest("F"); const f = ts => { raf = requestAnimationFrame(f); if (!activo || document.hidden) { last = 0; return; } const dt = Math.min(.05, (ts - (last || ts)) / 1000); last = ts; A_.update(dt); }; raf = requestAnimationFrame(f); cola.splice(0).forEach(g => g()); }).catch(() => { });
   }
   async function clip(fr) { if (!ok) return; try { A_.cancel(); await A_.play(fr); } catch (e) { return; } A_.rest("F"); }
-  function poner(x, y, s) { cuando(() => { A_.cancel(); A_.setS(s); A_.place(x, y); A_.face(1); A_.rest("F"); }); }
+  function poner(x, y, s) { cuando(() => { A_.cancel(); A_.show(true); A_.setS(s); A_.place(x, y); A_.face(1); A_.rest("F"); }); }
   return {
     init, activo(v) { activo = v; clearTimeout(tim); if (!v) cuando(() => A_.cancel()); },
     portada() { const S = 340, [x, y] = LZ(1920 - S * .5 - 40, 1018); poner(x, y, S * __lz.k); clearTimeout(tim); const ciclo = () => { clip(Setpi.C.lupa()); tim = setTimeout(ciclo, 11000); }; tim = setTimeout(ciclo, 2200); },
+    ocultar() { clearTimeout(tim); cuando(() => { A_.cancel(); A_.show(false); }); },
     casa() { const S = 96, [x, y] = LZ(1920 - S * .5 - 14, 1054); poner(x, y, S * __lz.k); clearTimeout(tim); tim = setTimeout(() => cuando(() => clip(Setpi.C.present())), 1600); }
   };
 })();
@@ -621,14 +630,14 @@ function montar() {
   const n = document.createElement("div"); n.className = "lado-n"; n.id = "lado-n"; document.body.appendChild(n);
   [["izq", "‹", "Diapositiva anterior"], ["der", "›", "Diapositiva siguiente"]].forEach(([c, t, a]) => { const b = document.createElement("button"); b.className = "borde " + c; b.textContent = t; b.setAttribute("aria-label", a); b.addEventListener("click", () => c === "izq" ? ir(IDX - 1, true) : ir(IDX + 1)); document.body.appendChild(b); });
   window.addEventListener("keydown", e => { if (/INPUT|TEXTAREA/.test((e.target || {}).tagName || "")) return; if (e.key === "f" || e.key === "F") { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => { }); else document.exitFullscreen(); } });
-  window.addEventListener("resize", () => { escala(); const id = SLIDES[IDX] && SLIDES[IDX].id; if (id === "cover") Guia.portada(); else if (id && id !== "cuestionario") Guia.casa(); });
+  window.addEventListener("resize", () => { escala(); const id = SLIDES[IDX] && SLIDES[IDX].id; if (id === "cover") Guia.portada(); else if (id && id.indexOf("glosario") === 0) Guia.ocultar(); else if (id && id !== "cuestionario") Guia.casa(); });
 }
 window.onSlide = function (i) {
   const id = SLIDES[i].id, b = document.body.classList;
   b.toggle("en-cover", id === "cover"); b.toggle("en-quiz", id === "cuestionario");
   const n = document.getElementById("lado-n"); if (n) n.textContent = String(i + 1).padStart(2, "0") + " / " + SLIDES.length;
   Guia.activo(id !== "cuestionario");
-  if (id === "cover") Guia.portada(); else if (id !== "cuestionario") Guia.casa();
+  if (id === "cover") Guia.portada(); else if (id.indexOf("glosario") === 0) Guia.ocultar(); else if (id !== "cuestionario") Guia.casa();
 };
 
 slide("cuestionario","dia",`
